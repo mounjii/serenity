@@ -2,7 +2,7 @@
 
 import { formatInTimeZone } from "date-fns-tz";
 import { useRouter } from "next/navigation";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { DEFAULT_PHONE_PREFIX, NOTE_MAX } from "@/lib/booking-rules";
 import { customerDetailsSchema } from "@/lib/booking-schema";
@@ -26,6 +26,7 @@ const STEPS: { id: Step; label: string }[] = [
 ];
 
 const SLOT_TAKEN_MESSAGE = "This time was just booked by someone else. Please choose another time.";
+const SLOT_REFRESH_MS = 30_000;
 const NETWORK_MESSAGE = "We couldn't reach the server. Please check your connection and try again.";
 
 function newIdempotencyKey(): string {
@@ -107,6 +108,22 @@ export default function BookingFlow({ services, days, initialServiceSlug }: Prop
       if (slotsRequest.current === controller) setSlotsLoading(false);
     }
   }, []);
+
+  // While the customer is choosing a time, keep the slots fresh: every 30 s and whenever the tab regains focus.
+  useEffect(() => {
+    if (step !== 3 || !serviceId || !date) return;
+    const refresh = () => {
+      if (!document.hidden) void loadSlots(serviceId, date, true);
+    };
+    const timer = window.setInterval(refresh, SLOT_REFRESH_MS);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [step, serviceId, date, loadSlots]);
 
   const chooseService = (id: string) => {
     setServiceId(id);

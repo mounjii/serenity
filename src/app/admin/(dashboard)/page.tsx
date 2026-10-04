@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { connection } from "next/server";
-import BookingList from "@/components/admin/BookingList";
+import { LiveBookingList } from "@/components/admin/LiveBookings";
 import StatusBadge from "@/components/admin/StatusBadge";
 import { ButtonLink } from "@/components/ui/Button";
 import { addDays, formatLongDate, isValidDateString } from "@/lib/time";
@@ -82,7 +82,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
 
       <section>
         <h2 className="mb-4 font-serif text-2xl text-ink">Today</h2>
-        <BookingList bookings={todayBookings} emptyText="No reservations today." />
+        <LiveBookingList bookings={todayBookings} emptyText="No reservations today." />
       </section>
 
       <section>
@@ -119,7 +119,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
             </form>
           </div>
         </div>
-        <BookingList bookings={rangeBookings} emptyText="No reservations for this period." showDate={range.from !== range.to} />
+        <LiveBookingList bookings={rangeBookings} emptyText="No reservations for this period." showDate={range.from !== range.to} />
       </section>
     </div>
   );

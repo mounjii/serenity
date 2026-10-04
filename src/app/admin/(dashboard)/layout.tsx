@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import AdminNav from "@/components/admin/AdminNav";
+import LiveBookings from "@/components/admin/LiveBookings";
+import { pollingCursor } from "@/server/admin/changes";
 import { getSession } from "@/server/auth/session";
 import { logoutAction } from "../actions";
 
@@ -25,7 +27,9 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
           <AdminNav />
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-5 py-8 sm:px-6 sm:py-10">{children}</main>
+      <main className="mx-auto max-w-6xl px-5 py-8 sm:px-6 sm:py-10">
+        <LiveBookings initialSince={pollingCursor()}>{children}</LiveBookings>
+      </main>
     </>
   );
 }
