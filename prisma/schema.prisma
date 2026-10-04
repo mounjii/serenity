@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum BookingStatus {
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum BookingSource {
+  ONLINE
+  ADMIN
+}
+
+enum NotificationRecipient {
+  CUSTOMER
+  OWNER
+}
+
+enum NotificationStatus {
+  SENT
+  FAILED
+}
+
+model Service {
+  id              String    @id @default(cuid())
+  slug            String    @unique @db.VarChar(80)
+  name            String    @db.VarChar(120)
+  description     String    @db.Text
+  durationMinutes Int
+  priceCents      Int
+  active          Boolean   @default(true)
+  sortOrder       Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  bookings        Booking[]
+
+  @@map("services")
+}
+
+model Therapist {
+  id        String    @id @default(cuid())
+  name      String    @db.VarChar(120)
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  bookings  Booking[]
+
+  @@map("therapists")
+}
+
+/// weekday: 0 = Sunday ... 6 = Saturday. Minutes are counted from local midnight (Africa/Casablanca).
+model OpeningHours {
+  id          Int     @id @default(autoincrement())
+  weekday     Int     @unique
+  openMinute  Int
+  closeMinute Int
+  closed      Boolean @default(false)
+
+  @@map("opening_hours")
+}
+
+/// date is a local calendar day (Africa/Casablanca), stored as a DATE.
+model ClosedDay {
+  id        String   @id @default(cuid())
+  date      DateTime @unique @db.Date
+  reason    String?  @db.VarChar(200)
+  createdAt DateTime @default(now())
+
+  @@map("closed_days")
+}
+
+/// All DateTime columns are stored in UTC.
+model Booking {
+  id              String            @id @default(cuid())
+  serviceId       String
+  service         Service           @relation(fields: [serviceId], references: [id])
+  therapistId     String
+  therapist       Therapist         @relation(fields: [therapistId], references: [id])
+  startAt         DateTime
+  endAt           DateTime
+  blockedUntil    DateTime
+  durationMinutes Int
+  priceCents      Int
+  customerName    String            @db.VarChar(80)
+  customerPhone   String            @db.VarChar(20)
+  note            String?           @db.VarChar(500)
+  status          BookingStatus     @default(CONFIRMED)
+  source          BookingSource     @default(ONLINE)
+  idempotencyKey  String?           @unique @db.VarChar(100)
+  cancelledAt     DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  notifications   NotificationLog[]
+
+  @@index([therapistId, startAt])
+  @@index([status, startAt])
+  @@index([updatedAt])
+  @@map("bookings")
+}
+
+model NotificationLog {
+  id        String                @id @default(cuid())
+  bookingId String
+  booking   Booking               @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  recipient NotificationRecipient
+  phone     String                @db.VarChar(20)
+  template  String                @db.VarChar(60)
+  payload   Json
+  provider  String                @db.VarChar(30)
+  status    NotificationStatus
+  error     String?               @db.Text
+  createdAt DateTime              @default(now())
+
+  @@index([createdAt])
+  @@map("notification_logs")
+}
