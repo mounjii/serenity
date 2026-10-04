@@ -43,15 +43,15 @@ export default async function ReservationPage({ searchParams }: PageProps<"/rese
               <span className="h-px w-8 bg-bronze/60" aria-hidden />
               Reservation
             </p>
-            <h1 className="animate-fade-up mt-5 max-w-md font-serif text-5xl leading-[1.05] text-ink [animation-delay:120ms] sm:text-6xl lg:text-7xl">
+            <h1 className="animate-fade-up mt-5 max-w-md font-serif text-5xl leading-[1.05] text-ink [animation-delay:80ms] sm:text-6xl lg:text-7xl">
               Book Your Massage
             </h1>
-            <p className="animate-fade-up mt-6 max-w-sm text-[0.95rem] leading-relaxed font-light text-ink-soft [animation-delay:240ms]">
+            <p className="animate-fade-up mt-6 max-w-sm text-[0.95rem] leading-relaxed font-light text-ink-soft [animation-delay:160ms]">
               Choose your treatment, pick a time that suits you and confirm in a minute.
             </p>
             <a
               href="#book"
-              className="animate-fade-up mt-8 inline-flex items-center gap-3 text-[0.7rem] tracking-[0.25em] text-ink uppercase [animation-delay:360ms] hover:text-olive"
+              className="animate-fade-up mt-8 inline-flex items-center gap-3 text-[0.7rem] tracking-[0.25em] text-ink uppercase [animation-delay:240ms] hover:text-olive"
             >
               Start booking
               <span className="grid h-8 w-8 place-items-center rounded-full border border-ink/25">

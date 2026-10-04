@@ -3,7 +3,8 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { serviceImage } from "@/lib/images";
 import { RESERVATION_PATH } from "@/lib/navigation";
-import { formatDuration, formatPrice } from "@/lib/format";
+import { formatDuration } from "@/lib/format";
+import { ArrowRight } from "./Icons";
 import { getActiveServices, type PublicService } from "@/server/booking/services";
 import Reveal from "./Reveal";
 
@@ -65,7 +66,7 @@ export default async function Treatments() {
             >
               <Link
                 href={`${RESERVATION_PATH}?service=${t.slug}`}
-                aria-label={`Book ${t.name}`}
+                aria-label={`${t.name}: details and prices`}
                 className="absolute inset-0 z-10"
               />
               <div className="relative aspect-[4/3] overflow-hidden">
@@ -82,15 +83,17 @@ export default async function Treatments() {
                 <p className="mt-3 flex-1 text-[0.8rem] leading-relaxed font-light text-muted">
                   {t.description}
                 </p>
-                <ul className="mt-6 space-y-1.5 border-t border-sand pt-4 text-[0.78rem] text-ink-soft">
+                <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="Durations">
                   {t.options.map((o) => (
-                    <li key={o.durationMinutes} className="flex items-baseline gap-2">
-                      <span>{formatDuration(o.durationMinutes)}</span>
-                      <span className="flex-1 border-b border-dotted border-sand" aria-hidden />
-                      <span className="text-ink">{formatPrice(o.priceCents)}</span>
+                    <li key={o.durationMinutes} className="rounded-full border border-sand px-2.5 py-0.5 text-[0.7rem] text-ink-soft">
+                      {formatDuration(o.durationMinutes)}
                     </li>
                   ))}
                 </ul>
+                <p className="mt-5 flex items-center gap-2 border-t border-sand pt-4 text-[0.7rem] tracking-[0.18em] text-ink uppercase transition-colors group-hover:text-olive">
+                  Details &amp; prices
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                </p>
               </div>
             </Reveal>
           ))}

@@ -4,13 +4,14 @@ import { formatInTimeZone } from "date-fns-tz";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowRight, LeafIcon } from "@/components/Icons";
+import { ArrowLeft, ArrowRight, LeafIcon } from "@/components/Icons";
 import { Button } from "@/components/ui/Button";
 import { DEFAULT_PHONE_PREFIX, NOTE_MAX } from "@/lib/booking-rules";
 import { customerDetailsSchema } from "@/lib/booking-schema";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { serviceImage } from "@/lib/images";
 import { formatPhone } from "@/lib/phone";
+import { serviceDetails } from "@/lib/service-details";
 import { pickOption } from "@/lib/service-options";
 import { NAVBAR_OFFSET, smoothScrollTo } from "@/lib/smooth-scroll";
 import { formatLongDate } from "@/lib/time";
@@ -62,18 +63,13 @@ type Props = { services: PublicService[]; days: BookableDay[]; initialServiceSlu
 export default function BookingFlow({ services, days, initialServiceSlug, initialDuration }: Props) {
   const router = useRouter();
   const initialService = services.find((s) => s.slug === initialServiceSlug);
-  // Skip the first step only when the duration is unambiguous.
-  const initialOption = initialService
-    ? initialDuration
-      ? pickOption(initialService.options, initialDuration)
-      : initialService.options.length === 1
-        ? initialService.options[0]
-        : null
-    : null;
+  // A link with a duration skips straight to the date; a link with only a service opens its details (and prices).
+  const initialOption = initialService && initialDuration ? pickOption(initialService.options, initialDuration) : null;
 
   const [step, setStep] = useState<Step>(initialOption ? 2 : 1);
   const [serviceId, setServiceId] = useState<string | null>(initialService?.id ?? null);
   const [durationMinutes, setDurationMinutes] = useState<number | null>(initialOption?.durationMinutes ?? null);
+  const [detailId, setDetailId] = useState<string | null>(initialService && !initialOption ? initialService.id : null);
   const [pickedDurations, setPickedDurations] = useState<Record<string, number>>({});
   const [date, setDate] = useState<string | null>(null);
   const [slot, setSlot] = useState<Slot | null>(null);
@@ -93,13 +89,20 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
   const idempotencyKey = useRef<string>(newIdempotencyKey());
   const slotsRequest = useRef<AbortController | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
-  const scrolledForStep = useRef<Step>(step);
-  const [shownStep, setShownStep] = useState<Step>(step);
+  const detailService = step === 1 ? (services.find((s) => s.id === detailId) ?? null) : null;
+  const detailOption = detailService
+    ? (pickOption(detailService.options, pickedDurations[detailService.id] ?? (detailService.id === serviceId ? durationMinutes ?? undefined : undefined)) ??
+      detailService.options[0])
+    : null;
+  // The details view sits between the list (step 1) and the date (step 2).
+  const position = detailService ? 1.5 : step;
+  const scrolledForPosition = useRef(position);
+  const [shownPosition, setShownPosition] = useState(position);
   const [direction, setDirection] = useState<1 | -1>(1);
   const [hasMoved, setHasMoved] = useState(false);
-  if (step !== shownStep) {
-    setDirection(step > shownStep ? 1 : -1);
-    setShownStep(step);
+  if (position !== shownPosition) {
+    setDirection(position > shownPosition ? 1 : -1);
+    setShownPosition(position);
     setHasMoved(true);
   }
 
@@ -109,8 +112,8 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
     const root = rootRef.current;
     let cancel = () => {};
     const timer = window.setTimeout(() => {
-      cancel = smoothScrollTo(root, 1300);
-    }, 750);
+      cancel = smoothScrollTo(root, 850);
+    }, 400);
     return () => {
       window.clearTimeout(timer);
       cancel();
@@ -120,12 +123,12 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
   // On each step change, bring the steps back into view if the visitor had scrolled away from them.
   useEffect(() => {
     const root = rootRef.current;
-    if (scrolledForStep.current === step || !root) return undefined;
-    scrolledForStep.current = step;
+    if (scrolledForPosition.current === position || !root) return undefined;
+    scrolledForPosition.current = position;
     const top = root.getBoundingClientRect().top;
     if (top >= NAVBAR_OFFSET - 8 && top <= window.innerHeight * 0.4) return undefined;
-    return smoothScrollTo(root, 700);
-  }, [step]);
+    return smoothScrollTo(root, 500);
+  }, [position]);
 
   const service = services.find((s) => s.id === serviceId) ?? null;
   const option = service && durationMinutes ? pickOption(service.options, durationMinutes) : null;
@@ -174,6 +177,13 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
       document.removeEventListener("visibilitychange", refresh);
     };
   }, [step, serviceId, durationMinutes, date, loadSlots]);
+
+  const openDetail = (id: string) => {
+    setNotice(null);
+    setDetailId(id);
+  };
+
+  const closeDetail = () => setDetailId(null);
 
   const chooseOption = (id: string, duration: number) => {
     if (id !== serviceId || duration !== durationMinutes) {
@@ -299,7 +309,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
 
   return (
     <div ref={rootRef} id="book" className="-mt-6 scroll-mt-24 sm:-mt-8">
-      <ol className="animate-fade-up mx-auto flex max-w-3xl items-start [animation-delay:350ms]" aria-label="Reservation steps">
+      <ol className="animate-fade-up mx-auto flex max-w-3xl items-start [animation-delay:200ms]" aria-label="Reservation steps">
         {STEPS.map((s, index) => {
           const current = s.id === step;
           const done = s.id < step;
@@ -342,16 +352,16 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
         </div>
       )}
 
-      <section className="animate-fade-up mt-8 overflow-hidden rounded-xl border border-sand/60 bg-[#fcfaf7] p-4 shadow-[0_30px_60px_-35px_rgba(60,40,20,0.35)] [animation-delay:500ms] sm:p-8 lg:p-10">
-        <div key={step} className={direction > 0 ? "animate-step-next" : "animate-step-prev"}>
-        {step === 1 && (
+      <section className="animate-fade-up mt-8 overflow-hidden rounded-xl border border-sand/60 bg-[#fcfaf7] p-4 shadow-[0_30px_60px_-35px_rgba(60,40,20,0.35)] [animation-delay:300ms] sm:p-8 lg:p-10">
+        <div key={position} className={direction > 0 ? "animate-step-next" : "animate-step-prev"}>
+        {step === 1 && !detailService && (
           <div>
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3 sm:gap-4">
                 <LeafIcon className="h-9 w-9 shrink-0 -rotate-12 text-olive sm:h-11 sm:w-11" aria-hidden />
                 <div>
                   <h2 className="font-serif text-2xl text-ink sm:text-[2.1rem] sm:leading-tight">Choose your treatment</h2>
-                  <p className="mt-0.5 text-[0.85rem] font-light text-ink-soft">Tap the duration you would like, then continue.</p>
+                  <p className="mt-0.5 text-[0.85rem] font-light text-ink-soft">Tap a treatment to see the details and prices.</p>
                 </div>
               </div>
               <p className="hidden -rotate-6 pt-1 font-script text-2xl leading-none text-bronze/80 md:block" aria-hidden>
@@ -364,64 +374,60 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
               <p className="mt-6 text-[0.9rem] text-ink-soft">No treatments are available for booking right now.</p>
             ) : (
               <div className="mt-7 grid gap-4 lg:grid-cols-2">
-                {services.map((s, index) => {
-                  const picked = pickedDurations[s.id] ?? (s.id === serviceId && durationMinutes ? durationMinutes : s.options[0].durationMinutes);
-                  const pickedOption = pickOption(s.options, picked) ?? s.options[0];
-                  const active = s.id === serviceId;
-                  return (
-                    <article
-                      key={s.id}
-                      style={{ animationDelay: `${(hasMoved ? 80 : 650) + index * 80}ms` }}
-                      className={`animate-fade-up relative flex gap-3 rounded-lg border bg-white p-3 transition sm:gap-4 sm:p-4 ${
-                        active ? "border-olive/50 shadow-[0_12px_30px_-20px_rgba(75,85,55,0.6)]" : "border-sand/70 hover:border-sand"
-                      }`}
-                    >
-                      <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-md sm:h-28 sm:w-28">
-                        <Image src={serviceImage(s.slug)} alt={s.name} fill sizes="112px" className="object-cover" />
-                      </div>
-                      <div className="flex min-w-0 flex-1 flex-col">
-                        <LeafIcon className="absolute top-3 right-3 h-4 w-4 text-sand" aria-hidden />
-                        <h3 className="pr-6 font-serif text-xl leading-tight text-ink sm:text-[1.35rem]">{s.name}</h3>
-                        <p className="mt-1 text-[0.78rem] leading-relaxed font-light text-muted">{s.description}</p>
-                        <div className="mt-3 flex items-center gap-2">
-                          <div className="grid flex-1 grid-cols-3 gap-1.5 sm:gap-2">
-                            {s.options.map((o) => {
-                              const selected = o.durationMinutes === pickedOption.durationMinutes;
-                              return (
-                                <button
-                                  key={o.durationMinutes}
-                                  type="button"
-                                  onClick={() => setPickedDurations((p) => ({ ...p, [s.id]: o.durationMinutes }))}
-                                  aria-pressed={selected}
-                                  aria-label={`${s.name}, ${formatDuration(o.durationMinutes)}, ${formatPrice(o.priceCents)}`}
-                                  className={`flex min-h-12 flex-col items-center justify-center rounded-md border px-1 text-center leading-tight transition ${
-                                    selected
-                                      ? "border-olive bg-olive text-white shadow-[0_6px_14px_-8px_rgba(75,85,55,0.9)]"
-                                      : "border-sand bg-white text-ink hover:border-olive/50"
-                                  }`}
-                                >
-                                  <span className="text-[0.68rem] opacity-90">{formatDuration(o.durationMinutes)}</span>
-                                  <span className="text-[0.78rem] font-medium">{formatPrice(o.priceCents)}</span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => chooseOption(s.id, pickedOption.durationMinutes)}
-                            aria-label={`Continue with ${s.name}, ${formatDuration(pickedOption.durationMinutes)}`}
-                            className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-sand bg-cream text-ink transition hover:border-olive hover:bg-olive hover:text-white"
-                          >
+                {services.map((s, index) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => openDetail(s.id)}
+                    style={{ animationDelay: `${(hasMoved ? 40 : 380) + index * 50}ms` }}
+                    className={`animate-fade-up group relative flex gap-3 rounded-lg border bg-white p-3 text-left transition hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-22px_rgba(60,40,20,0.5)] sm:gap-4 sm:p-4 ${
+                      s.id === serviceId ? "border-olive/50" : "border-sand/70 hover:border-sand"
+                    }`}
+                  >
+                    <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-md sm:h-28 sm:w-28">
+                      <Image
+                        src={serviceImage(s.slug)}
+                        alt=""
+                        fill
+                        sizes="112px"
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                    </div>
+                    <div className="flex min-w-0 flex-1 flex-col">
+                      <LeafIcon className="absolute top-3 right-3 h-4 w-4 text-sand" aria-hidden />
+                      <span className="pr-6 font-serif text-xl leading-tight text-ink sm:text-[1.35rem]">{s.name}</span>
+                      <span className="mt-1 text-[0.78rem] leading-relaxed font-light text-muted">{s.description}</span>
+                      <span className="mt-auto flex items-center justify-between gap-2 pt-3">
+                        <span className="flex flex-wrap gap-1.5">
+                          {s.options.map((o) => (
+                            <span key={o.durationMinutes} className="rounded-full border border-sand px-2.5 py-0.5 text-[0.68rem] text-ink-soft">
+                              {formatDuration(o.durationMinutes)}
+                            </span>
+                          ))}
+                        </span>
+                        <span className="flex shrink-0 items-center gap-2 text-[0.68rem] tracking-[0.15em] text-ink uppercase">
+                          <span className="hidden sm:inline">Details</span>
+                          <span className="grid h-9 w-9 place-items-center rounded-full border border-sand bg-cream transition group-hover:border-olive group-hover:bg-olive group-hover:text-white">
                             <ArrowRight className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </article>
-                  );
-                })}
+                          </span>
+                        </span>
+                      </span>
+                    </div>
+                  </button>
+                ))}
               </div>
             )}
           </div>
+        )}
+
+        {step === 1 && detailService && detailOption && (
+          <ServiceDetailView
+            service={detailService}
+            selected={detailOption}
+            onSelect={(duration) => setPickedDurations((p) => ({ ...p, [detailService.id]: duration }))}
+            onBack={closeDetail}
+            onContinue={() => chooseOption(detailService.id, detailOption.durationMinutes)}
+          />
         )}
 
         {step === 2 && service && option && (
@@ -637,6 +643,114 @@ function Field({
       ) : (
         hint && <p className="mt-1.5 text-[0.75rem] text-muted">{hint}</p>
       )}
+    </div>
+  );
+}
+
+type ServiceOption = PublicService["options"][number];
+
+function ServiceDetailView({
+  service,
+  selected,
+  onSelect,
+  onBack,
+  onContinue,
+}: {
+  service: PublicService;
+  selected: ServiceOption;
+  onSelect: (durationMinutes: number) => void;
+  onBack: () => void;
+  onContinue: () => void;
+}) {
+  const info = serviceDetails(service.slug, service.description);
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={onBack}
+        className="inline-flex items-center gap-2 text-[0.72rem] tracking-[0.2em] text-muted uppercase transition hover:text-ink"
+      >
+        <ArrowLeft className="h-4 w-4" /> All treatments
+      </button>
+
+      <div className="mt-5 grid gap-6 md:grid-cols-[1fr_1.1fr] md:gap-10">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-lg md:aspect-auto md:min-h-[26rem]">
+          <Image src={serviceImage(service.slug)} alt={service.name} fill sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/45 to-transparent p-5 pt-16">
+            <p className="font-script text-2xl text-white/95">Your wellness matters ♡</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col">
+          <p className="flex items-center gap-3 text-[0.68rem] tracking-[0.3em] text-bronze uppercase">
+            <span className="h-px w-6 bg-bronze/60" aria-hidden />
+            Treatment
+          </p>
+          <h2 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl">{service.name}</h2>
+          <p className="mt-4 text-[0.9rem] leading-relaxed font-light text-ink-soft">{info.intro}</p>
+
+          <dl className="mt-5 grid grid-cols-2 gap-3 text-[0.8rem]">
+            <div className="rounded-md border border-sand/70 bg-white px-4 py-3">
+              <dt className="text-[0.65rem] tracking-[0.2em] text-muted uppercase">Pressure</dt>
+              <dd className="mt-1 text-ink">{info.pressure}</dd>
+            </div>
+            <div className="rounded-md border border-sand/70 bg-white px-4 py-3">
+              <dt className="text-[0.65rem] tracking-[0.2em] text-muted uppercase">Ideal for</dt>
+              <dd className="mt-1 text-ink">{info.idealFor}</dd>
+            </div>
+          </dl>
+
+          {info.highlights.length > 0 && (
+            <ul className="mt-5 space-y-2 text-[0.85rem] text-ink-soft">
+              {info.highlights.map((h) => (
+                <li key={h} className="flex items-center gap-3">
+                  <LeafIcon className="h-4 w-4 shrink-0 text-olive" aria-hidden />
+                  {h}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <p className="mt-7 text-[0.68rem] tracking-[0.25em] text-muted uppercase">Choose your duration</p>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {service.options.map((o, index) => {
+              const isSelected = o.durationMinutes === selected.durationMinutes;
+              return (
+                <button
+                  key={o.durationMinutes}
+                  type="button"
+                  onClick={() => onSelect(o.durationMinutes)}
+                  aria-pressed={isSelected}
+                  style={{ animationDelay: `${150 + index * 60}ms` }}
+                  className={`animate-fade-up flex min-h-16 flex-col items-center justify-center rounded-md border px-1 leading-tight transition ${
+                    isSelected
+                      ? "border-olive bg-olive text-white shadow-[0_8px_18px_-10px_rgba(75,85,55,0.9)]"
+                      : "border-sand bg-white text-ink hover:border-olive/50"
+                  }`}
+                >
+                  <span className="text-[0.75rem] opacity-90">{formatDuration(o.durationMinutes)}</span>
+                  <span className="mt-0.5 font-serif text-lg">{formatPrice(o.priceCents)}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-6 flex flex-col gap-4 border-t border-sand pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-[0.85rem] text-ink-soft">
+              {formatDuration(selected.durationMinutes)} session ·{" "}
+              <span className="font-serif text-2xl text-ink">{formatPrice(selected.priceCents)}</span>
+            </p>
+            <button
+              type="button"
+              onClick={onContinue}
+              className="inline-flex items-center justify-center gap-3 rounded-full bg-olive px-7 py-3 text-[0.8rem] tracking-wide text-white transition hover:bg-olive-dark"
+            >
+              Choose a date
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
