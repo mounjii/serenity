@@ -4,14 +4,14 @@ import { formatInTimeZone } from "date-fns-tz";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, LeafIcon } from "@/components/Icons";
+import { ArrowLeft, ArrowRight, ChevronDown, HeartIcon, LeafIcon, LotusIcon } from "@/components/Icons";
 import { Button } from "@/components/ui/Button";
 import { DEFAULT_PHONE_PREFIX, NOTE_MAX } from "@/lib/booking-rules";
 import { customerDetailsSchema } from "@/lib/booking-schema";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { serviceCardImage, serviceImage } from "@/lib/images";
 import { formatPhone } from "@/lib/phone";
-import { serviceDetails } from "@/lib/service-details";
+import { serviceDetails, type ServiceDetails } from "@/lib/service-details";
 import { pickOption } from "@/lib/service-options";
 import { NAVBAR_OFFSET, smoothScrollTo } from "@/lib/smooth-scroll";
 import { formatLongDate } from "@/lib/time";
@@ -655,6 +655,8 @@ function Field({
 
 type ServiceOption = PublicService["options"][number];
 
+const BENEFIT_ICONS = [LeafIcon, HeartIcon, LotusIcon];
+
 function ServiceDetailView({
   service,
   selected,
@@ -679,21 +681,84 @@ function ServiceDetailView({
         <ArrowLeft className="h-4 w-4" /> All treatments
       </button>
 
-      <div className="mt-5 grid gap-6 md:grid-cols-[1fr_1.1fr] md:gap-10">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-lg md:aspect-auto md:min-h-[26rem]">
-          <Image src={serviceImage(service.slug)} alt={service.name} fill sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/45 to-transparent p-5 pt-16">
-            <p className="font-script text-2xl text-white/95">Your wellness matters ♡</p>
-          </div>
+      <div className="mt-5 grid gap-6 md:grid-cols-[1fr_1.35fr] md:gap-10">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:sticky md:top-28 md:aspect-[4/5] md:self-start">
+          <Image src={serviceImage(service.slug)} alt={service.name} fill sizes="(min-width: 768px) 40vw, 100vw" className="object-cover" />
         </div>
 
         <div className="flex flex-col">
-          <p className="flex items-center gap-3 text-[0.68rem] tracking-[0.3em] text-bronze uppercase">
-            <span className="h-px w-6 bg-bronze/60" aria-hidden />
-            Treatment
-          </p>
-          <h2 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl">{service.name}</h2>
-          <p className="mt-4 text-[0.9rem] leading-relaxed font-light text-ink-soft">{info.intro}</p>
+          <p className="text-[0.66rem] tracking-[0.3em] text-muted uppercase">Treatment</p>
+          <h2 className="mt-2 font-serif text-3xl leading-tight text-ink sm:text-[2.4rem]">{service.name}</h2>
+
+          <ul className="mt-6 grid grid-cols-3 border-b border-sand pb-6">
+            {info.benefits.map((benefit, index) => {
+              const Icon = BENEFIT_ICONS[index % BENEFIT_ICONS.length];
+              return (
+                <li key={benefit} className={`flex flex-col gap-3 px-3 first:pl-0 sm:px-5 ${index > 0 ? "border-l border-sand" : ""}`}>
+                  <Icon className="h-7 w-7 text-ink-soft" aria-hidden />
+                  <span className="max-w-[9rem] text-[0.72rem] leading-snug tracking-[0.08em] text-ink-soft sm:text-[0.78rem]">{benefit}</span>
+                </li>
+              );
+            })}
+          </ul>
+
+          <p className="mt-6 text-[0.66rem] tracking-[0.3em] text-muted uppercase">Duration</p>
+          <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
+            {service.options.map((o, index) => {
+              const isSelected = o.durationMinutes === selected.durationMinutes;
+              return (
+                <button
+                  key={o.durationMinutes}
+                  type="button"
+                  onClick={() => onSelect(o.durationMinutes)}
+                  aria-pressed={isSelected}
+                  style={{ animationDelay: `${120 + index * 60}ms` }}
+                  className={`animate-fade-up flex min-h-[4.25rem] flex-col items-center justify-center rounded-lg border px-1 leading-tight transition ${
+                    isSelected
+                      ? "border-ink bg-ink text-cream shadow-[0_10px_22px_-12px_rgba(20,18,15,0.8)]"
+                      : "border-sand bg-white text-ink shadow-[0_6px_16px_-14px_rgba(60,40,20,0.5)] hover:border-ink"
+                  }`}
+                >
+                  <span className="text-[0.72rem] opacity-80">{formatDuration(o.durationMinutes)}</span>
+                  <span className="mt-1 font-serif text-lg">{formatPrice(o.priceCents)}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            type="button"
+            onClick={onContinue}
+            className="mt-5 inline-flex w-full items-center justify-center gap-3 rounded-full bg-ink py-3.5 text-[0.85rem] tracking-wide text-cream shadow-[0_12px_24px_-14px_rgba(20,18,15,0.9)] transition hover:-translate-y-0.5 hover:bg-black"
+          >
+            Book Now · {formatDuration(selected.durationMinutes)}
+            <ArrowRight className="h-4 w-4" />
+          </button>
+
+          <TreatmentDetails info={info} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TreatmentDetails({ info }: { info: ServiceDetails }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-4 rounded-lg border border-sand bg-white">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between px-5 py-4 text-left text-[0.85rem] font-medium text-ink"
+      >
+        Treatment details
+        <ChevronDown className={`h-4 w-4 text-muted transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+      </button>
+      <div className={`grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+        <div className="overflow-hidden" inert={!open}>
+          <div className="border-t border-sand px-5 pt-4 pb-5">
+          <p className="text-[0.88rem] leading-relaxed font-light text-ink-soft">{info.intro}</p>
 
           <dl className="mt-5 grid grid-cols-2 gap-3 text-[0.8rem]">
             <div className="rounded-md border border-sand/70 bg-white px-4 py-3">
@@ -740,43 +805,6 @@ function ServiceDetailView({
             </div>
           )}
 
-          <p className="mt-7 text-[0.68rem] tracking-[0.25em] text-muted uppercase">Choose your duration</p>
-          <div className="mt-3 grid grid-cols-3 gap-2">
-            {service.options.map((o, index) => {
-              const isSelected = o.durationMinutes === selected.durationMinutes;
-              return (
-                <button
-                  key={o.durationMinutes}
-                  type="button"
-                  onClick={() => onSelect(o.durationMinutes)}
-                  aria-pressed={isSelected}
-                  style={{ animationDelay: `${150 + index * 60}ms` }}
-                  className={`animate-fade-up flex min-h-16 flex-col items-center justify-center rounded-md border px-1 leading-tight transition ${
-                    isSelected
-                      ? "border-ink bg-ink text-cream shadow-[0_8px_18px_-10px_rgba(20,18,15,0.8)]"
-                      : "border-sand bg-white text-ink hover:border-ink"
-                  }`}
-                >
-                  <span className="text-[0.75rem] opacity-90">{formatDuration(o.durationMinutes)}</span>
-                  <span className="mt-0.5 font-serif text-lg">{formatPrice(o.priceCents)}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="mt-6 flex flex-col gap-4 border-t border-sand pt-5 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-[0.85rem] text-ink-soft">
-              {formatDuration(selected.durationMinutes)} session ·{" "}
-              <span className="font-serif text-2xl text-ink">{formatPrice(selected.priceCents)}</span>
-            </p>
-            <button
-              type="button"
-              onClick={onContinue}
-              className="inline-flex items-center justify-center gap-3 rounded-full bg-ink px-7 py-3 text-[0.8rem] tracking-wide text-cream transition hover:bg-black"
-            >
-              Choose a date
-              <ArrowRight className="h-4 w-4" />
-            </button>
           </div>
         </div>
       </div>

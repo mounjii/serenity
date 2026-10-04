@@ -75,6 +75,14 @@ export function ArrowDown(props: IconProps) {
   );
 }
 
+export function ChevronDown(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} strokeWidth={1.5} {...props}>
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
 export function ArrowUp(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" {...base} strokeWidth={1.5} {...props}>
