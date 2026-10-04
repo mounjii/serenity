@@ -318,7 +318,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
               {index > 0 && (
                 <span
                   aria-hidden
-                  className={`absolute top-[1.15rem] h-px -translate-y-1/2 sm:top-5 ${s.id <= step ? "bg-olive/50" : "bg-sand"}`}
+                  className={`absolute top-[1.15rem] h-px -translate-y-1/2 sm:top-5 ${s.id <= step ? "bg-ink/40" : "bg-sand"}`}
                   style={{ left: "calc(-50% + 1.6rem)", right: "calc(50% + 1.6rem)" }}
                 />
               )}
@@ -330,9 +330,9 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                 aria-label={`Step ${s.id}: ${s.label}`}
                 className={`relative grid h-9 w-9 place-items-center rounded-full text-[0.8rem] transition sm:h-10 sm:w-10 ${
                   current
-                    ? "bg-olive text-white shadow-[0_6px_16px_-6px_rgba(75,85,55,0.8)] ring-4 ring-olive/15"
+                    ? "bg-ink text-cream shadow-[0_6px_16px_-6px_rgba(20,18,15,0.7)] ring-4 ring-ink/10"
                     : done
-                      ? "border border-olive/40 bg-white text-olive hover:bg-olive hover:text-white"
+                      ? "border border-ink/40 bg-white text-ink hover:bg-ink hover:text-cream"
                       : "border border-sand bg-white/80 text-muted"
                 }`}
               >
@@ -414,7 +414,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                         <span className="text-[0.66rem] tracking-[0.18em] text-ink-soft uppercase transition-colors duration-500 group-hover:text-white/85 group-focus-visible:text-white/85">
                           {s.options.map((o) => o.durationMinutes).join(" · ")} min
                         </span>
-                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-olive bg-olive text-white transition-all duration-500 group-hover:border-white/80 group-hover:bg-white/10 group-hover:backdrop-blur-sm group-focus-visible:border-white/80 group-focus-visible:bg-white/10">
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-ink bg-ink text-cream transition-all duration-500 group-hover:border-white/80 group-hover:bg-white/10 group-hover:backdrop-blur-sm group-focus-visible:border-white/80 group-focus-visible:bg-white/10">
                           <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-0.5" />
                         </span>
                       </span>
@@ -456,9 +456,9 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                     aria-label={d.open ? formatLongDate(new Date(`${d.date}T12:00:00.000Z`)) : `${parts.weekday} ${parts.day} ${parts.month} (closed)`}
                     className={`flex min-h-16 flex-col items-center justify-center rounded-md border text-center transition ${
                       selected
-                        ? "border-olive bg-olive text-white"
+                        ? "border-ink bg-ink text-cream"
                         : d.open
-                          ? "border-sand bg-white text-ink hover:border-olive/50"
+                          ? "border-sand bg-white text-ink hover:border-ink"
                           : "cursor-not-allowed border-transparent bg-cream-dark/50 text-muted/60 line-through"
                     }`}
                   >
@@ -500,7 +500,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                     onClick={() => chooseSlot(s)}
                     aria-pressed={slot?.startAt === s.startAt}
                     className={`min-h-12 rounded-md border text-[0.9rem] transition ${
-                      slot?.startAt === s.startAt ? "border-olive bg-olive text-white" : "border-sand bg-white text-ink hover:border-olive/50"
+                      slot?.startAt === s.startAt ? "border-ink bg-ink text-cream" : "border-sand bg-white text-ink hover:border-ink"
                     }`}
                   >
                     {s.time}
@@ -753,8 +753,8 @@ function ServiceDetailView({
                   style={{ animationDelay: `${150 + index * 60}ms` }}
                   className={`animate-fade-up flex min-h-16 flex-col items-center justify-center rounded-md border px-1 leading-tight transition ${
                     isSelected
-                      ? "border-olive bg-olive text-white shadow-[0_8px_18px_-10px_rgba(75,85,55,0.9)]"
-                      : "border-sand bg-white text-ink hover:border-olive/50"
+                      ? "border-ink bg-ink text-cream shadow-[0_8px_18px_-10px_rgba(20,18,15,0.8)]"
+                      : "border-sand bg-white text-ink hover:border-ink"
                   }`}
                 >
                   <span className="text-[0.75rem] opacity-90">{formatDuration(o.durationMinutes)}</span>
@@ -772,7 +772,7 @@ function ServiceDetailView({
             <button
               type="button"
               onClick={onContinue}
-              className="inline-flex items-center justify-center gap-3 rounded-full bg-olive px-7 py-3 text-[0.8rem] tracking-wide text-white transition hover:bg-olive-dark"
+              className="inline-flex items-center justify-center gap-3 rounded-full bg-ink px-7 py-3 text-[0.8rem] tracking-wide text-cream transition hover:bg-black"
             >
               Choose a date
               <ArrowRight className="h-4 w-4" />
