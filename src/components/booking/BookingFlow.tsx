@@ -717,6 +717,29 @@ function ServiceDetailView({
             </ul>
           )}
 
+          {(info.why || info.helpsWith.length > 0) && (
+            <div className="mt-6 rounded-lg border border-olive/15 bg-olive/[0.04] px-4 py-4 sm:px-5">
+              {info.why && (
+                <>
+                  <p className="text-[0.65rem] tracking-[0.25em] text-olive uppercase">Why choose it</p>
+                  <p className="mt-1.5 text-[0.85rem] leading-relaxed text-ink-soft">{info.why}</p>
+                </>
+              )}
+              {info.helpsWith.length > 0 && (
+                <>
+                  <p className={`text-[0.65rem] tracking-[0.25em] text-olive uppercase ${info.why ? "mt-4" : ""}`}>Helps with</p>
+                  <ul className="mt-2 flex flex-wrap gap-1.5">
+                    {info.helpsWith.map((item) => (
+                      <li key={item} className="rounded-full border border-olive/25 bg-white px-3 py-1 text-[0.75rem] text-ink">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
+          )}
+
           <p className="mt-7 text-[0.68rem] tracking-[0.25em] text-muted uppercase">Choose your duration</p>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {service.options.map((o, index) => {
