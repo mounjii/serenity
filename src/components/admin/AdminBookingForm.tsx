@@ -10,7 +10,7 @@ import { formatDuration, formatPrice } from "@/lib/format";
 import type { PublicService } from "@/server/booking/services";
 
 type Slot = { time: string; startAt: string };
-type Availability = { closed: boolean; slots: Slot[] };
+type Availability = { closed: boolean; slots: Slot[]; times: (Slot & { available: boolean })[] };
 
 const inputClass = (invalid = false) =>
   `block w-full rounded-sm border bg-white px-4 py-3 text-[0.95rem] text-ink outline-none transition focus:border-ink ${
@@ -164,16 +164,25 @@ export default function AdminBookingForm({ services, today, initialDate }: Props
           <p className="text-[0.85rem] text-red-700">{slotsError}</p>
         ) : !availability ? (
           <p className="text-[0.85rem] text-muted">Loading available times…</p>
-        ) : availability.slots.length === 0 ? (
+        ) : availability.times.length === 0 ? (
           <p className="text-[0.85rem] text-muted">{availability.closed ? "The salon is closed on this day." : "No available times on this day."}</p>
         ) : (
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
-            {availability.slots.map((s) => (
+            {availability.times.map((s) => !s.available ? (
+              <span
+                key={s.startAt}
+                aria-label={`${s.time}, booked`}
+                className="flex min-h-11 cursor-not-allowed flex-col items-center justify-center rounded-sm bg-cream-dark/60 leading-tight text-muted/70"
+              >
+                <span className="text-[0.85rem] line-through">{s.time}</span>
+                <span className="text-[0.55rem] tracking-[0.15em] uppercase">Booked</span>
+              </span>
+            ) : (
               <button
                 key={s.startAt}
                 type="button"
                 onClick={() => {
-                  setSlot(s);
+                  setSlot({ time: s.time, startAt: s.startAt });
                   setFieldErrors((errors) => {
                     const next = { ...errors };
                     delete next.slot;

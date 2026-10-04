@@ -20,6 +20,7 @@ import type { PublicService } from "@/server/booking/services";
 import type { ApiErrorBody } from "@/server/errors";
 
 type Slot = { time: string; startAt: string };
+type GridTime = Slot & { available: boolean };
 type Step = 1 | 2 | 3 | 4 | 5;
 type Details = { customerName: string; customerPhone: string; note: string; website: string };
 
@@ -81,6 +82,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [slots, setSlots] = useState<Slot[]>([]);
+  const [times, setTimes] = useState<GridTime[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [slotsError, setSlotsError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -151,8 +153,9 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
         const err = await readError(res);
         throw new Error(err?.message ?? "Could not load available times.");
       }
-      const data = (await res.json()) as { slots: Slot[] };
+      const data = (await res.json()) as { slots: Slot[]; times?: GridTime[] };
       setSlots(data.slots);
+      setTimes(data.times ?? data.slots.map((s) => ({ ...s, available: true })));
       setSlot((current) => (current && data.slots.some((s) => s.startAt === current.startAt) ? current : null));
     } catch (error) {
       if (controller.signal.aborted) return;
@@ -189,6 +192,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
     if (id !== serviceId || duration !== durationMinutes) {
       setSlot(null);
       setSlots([]);
+      setTimes([]);
     }
     setServiceId(id);
     setDurationMinutes(duration);
@@ -479,34 +483,56 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
               title="Choose a time"
               subtitle={`${service.name} · ${formatDuration(option.durationMinutes)} · ${formatLongDate(new Date(`${date}T12:00:00.000Z`))}`}
             />
-            {slotsLoading && slots.length === 0 ? (
+            {slotsLoading && times.length === 0 ? (
               <p className="mt-6 text-[0.9rem] text-ink-soft">Loading available times…</p>
             ) : slotsError ? (
               <div className="mt-6 space-y-4">
                 <p role="alert" className="text-[0.9rem] text-red-700">{slotsError}</p>
                 <Button variant="outline" size="sm" onClick={() => void loadSlots(service.id, option.durationMinutes, date)}>Try again</Button>
               </div>
-            ) : slots.length === 0 ? (
+            ) : times.length === 0 ? (
               <div className="mt-6 space-y-4">
                 <p className="text-[0.9rem] text-ink-soft">No available times on this day.</p>
                 <Button variant="outline" size="sm" onClick={() => setStep(2)}>Choose another date</Button>
               </div>
             ) : (
-              <div className="mt-6 grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-6">
-                {slots.map((s) => (
-                  <button
-                    key={s.startAt}
-                    type="button"
-                    onClick={() => chooseSlot(s)}
-                    aria-pressed={slot?.startAt === s.startAt}
-                    className={`min-h-12 rounded-md border text-[0.9rem] transition ${
-                      slot?.startAt === s.startAt ? "border-ink bg-ink text-cream" : "border-sand bg-white text-ink hover:border-ink"
-                    }`}
-                  >
-                    {s.time}
-                  </button>
-                ))}
-              </div>
+              <>
+                {slots.length === 0 && (
+                  <div className="mt-6 flex flex-wrap items-center gap-4">
+                    <p className="text-[0.9rem] text-ink-soft">This day is fully booked for a {formatDuration(option.durationMinutes)} treatment.</p>
+                    <Button variant="outline" size="sm" onClick={() => setStep(2)}>Choose another date</Button>
+                  </div>
+                )}
+                <div className="mt-6 grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-6">
+                  {times.map((t) =>
+                    t.available ? (
+                      <button
+                        key={t.startAt}
+                        type="button"
+                        onClick={() => chooseSlot({ time: t.time, startAt: t.startAt })}
+                        aria-pressed={slot?.startAt === t.startAt}
+                        className={`min-h-12 rounded-md border text-[0.9rem] transition ${
+                          slot?.startAt === t.startAt ? "border-ink bg-ink text-cream" : "border-sand bg-white text-ink hover:border-ink"
+                        }`}
+                      >
+                        {t.time}
+                      </button>
+                    ) : (
+                      <span
+                        key={t.startAt}
+                        aria-label={`${t.time}, booked`}
+                        className="flex min-h-12 cursor-not-allowed flex-col items-center justify-center rounded-md border border-transparent bg-cream-dark/60 leading-tight text-muted/70"
+                      >
+                        <span className="text-[0.85rem] line-through">{t.time}</span>
+                        <span className="text-[0.58rem] tracking-[0.15em] uppercase">Booked</span>
+                      </span>
+                    ),
+                  )}
+                </div>
+                <p className="mt-4 text-[0.75rem] text-muted">
+                  Greyed-out times are already taken. Each treatment includes a 15-minute pause before the next guest.
+                </p>
+              </>
             )}
           </div>
         )}

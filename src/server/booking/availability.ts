@@ -21,12 +21,29 @@ export function parseDurationParam(raw: string | null): number | null {
   return Number(raw);
 }
 
+/** A start time on the grid; `available` is false when it would overlap a booking (or its pause). */
+export type GridTime = Slot & { available: boolean };
+
 export async function getAvailability(
   serviceId: string,
   date: string,
   now = new Date(),
   options: AvailabilityOptions = {},
 ): Promise<Slot[]> {
+  const grid = await getTimeGrid(serviceId, date, now, options);
+  return grid.filter((t) => t.available).map(({ time, startAt }) => ({ time, startAt }));
+}
+
+/**
+ * Every bookable start time of the day for this duration, booked or not.
+ * Times that are past, too soon (2 h notice) or too far ahead are left out entirely.
+ */
+export async function getTimeGrid(
+  serviceId: string,
+  date: string,
+  now = new Date(),
+  options: AvailabilityOptions = {},
+): Promise<GridTime[]> {
   if (!serviceId || serviceId.length > 40) throw invalidInput("A valid serviceId is required.");
   if (!isValidDateString(date)) throw invalidInput("date must be a valid YYYY-MM-DD date.");
 
@@ -66,7 +83,7 @@ export async function getAvailability(
     select: { therapistId: true, startAt: true, blockedUntil: true },
   });
 
-  const slots: Slot[] = [];
+  const grid: GridTime[] = [];
   for (let minute = schedule.openMinute; minute + duration <= schedule.closeMinute; minute += SLOT_STEP_MINUTES) {
     const start = localToUtc(date, minute);
     if (start < earliest || (latest && start > latest)) continue;
@@ -74,7 +91,7 @@ export async function getAvailability(
     const hasFreeTherapist = therapistIds.some(
       (id) => !bookings.some((b) => b.therapistId === id && b.startAt < blockedUntil && b.blockedUntil > start),
     );
-    if (hasFreeTherapist) slots.push({ time: minutesToHHmm(minute), startAt: start.toISOString() });
+    grid.push({ time: minutesToHHmm(minute), startAt: start.toISOString(), available: hasFreeTherapist });
   }
-  return slots;
+  return grid;
 }
