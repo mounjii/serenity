@@ -4,7 +4,7 @@ import { formatInTimeZone } from "date-fns-tz";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, ChevronDown, HeartIcon, LeafIcon, LotusIcon } from "@/components/Icons";
+import { ArrowLeft, ArrowRight, CheckIcon, ChevronDown, HeartIcon, LeafIcon, LotusIcon } from "@/components/Icons";
 import { Button } from "@/components/ui/Button";
 import { DEFAULT_PHONE_PREFIX, NOTE_MAX } from "@/lib/booking-rules";
 import { customerDetailsSchema } from "@/lib/booking-schema";
@@ -657,6 +657,23 @@ type ServiceOption = PublicService["options"][number];
 
 const BENEFIT_ICONS = [LeafIcon, HeartIcon, LotusIcon];
 
+const PRESSURE_LEVEL: Record<ServiceDetails["pressure"], number> = {
+  Light: 1,
+  "Light to medium": 2,
+  Medium: 3,
+  "Medium to firm": 4,
+  Firm: 5,
+};
+
+function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="grid gap-2 py-4 sm:grid-cols-[8.5rem_1fr] sm:gap-4">
+      <p className="pt-0.5 text-[0.62rem] tracking-[0.25em] text-muted uppercase">{label}</p>
+      <div>{children}</div>
+    </div>
+  );
+}
+
 function ServiceDetailView({
   service,
   selected,
@@ -757,54 +774,61 @@ function TreatmentDetails({ info }: { info: ServiceDetails }) {
       </button>
       <div className={`grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
         <div className="overflow-hidden" inert={!open}>
-          <div className="border-t border-sand px-5 pt-4 pb-5">
-          <p className="text-[0.88rem] leading-relaxed font-light text-ink-soft">{info.intro}</p>
+          <div className="border-t border-sand">
+            <dl className="grid grid-cols-2 divide-x divide-sand border-b border-sand bg-cream/50">
+              <div className="px-5 py-4">
+                <dt className="text-[0.62rem] tracking-[0.25em] text-muted uppercase">Pressure</dt>
+                <dd className="mt-2">
+                  <span className="flex gap-1" aria-hidden>
+                    {[1, 2, 3, 4, 5].map((level) => (
+                      <span key={level} className={`h-1.5 w-5 rounded-full ${level <= PRESSURE_LEVEL[info.pressure] ? "bg-ink" : "bg-sand"}`} />
+                    ))}
+                  </span>
+                  <span className="mt-1.5 block text-[0.8rem] text-ink">{info.pressure}</span>
+                </dd>
+              </div>
+              <div className="px-5 py-4">
+                <dt className="text-[0.62rem] tracking-[0.25em] text-muted uppercase">Ideal for</dt>
+                <dd className="mt-2 text-[0.8rem] leading-snug text-ink">{info.idealFor}</dd>
+              </div>
+            </dl>
 
-          <dl className="mt-5 grid grid-cols-2 gap-3 text-[0.8rem]">
-            <div className="rounded-md border border-sand/70 bg-white px-4 py-3">
-              <dt className="text-[0.65rem] tracking-[0.2em] text-muted uppercase">Pressure</dt>
-              <dd className="mt-1 text-ink">{info.pressure}</dd>
-            </div>
-            <div className="rounded-md border border-sand/70 bg-white px-4 py-3">
-              <dt className="text-[0.65rem] tracking-[0.2em] text-muted uppercase">Ideal for</dt>
-              <dd className="mt-1 text-ink">{info.idealFor}</dd>
-            </div>
-          </dl>
+            <div className="divide-y divide-sand px-5">
+              <DetailRow label="Overview">
+                <p className="text-[0.85rem] leading-relaxed font-light text-ink-soft">{info.intro}</p>
+              </DetailRow>
 
-          {info.highlights.length > 0 && (
-            <ul className="mt-5 space-y-2 text-[0.85rem] text-ink-soft">
-              {info.highlights.map((h) => (
-                <li key={h} className="flex items-center gap-3">
-                  <LeafIcon className="h-4 w-4 shrink-0 text-olive" aria-hidden />
-                  {h}
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {(info.why || info.helpsWith.length > 0) && (
-            <div className="mt-6 rounded-lg border border-olive/15 bg-olive/[0.04] px-4 py-4 sm:px-5">
-              {info.why && (
-                <>
-                  <p className="text-[0.65rem] tracking-[0.25em] text-olive uppercase">Why choose it</p>
-                  <p className="mt-1.5 text-[0.85rem] leading-relaxed text-ink-soft">{info.why}</p>
-                </>
+              {info.highlights.length > 0 && (
+                <DetailRow label="What to expect">
+                  <ul className="space-y-2 text-[0.85rem] text-ink-soft">
+                    {info.highlights.map((h) => (
+                      <li key={h} className="flex items-start gap-2.5">
+                        <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-ink" aria-hidden />
+                        {h}
+                      </li>
+                    ))}
+                  </ul>
+                </DetailRow>
               )}
+
               {info.helpsWith.length > 0 && (
-                <>
-                  <p className={`text-[0.65rem] tracking-[0.25em] text-olive uppercase ${info.why ? "mt-4" : ""}`}>Helps with</p>
-                  <ul className="mt-2 flex flex-wrap gap-1.5">
+                <DetailRow label="Helps with">
+                  <ul className="flex flex-wrap gap-1.5">
                     {info.helpsWith.map((item) => (
-                      <li key={item} className="rounded-full border border-olive/25 bg-white px-3 py-1 text-[0.75rem] text-ink">
+                      <li key={item} className="rounded-full bg-cream-dark px-3 py-1 text-[0.75rem] text-ink">
                         {item}
                       </li>
                     ))}
                   </ul>
-                </>
+                </DetailRow>
+              )}
+
+              {info.why && (
+                <DetailRow label="Why choose it">
+                  <p className="border-l-2 border-ink/20 pl-3 font-serif text-[1.05rem] leading-snug text-ink italic">{info.why}</p>
+                </DetailRow>
               )}
             </div>
-          )}
-
           </div>
         </div>
       </div>
