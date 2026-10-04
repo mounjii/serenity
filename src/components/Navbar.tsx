@@ -72,12 +72,20 @@ export default function Navbar() {
           ))}
         </ul>
 
-        <Link
-          href={RESERVATION_PATH}
-          className="hidden rounded-full bg-ink px-6 py-2.5 text-[0.78rem] tracking-wide text-cream transition hover:bg-black md:inline-block"
-        >
-          Book Now
-        </Link>
+        <div className="hidden items-center gap-3 md:flex">
+          <Link
+            href="/admin/login"
+            className="rounded-full border border-ink/30 px-5 py-2.5 text-[0.78rem] tracking-wide text-ink transition hover:border-ink hover:bg-ink hover:text-cream"
+          >
+            Login
+          </Link>
+          <Link
+            href={RESERVATION_PATH}
+            className="rounded-full bg-ink px-6 py-2.5 text-[0.78rem] tracking-wide text-cream transition hover:bg-black"
+          >
+            Book Now
+          </Link>
+        </div>
 
         <button
           aria-label="Toggle menu"
@@ -105,13 +113,20 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
-          <li>
+          <li className="mt-2 flex flex-wrap gap-3">
             <Link
               href={RESERVATION_PATH}
               onClick={() => setOpen(false)}
-              className="mt-2 inline-block rounded-full bg-ink px-6 py-2.5 text-sm text-cream"
+              className="inline-block rounded-full bg-ink px-6 py-2.5 text-sm text-cream"
             >
               Book Now
+            </Link>
+            <Link
+              href="/admin/login"
+              onClick={() => setOpen(false)}
+              className="inline-block rounded-full border border-ink/30 px-6 py-2.5 text-sm text-ink"
+            >
+              Login
             </Link>
           </li>
         </ul>
