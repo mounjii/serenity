@@ -1,4 +1,8 @@
 export type ServiceDetails = {
+  /** One line under “Overview” in the treatment details. */
+  summary: string;
+  /** One line under “What to expect”. */
+  expectSummary: string;
   /** Three short benefits shown with icons at the top of the treatment view. */
   benefits: [string, string, string];
   intro: string;
@@ -13,6 +17,8 @@ export type ServiceDetails = {
 
 const details: Record<string, ServiceDetails> = {
   "swedish-massage": {
+    summary: "A gentle, full-body massage designed to relax and restore balance.",
+    expectSummary: "Warm oil, long strokes and calming pressure.",
     benefits: ["Relieves Tension", "Improves Circulation", "Promotes Relaxation"],
     intro:
       "Our signature full-body massage. Long, flowing strokes and gentle kneading warm the muscles, ease everyday tension and leave you deeply relaxed.",
@@ -23,6 +29,8 @@ const details: Record<string, ServiceDetails> = {
     helpsWith: ["Stress & anxiety", "General muscle tension", "Poor sleep", "Fatigue", "Poor circulation"],
   },
   "thai-oil-massage": {
+    summary: "Thai pressure techniques with warm oil to release deep tension.",
+    expectSummary: "Warm oil, firm pressure on key points and slow stretches.",
     benefits: ["Releases Muscle Knots", "Restores Energy", "Eases Stiffness"],
     intro:
       "The best of both worlds: traditional Thai pressure techniques combined with the glide of warm oil, to loosen tight muscles and restore your energy.",
@@ -33,6 +41,8 @@ const details: Record<string, ServiceDetails> = {
     helpsWith: ["Muscle knots", "Back pain", "Stiffness", "Low energy", "Physical fatigue"],
   },
   "aroma-massage": {
+    summary: "A soft, scented massage that calms both body and mind.",
+    expectSummary: "Essential oils, light strokes and a slow, soothing rhythm.",
     benefits: ["Reduces Stress", "Improves Sleep", "Calms the Mind"],
     intro:
       "A gentle, enveloping massage with essential oils chosen to calm, balance or uplift. A sensory escape for body and mind.",
@@ -43,6 +53,8 @@ const details: Record<string, ServiceDetails> = {
     helpsWith: ["Stress & anxiety", "Insomnia", "Mental fatigue", "Low mood", "Headaches"],
   },
   "head-neck-shoulder-massage": {
+    summary: "Targeted work on the upper body, where stress builds up.",
+    expectSummary: "Scalp, neck and shoulder massage with focused pressure.",
     benefits: ["Eases Neck Pain", "Relieves Headaches", "Clears the Mind"],
     intro:
       "Focused work where most of us hold our tension. Targeted pressure on the head, neck and shoulders releases stiffness and clears the mind.",
@@ -53,6 +65,8 @@ const details: Record<string, ServiceDetails> = {
     helpsWith: ["Neck pain", "Tight shoulders", "Tension headaches", "Eye strain", "Poor posture"],
   },
   "thai-massage": {
+    summary: "A traditional clothed massage with stretches and acupressure.",
+    expectSummary: "Comfortable clothes, assisted stretches and rhythmic pressure.",
     benefits: ["Improves Flexibility", "Boosts Energy", "Balances the Body"],
     intro:
       "A traditional, fully clothed massage combining acupressure and assisted yoga-like stretches to improve flexibility and balance the body.",
@@ -63,6 +77,8 @@ const details: Record<string, ServiceDetails> = {
     helpsWith: ["Stiff joints", "Limited flexibility", "Lower back tension", "Low energy", "Poor posture"],
   },
   "sports-massage": {
+    summary: "Deep, focused massage to relieve tight, overworked muscles.",
+    expectSummary: "Firm pressure on problem areas and deep-tissue techniques.",
     benefits: ["Relieves Soreness", "Speeds Up Recovery", "Improves Mobility"],
     intro:
       "Deep, targeted pressure on the muscles you use the most, to relieve tightness, prevent injury and help your body recover faster.",
@@ -73,6 +89,8 @@ const details: Record<string, ServiceDetails> = {
     helpsWith: ["Sore muscles", "Muscle tightness", "Post-workout recovery", "Reduced mobility", "Chronic back pain"],
   },
   "foot-reflexology": {
+    summary: "Reflex-point pressure on the feet to relax the whole body.",
+    expectSummary: "A warm foot soak, then precise pressure on the soles.",
     benefits: ["Relieves Tired Feet", "Improves Circulation", "Deep Relaxation"],
     intro:
       "Precise pressure on the reflex points of the feet, said to correspond to the whole body. Light on the feet, deeply relaxing everywhere else.",
@@ -83,6 +101,8 @@ const details: Record<string, ServiceDetails> = {
     helpsWith: ["Tired, aching feet", "Heavy legs", "Stress", "Poor sleep", "Poor circulation"],
   },
   "hot-herbal-compress": {
+    summary: "Warm Thai herbal compresses to melt away aches.",
+    expectSummary: "Steamed herbal compresses pressed along the body, then massage.",
     benefits: ["Soothes Muscle Aches", "Warms the Body", "Deep Relaxation"],
     intro:
       "Warm Thai herbal compresses are pressed along the body, releasing soothing heat and natural aromas to melt away soreness.",
@@ -97,6 +117,8 @@ const details: Record<string, ServiceDetails> = {
 export function serviceDetails(slug: string, description: string): ServiceDetails {
   return (
     details[slug] ?? {
+      summary: description,
+      expectSummary: "A relaxing, personalised treatment.",
       benefits: ["Relieves Tension", "Restores Energy", "Promotes Relaxation"],
       intro: description,
       highlights: [],

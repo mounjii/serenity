@@ -665,15 +665,6 @@ const PRESSURE_LEVEL: Record<ServiceDetails["pressure"], number> = {
   Firm: 5,
 };
 
-function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="grid gap-2 py-4 sm:grid-cols-[8.5rem_1fr] sm:gap-4">
-      <p className="pt-0.5 text-[0.62rem] tracking-[0.25em] text-muted uppercase">{label}</p>
-      <div>{children}</div>
-    </div>
-  );
-}
-
 function ServiceDetailView({
   service,
   selected,
@@ -698,29 +689,29 @@ function ServiceDetailView({
         <ArrowLeft className="h-4 w-4" /> All treatments
       </button>
 
-      <div className="mt-5 grid gap-6 md:grid-cols-[1fr_1.35fr] md:gap-10">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:sticky md:top-28 md:aspect-[4/5] md:self-start">
-          <Image src={serviceImage(service.slug)} alt={service.name} fill sizes="(min-width: 768px) 40vw, 100vw" className="object-cover" />
+      <div className="mt-5 grid gap-6 md:grid-cols-[0.85fr_1.5fr] md:gap-8">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:aspect-auto md:min-h-[21rem]">
+          <Image src={serviceImage(service.slug)} alt={service.name} fill sizes="(min-width: 768px) 34vw, 100vw" className="object-cover" />
         </div>
 
         <div className="flex flex-col">
           <p className="text-[0.66rem] tracking-[0.3em] text-muted uppercase">Treatment</p>
-          <h2 className="mt-2 font-serif text-3xl leading-tight text-ink sm:text-[2.4rem]">{service.name}</h2>
+          <h2 className="mt-1.5 font-serif text-3xl leading-tight text-ink sm:text-[2.3rem]">{service.name}</h2>
 
-          <ul className="mt-6 grid grid-cols-3 border-b border-sand pb-6">
+          <ul className="mt-5 grid grid-cols-3 border-b border-sand pb-5">
             {info.benefits.map((benefit, index) => {
               const Icon = BENEFIT_ICONS[index % BENEFIT_ICONS.length];
               return (
-                <li key={benefit} className={`flex flex-col gap-3 px-3 first:pl-0 sm:px-5 ${index > 0 ? "border-l border-sand" : ""}`}>
-                  <Icon className="h-7 w-7 text-ink-soft" aria-hidden />
-                  <span className="max-w-[9rem] text-[0.72rem] leading-snug tracking-[0.08em] text-ink-soft sm:text-[0.78rem]">{benefit}</span>
+                <li key={benefit} className={`flex flex-col gap-2.5 px-3 first:pl-0 sm:px-5 ${index > 0 ? "border-l border-sand" : ""}`}>
+                  <Icon className="h-6 w-6 text-ink-soft" aria-hidden />
+                  <span className="text-[0.72rem] leading-snug text-ink-soft sm:text-[0.78rem]">{benefit}</span>
                 </li>
               );
             })}
           </ul>
 
-          <p className="mt-6 text-[0.66rem] tracking-[0.3em] text-muted uppercase">Duration</p>
-          <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
+          <p className="mt-5 text-[0.66rem] tracking-[0.3em] text-muted uppercase">Duration</p>
+          <div className="mt-2.5 grid grid-cols-3 gap-2 sm:gap-3">
             {service.options.map((o, index) => {
               const isSelected = o.durationMinutes === selected.durationMinutes;
               return (
@@ -730,14 +721,14 @@ function ServiceDetailView({
                   onClick={() => onSelect(o.durationMinutes)}
                   aria-pressed={isSelected}
                   style={{ animationDelay: `${120 + index * 60}ms` }}
-                  className={`animate-fade-up flex min-h-[4.25rem] flex-col items-center justify-center rounded-lg border px-1 leading-tight transition ${
+                  className={`animate-fade-up flex min-h-[3.75rem] flex-col items-center justify-center rounded-lg border px-1 leading-tight transition ${
                     isSelected
                       ? "border-ink bg-ink text-cream shadow-[0_10px_22px_-12px_rgba(20,18,15,0.8)]"
                       : "border-sand bg-white text-ink shadow-[0_6px_16px_-14px_rgba(60,40,20,0.5)] hover:border-ink"
                   }`}
                 >
                   <span className="text-[0.72rem] opacity-80">{formatDuration(o.durationMinutes)}</span>
-                  <span className="mt-1 font-serif text-lg">{formatPrice(o.priceCents)}</span>
+                  <span className="mt-0.5 font-serif text-lg">{formatPrice(o.priceCents)}</span>
                 </button>
               );
             })}
@@ -746,90 +737,104 @@ function ServiceDetailView({
           <button
             type="button"
             onClick={onContinue}
-            className="mt-5 inline-flex w-full items-center justify-center gap-3 rounded-full bg-ink py-3.5 text-[0.85rem] tracking-wide text-cream shadow-[0_12px_24px_-14px_rgba(20,18,15,0.9)] transition hover:-translate-y-0.5 hover:bg-black"
+            className="mt-4 inline-flex w-full items-center justify-center gap-3 rounded-full bg-ink py-3.5 text-[0.85rem] tracking-wide text-cream shadow-[0_12px_24px_-14px_rgba(20,18,15,0.9)] transition hover:-translate-y-0.5 hover:bg-black"
           >
             Book Now · {formatDuration(selected.durationMinutes)}
             <ArrowRight className="h-4 w-4" />
           </button>
-
-          <TreatmentDetails info={info} />
         </div>
       </div>
+
+      <TreatmentDetails info={info} />
     </div>
   );
 }
 
 function TreatmentDetails({ info }: { info: ServiceDetails }) {
+  return (
+    <section className="mt-8 rounded-2xl border border-sand/70 bg-white/60 p-4 sm:p-6">
+      <h3 className="px-1 text-[1.05rem] font-medium text-ink">Treatment details</h3>
+      <div className="mt-4 space-y-3">
+        <DetailItem icon={LotusIcon} title="Overview" summary={info.summary}>
+          <p className="text-[0.86rem] leading-relaxed font-light text-ink-soft">{info.intro}</p>
+          <dl className="mt-4 grid grid-cols-2 gap-3">
+            <div className="rounded-lg bg-cream px-4 py-3">
+              <dt className="text-[0.6rem] tracking-[0.25em] text-muted uppercase">Pressure</dt>
+              <dd className="mt-2">
+                <span className="flex gap-1" aria-hidden>
+                  {[1, 2, 3, 4, 5].map((level) => (
+                    <span key={level} className={`h-1.5 w-5 rounded-full ${level <= PRESSURE_LEVEL[info.pressure] ? "bg-ink" : "bg-sand"}`} />
+                  ))}
+                </span>
+                <span className="mt-1.5 block text-[0.8rem] text-ink">{info.pressure}</span>
+              </dd>
+            </div>
+            <div className="rounded-lg bg-cream px-4 py-3">
+              <dt className="text-[0.6rem] tracking-[0.25em] text-muted uppercase">Ideal for</dt>
+              <dd className="mt-2 text-[0.8rem] leading-snug text-ink">{info.idealFor}</dd>
+            </div>
+          </dl>
+          {info.why && (
+            <p className="mt-4 border-l-2 border-ink/20 pl-3 font-serif text-[1.02rem] leading-snug text-ink italic">{info.why}</p>
+          )}
+        </DetailItem>
+
+        {info.highlights.length > 0 && (
+          <DetailItem icon={LeafIcon} title="What to expect" summary={info.expectSummary}>
+            <ul className="space-y-2 text-[0.86rem] text-ink-soft">
+              {info.highlights.map((h) => (
+                <li key={h} className="flex items-start gap-2.5">
+                  <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-ink" aria-hidden />
+                  {h}
+                </li>
+              ))}
+            </ul>
+          </DetailItem>
+        )}
+
+        {info.helpsWith.length > 0 && (
+          <DetailItem icon={HeartIcon} title="Helps with" summary={`${info.helpsWith.slice(0, 3).join(", ")}…`}>
+            <ul className="flex flex-wrap gap-1.5">
+              {info.helpsWith.map((item) => (
+                <li key={item} className="rounded-full bg-cream-dark px-3 py-1 text-[0.76rem] text-ink">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </DetailItem>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function DetailItem({
+  icon: Icon,
+  title,
+  summary,
+  children,
+}: {
+  icon: (props: React.SVGProps<SVGSVGElement>) => React.ReactNode;
+  title: string;
+  summary: string;
+  children: React.ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="mt-4 rounded-lg border border-sand bg-white">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        className="flex w-full items-center justify-between px-5 py-4 text-left text-[0.85rem] font-medium text-ink"
-      >
-        Treatment details
-        <ChevronDown className={`h-4 w-4 text-muted transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+    <div className={`rounded-xl border bg-white transition-shadow duration-300 ${open ? "border-sand shadow-[0_14px_30px_-24px_rgba(60,40,20,0.5)]" : "border-sand/70"}`}>
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="flex w-full items-center gap-4 px-4 py-3.5 text-left sm:px-5">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-cream-dark text-ink-soft">
+          <Icon className="h-5 w-5" aria-hidden />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-serif text-[1.15rem] leading-tight text-ink">{title}</span>
+          <span className="mt-0.5 block truncate text-[0.78rem] font-light text-muted">{summary}</span>
+        </span>
+        <ChevronDown className={`h-4 w-4 shrink-0 text-ink-soft transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
       </button>
       <div className={`grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
         <div className="overflow-hidden" inert={!open}>
-          <div className="border-t border-sand">
-            <dl className="grid grid-cols-2 divide-x divide-sand border-b border-sand bg-cream/50">
-              <div className="px-5 py-4">
-                <dt className="text-[0.62rem] tracking-[0.25em] text-muted uppercase">Pressure</dt>
-                <dd className="mt-2">
-                  <span className="flex gap-1" aria-hidden>
-                    {[1, 2, 3, 4, 5].map((level) => (
-                      <span key={level} className={`h-1.5 w-5 rounded-full ${level <= PRESSURE_LEVEL[info.pressure] ? "bg-ink" : "bg-sand"}`} />
-                    ))}
-                  </span>
-                  <span className="mt-1.5 block text-[0.8rem] text-ink">{info.pressure}</span>
-                </dd>
-              </div>
-              <div className="px-5 py-4">
-                <dt className="text-[0.62rem] tracking-[0.25em] text-muted uppercase">Ideal for</dt>
-                <dd className="mt-2 text-[0.8rem] leading-snug text-ink">{info.idealFor}</dd>
-              </div>
-            </dl>
-
-            <div className="divide-y divide-sand px-5">
-              <DetailRow label="Overview">
-                <p className="text-[0.85rem] leading-relaxed font-light text-ink-soft">{info.intro}</p>
-              </DetailRow>
-
-              {info.highlights.length > 0 && (
-                <DetailRow label="What to expect">
-                  <ul className="space-y-2 text-[0.85rem] text-ink-soft">
-                    {info.highlights.map((h) => (
-                      <li key={h} className="flex items-start gap-2.5">
-                        <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-ink" aria-hidden />
-                        {h}
-                      </li>
-                    ))}
-                  </ul>
-                </DetailRow>
-              )}
-
-              {info.helpsWith.length > 0 && (
-                <DetailRow label="Helps with">
-                  <ul className="flex flex-wrap gap-1.5">
-                    {info.helpsWith.map((item) => (
-                      <li key={item} className="rounded-full bg-cream-dark px-3 py-1 text-[0.75rem] text-ink">
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </DetailRow>
-              )}
-
-              {info.why && (
-                <DetailRow label="Why choose it">
-                  <p className="border-l-2 border-ink/20 pl-3 font-serif text-[1.05rem] leading-snug text-ink italic">{info.why}</p>
-                </DetailRow>
-              )}
-            </div>
-          </div>
+          <div className="border-t border-sand/70 px-4 pt-4 pb-5 sm:pl-[4.75rem] sm:pr-6">{children}</div>
         </div>
       </div>
     </div>
