@@ -1,3 +1,4 @@
+import Link from "next/link";
 import LoginForm from "@/components/admin/LoginForm";
 
 export default async function AdminLoginPage({ searchParams }: PageProps<"/admin/login">) {
@@ -8,6 +9,12 @@ export default async function AdminLoginPage({ searchParams }: PageProps<"/admin
         <p className="eyebrow text-center">Serenity</p>
         <h1 className="mt-3 text-center font-serif text-3xl text-ink">Admin sign in</h1>
         <LoginForm next={typeof next === "string" ? next : "/admin"} />
+        <Link
+          href="/"
+          className="mt-4 flex min-h-12 w-full items-center justify-center rounded-full border border-sand text-[0.8rem] tracking-wide text-ink transition hover:border-ink"
+        >
+          ← Back to home
+        </Link>
       </div>
     </main>
   );
