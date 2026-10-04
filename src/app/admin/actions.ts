@@ -47,7 +47,7 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
 
 export async function logoutAction(): Promise<void> {
   await endSession();
-  redirect("/admin/login");
+  redirect("/");
 }
 
 export async function cancelBookingAction(id: string): Promise<ActionResult<AdminBooking>> {
