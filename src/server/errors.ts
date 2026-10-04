@@ -57,25 +57,27 @@ export function jsonResponse(data: unknown, status = 200): Response {
   return Response.json(data, { status, headers: NO_STORE });
 }
 
-/** Turns any thrown value into the uniform API error format. Internal details are only logged. */
-export function errorResponse(error: unknown): Response {
+/** Maps any thrown value to a status and the uniform error body. Internal details are only logged. */
+export function describeError(error: unknown): { status: number; body: ApiErrorBody } {
   if (error instanceof AppError) {
-    const body: ApiErrorBody = {
-      error: { code: error.code, message: error.message, ...(error.fields ? { fields: error.fields } : {}) },
+    return {
+      status: error.status,
+      body: { error: { code: error.code, message: error.message, ...(error.fields ? { fields: error.fields } : {}) } },
     };
-    return jsonResponse(body, error.status);
   }
   if (error instanceof z.ZodError) {
-    const body: ApiErrorBody = {
-      error: { code: "INVALID_INPUT", message: "Some fields are invalid.", fields: zodFieldErrors(error) },
+    return {
+      status: 400,
+      body: { error: { code: "INVALID_INPUT", message: "Some fields are invalid.", fields: zodFieldErrors(error) } },
     };
-    return jsonResponse(body, 400);
   }
-  console.error("[api] unexpected error", error);
-  const body: ApiErrorBody = {
-    error: { code: "INTERNAL_ERROR", message: "Something went wrong. Please try again." },
-  };
-  return jsonResponse(body, 500);
+  console.error("[server] unexpected error", error);
+  return { status: 500, body: { error: { code: "INTERNAL_ERROR", message: "Something went wrong. Please try again." } } };
+}
+
+export function errorResponse(error: unknown): Response {
+  const { status, body } = describeError(error);
+  return jsonResponse(body, status);
 }
 
 export async function readJsonBody(request: Request): Promise<unknown> {

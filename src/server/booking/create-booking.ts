@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import { Prisma, type BookingSource } from "@/generated/prisma/client";
 import { BUFFER_MINUTES, MAX_DAYS_AHEAD, MIN_LEAD_MINUTES, SLOT_STEP_MINUTES } from "@/lib/booking-rules";
 import { createBookingSchema } from "@/lib/booking-schema";
-import { addMinutes, localToUtc, toLocalDateString, toLocalMinuteOfDay } from "@/lib/time";
+import { addMinutes, dateStringToDbDate, localToUtc, toLocalDateString, toLocalMinuteOfDay } from "@/lib/time";
 import { getDb } from "@/server/db";
 import { AppError, businessRule } from "@/server/errors";
 import { getDaySchedule } from "./schedule";
@@ -90,6 +90,9 @@ export async function createBooking(rawInput: unknown, options: CreateBookingOpt
     throw businessRule("INVALID_SLOT", "This start time is not a valid booking slot.");
   }
 
+  if (options.source === "ADMIN" && startAt <= now) {
+    throw businessRule("TOO_SOON", "This time has already passed.");
+  }
   if (options.source === "ONLINE") {
     if (startAt < addMinutes(now, MIN_LEAD_MINUTES)) {
       throw businessRule("TOO_SOON", `Reservations must be made at least ${MIN_LEAD_MINUTES / 60} hours in advance.`);
@@ -111,6 +114,10 @@ export async function createBooking(rawInput: unknown, options: CreateBookingOpt
           const locked = await tx.$queryRaw<{ id: string }[]>`
             SELECT id FROM therapists WHERE active = 1 ORDER BY id FOR UPDATE`;
           if (locked.length === 0) throw businessRule("NO_THERAPIST", "No therapist is available.");
+
+          // Closing a day takes the same lock, so this re-check cannot race with it.
+          const closedDay = await tx.closedDay.findUnique({ where: { date: dateStringToDbDate(localDate) }, select: { id: true } });
+          if (closedDay) throw businessRule("CLOSED", "The salon is closed on this day.");
 
           const overlapping = await tx.booking.findMany({
             where: {
