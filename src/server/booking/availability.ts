@@ -2,6 +2,7 @@ import { BUFFER_MINUTES, MAX_DAYS_AHEAD, MIN_LEAD_MINUTES, SLOT_STEP_MINUTES } f
 import { addDays, addMinutes, isValidDateString, localToUtc, minutesToHHmm, toLocalDateString } from "@/lib/time";
 import { getDb } from "@/server/db";
 import { invalidInput, notFound } from "@/server/errors";
+import { pickOption } from "@/lib/service-options";
 import { getDaySchedule } from "./schedule";
 
 export type Slot = { time: string; startAt: string };
@@ -9,7 +10,16 @@ export type Slot = { time: string; startAt: string };
 type AvailabilityOptions = {
   /** Admin bookings ignore the 2 h minimum notice and the 30-day horizon, but never past times. */
   ignoreLeadRules?: boolean;
+  /** One of the service's durations; the shortest one when omitted. */
+  durationMinutes?: number | null;
 };
+
+/** `?duration=` query value: absent means "shortest duration"; anything else must be a whole number of minutes. */
+export function parseDurationParam(raw: string | null): number | null {
+  if (raw === null || raw === "") return null;
+  if (!/^\d{1,3}$/.test(raw)) throw invalidInput("duration must be a number of minutes.", { durationMinutes: "Invalid duration." });
+  return Number(raw);
+}
 
 export async function getAvailability(
   serviceId: string,
@@ -23,9 +33,11 @@ export async function getAvailability(
   const db = getDb();
   const service = await db.service.findFirst({
     where: { id: serviceId, active: true },
-    select: { durationMinutes: true },
+    select: { options: { where: { active: true }, select: { durationMinutes: true, priceCents: true } } },
   });
-  if (!service) throw notFound("Service not found.");
+  if (!service || service.options.length === 0) throw notFound("Service not found.");
+  const option = pickOption(service.options, options.durationMinutes);
+  if (!option) throw invalidInput("This duration is not available for this service.", { durationMinutes: "This duration is not available." });
 
   const today = toLocalDateString(now);
   if (date < today) return [];
@@ -38,7 +50,7 @@ export async function getAvailability(
   if (therapists.length === 0) return [];
   const therapistIds = therapists.map((t) => t.id);
 
-  const duration = service.durationMinutes;
+  const duration = option.durationMinutes;
   const earliest = options.ignoreLeadRules ? addMinutes(now, 1) : addMinutes(now, MIN_LEAD_MINUTES);
   const latest = options.ignoreLeadRules ? null : addMinutes(now, MAX_DAYS_AHEAD * 24 * 60);
   const windowStart = localToUtc(date, schedule.openMinute);

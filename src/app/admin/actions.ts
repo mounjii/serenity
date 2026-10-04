@@ -64,6 +64,7 @@ export async function completeBookingAction(id: string): Promise<ActionResult<Ad
 
 export type AdminBookingInput = {
   serviceId: string;
+  durationMinutes: number;
   startAt: string;
   customerName: string;
   customerPhone: string;
@@ -76,6 +77,7 @@ export async function createAdminBookingAction(input: AdminBookingInput): Promis
     const { kind, booking } = await createBooking(
       {
         serviceId: input.serviceId,
+        durationMinutes: input.durationMinutes,
         startAt: input.startAt,
         customerName: input.customerName,
         customerPhone: input.customerPhone,

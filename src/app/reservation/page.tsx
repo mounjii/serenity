@@ -13,8 +13,9 @@ export const metadata: Metadata = {
 
 export default async function ReservationPage({ searchParams }: PageProps<"/reservation">) {
   await connection();
-  const [{ service }, services, days] = await Promise.all([searchParams, getActiveServices(), getBookableDays()]);
+  const [{ service, duration }, services, days] = await Promise.all([searchParams, getActiveServices(), getBookableDays()]);
   const initialSlug = typeof service === "string" ? service : undefined;
+  const initialDuration = typeof duration === "string" && /^\d{1,3}$/.test(duration) ? Number(duration) : undefined;
 
   return (
     <>
@@ -28,7 +29,7 @@ export default async function ReservationPage({ searchParams }: PageProps<"/rese
               Choose your treatment, pick a time that suits you and confirm in a minute.
             </p>
           </header>
-          <BookingFlow services={services} days={days} initialServiceSlug={initialSlug} />
+          <BookingFlow services={services} days={days} initialServiceSlug={initialSlug} initialDuration={initialDuration} />
         </div>
       </main>
       <Footer />

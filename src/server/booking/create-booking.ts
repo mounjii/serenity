@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { Prisma, type BookingSource } from "@/generated/prisma/client";
 import { BUFFER_MINUTES, MAX_DAYS_AHEAD, MIN_LEAD_MINUTES, SLOT_STEP_MINUTES } from "@/lib/booking-rules";
 import { createBookingSchema } from "@/lib/booking-schema";
+import { pickOption } from "@/lib/service-options";
 import { addMinutes, dateStringToDbDate, localToUtc, toLocalDateString, toLocalMinuteOfDay } from "@/lib/time";
 import { getDb } from "@/server/db";
 import { AppError, businessRule } from "@/server/errors";
@@ -72,11 +73,15 @@ export async function createBooking(rawInput: unknown, options: CreateBookingOpt
     throw businessRule("INVALID_SLOT", "This start time is not a valid booking slot.");
   }
 
-  const service = await db.service.findFirst({
+  const serviceRow = await db.service.findFirst({
     where: { id: input.serviceId, active: true },
-    select: { id: true, durationMinutes: true, priceCents: true },
+    select: { id: true, options: { where: { active: true }, select: { durationMinutes: true, priceCents: true } } },
   });
-  if (!service) throw businessRule("SERVICE_UNAVAILABLE", "This service is not available.");
+  if (!serviceRow) throw businessRule("SERVICE_UNAVAILABLE", "This service is not available.");
+  // Duration and price always come from the database, never from the client.
+  const option = pickOption(serviceRow.options, input.durationMinutes);
+  if (!option) throw businessRule("SERVICE_UNAVAILABLE", "This duration is not available for this service.");
+  const service = { id: serviceRow.id, durationMinutes: option.durationMinutes, priceCents: option.priceCents };
 
   const localDate = toLocalDateString(startAt);
   const schedule = await getDaySchedule(db, localDate);

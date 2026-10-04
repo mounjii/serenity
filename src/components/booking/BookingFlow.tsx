@@ -8,6 +8,7 @@ import { DEFAULT_PHONE_PREFIX, NOTE_MAX } from "@/lib/booking-rules";
 import { customerDetailsSchema } from "@/lib/booking-schema";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
+import { pickOption } from "@/lib/service-options";
 import { formatLongDate } from "@/lib/time";
 import type { BookableDay } from "@/server/booking/calendar";
 import type { PublicService } from "@/server/booking/services";
@@ -52,14 +53,23 @@ async function readError(res: Response): Promise<ApiErrorBody["error"] | null> {
   }
 }
 
-type Props = { services: PublicService[]; days: BookableDay[]; initialServiceSlug?: string };
+type Props = { services: PublicService[]; days: BookableDay[]; initialServiceSlug?: string; initialDuration?: number };
 
-export default function BookingFlow({ services, days, initialServiceSlug }: Props) {
+export default function BookingFlow({ services, days, initialServiceSlug, initialDuration }: Props) {
   const router = useRouter();
   const initialService = services.find((s) => s.slug === initialServiceSlug);
+  // Skip the first step only when the duration is unambiguous.
+  const initialOption = initialService
+    ? initialDuration
+      ? pickOption(initialService.options, initialDuration)
+      : initialService.options.length === 1
+        ? initialService.options[0]
+        : null
+    : null;
 
-  const [step, setStep] = useState<Step>(initialService ? 2 : 1);
+  const [step, setStep] = useState<Step>(initialOption ? 2 : 1);
   const [serviceId, setServiceId] = useState<string | null>(initialService?.id ?? null);
+  const [durationMinutes, setDurationMinutes] = useState<number | null>(initialOption?.durationMinutes ?? null);
   const [date, setDate] = useState<string | null>(null);
   const [slot, setSlot] = useState<Slot | null>(null);
   const [details, setDetails] = useState<Details>({
@@ -79,20 +89,21 @@ export default function BookingFlow({ services, days, initialServiceSlug }: Prop
   const slotsRequest = useRef<AbortController | null>(null);
 
   const service = services.find((s) => s.id === serviceId) ?? null;
+  const option = service && durationMinutes ? pickOption(service.options, durationMinutes) : null;
 
   const resetAttempt = () => {
     idempotencyKey.current = newIdempotencyKey();
     setSubmitError(null);
   };
 
-  const loadSlots = useCallback(async (forService: string, forDate: string, quiet = false) => {
+  const loadSlots = useCallback(async (forService: string, forDuration: number, forDate: string, quiet = false) => {
     slotsRequest.current?.abort();
     const controller = new AbortController();
     slotsRequest.current = controller;
     if (!quiet) setSlotsLoading(true);
     setSlotsError(null);
     try {
-      const params = new URLSearchParams({ serviceId: forService, date: forDate });
+      const params = new URLSearchParams({ serviceId: forService, duration: String(forDuration), date: forDate });
       const res = await fetch(`/api/availability?${params}`, { cache: "no-store", signal: controller.signal });
       if (!res.ok) {
         const err = await readError(res);
@@ -111,9 +122,9 @@ export default function BookingFlow({ services, days, initialServiceSlug }: Prop
 
   // While the customer is choosing a time, keep the slots fresh: every 30 s and whenever the tab regains focus.
   useEffect(() => {
-    if (step !== 3 || !serviceId || !date) return;
+    if (step !== 3 || !serviceId || !durationMinutes || !date) return;
     const refresh = () => {
-      if (!document.hidden) void loadSlots(serviceId, date, true);
+      if (!document.hidden) void loadSlots(serviceId, durationMinutes, date, true);
     };
     const timer = window.setInterval(refresh, SLOT_REFRESH_MS);
     window.addEventListener("focus", refresh);
@@ -123,28 +134,28 @@ export default function BookingFlow({ services, days, initialServiceSlug }: Prop
       window.removeEventListener("focus", refresh);
       document.removeEventListener("visibilitychange", refresh);
     };
-  }, [step, serviceId, date, loadSlots]);
+  }, [step, serviceId, durationMinutes, date, loadSlots]);
 
-  const chooseService = (id: string) => {
-    setServiceId(id);
-    if (id !== serviceId) {
-      setDate(null);
+  const chooseOption = (id: string, duration: number) => {
+    if (id !== serviceId || duration !== durationMinutes) {
       setSlot(null);
       setSlots([]);
     }
+    setServiceId(id);
+    setDurationMinutes(duration);
     resetAttempt();
     setNotice(null);
     setStep(2);
   };
 
   const chooseDate = (value: string) => {
-    if (!serviceId) return;
+    if (!serviceId || !durationMinutes) return;
     setDate(value);
     setSlot(null);
     setNotice(null);
     resetAttempt();
     setStep(3);
-    void loadSlots(serviceId, value);
+    void loadSlots(serviceId, durationMinutes, value);
   };
 
   const chooseSlot = (value: Slot) => {
@@ -172,7 +183,7 @@ export default function BookingFlow({ services, days, initialServiceSlug }: Prop
   };
 
   const confirm = async () => {
-    if (!service || !slot || submitting) return;
+    if (!service || !option || !slot || submitting) return;
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -181,6 +192,7 @@ export default function BookingFlow({ services, days, initialServiceSlug }: Prop
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           serviceId: service.id,
+          durationMinutes: option.durationMinutes,
           startAt: slot.startAt,
           customerName: details.customerName,
           customerPhone: details.customerPhone,
@@ -200,7 +212,7 @@ export default function BookingFlow({ services, days, initialServiceSlug }: Prop
         setSlot(null);
         resetAttempt();
         setStep(3);
-        if (date) void loadSlots(service.id, date);
+        if (date) void loadSlots(service.id, option.durationMinutes, date);
       } else if (res.status === 400 && err?.fields) {
         setFieldErrors(err.fields);
         setStep(4);
@@ -209,7 +221,7 @@ export default function BookingFlow({ services, days, initialServiceSlug }: Prop
         setSlot(null);
         resetAttempt();
         setStep(3);
-        if (date) void loadSlots(service.id, date);
+        if (date) void loadSlots(service.id, option.durationMinutes, date);
       } else {
         setSubmitError(err?.message ?? "Something went wrong. Please try again.");
       }
@@ -222,14 +234,14 @@ export default function BookingFlow({ services, days, initialServiceSlug }: Prop
 
   const canOpen = (target: Step) =>
     target === 1 ||
-    (target === 2 && !!service) ||
-    (target === 3 && !!service && !!date) ||
+    (target === 2 && !!option) ||
+    (target === 3 && !!option && !!date) ||
     (target === 4 && !!slot) ||
     (target === 5 && !!slot && step === 5);
 
   const goTo = (target: Step) => {
     if (!canOpen(target) || submitting) return;
-    if (target === 3 && serviceId && date) void loadSlots(serviceId, date);
+    if (target === 3 && serviceId && durationMinutes && date) void loadSlots(serviceId, durationMinutes, date);
     setStep(target);
   };
 
@@ -282,37 +294,51 @@ export default function BookingFlow({ services, days, initialServiceSlug }: Prop
       <section className="mt-8 rounded-sm bg-white p-5 shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)] sm:p-8">
         {step === 1 && (
           <div>
-            <StepTitle title="Choose your treatment" />
+            <StepTitle title="Choose your treatment" subtitle="Tap the duration you would like." />
             {services.length === 0 ? (
               <p className="mt-6 text-[0.9rem] text-ink-soft">No treatments are available for booking right now.</p>
             ) : (
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 {services.map((s) => (
-                  <button
+                  <div
                     key={s.id}
-                    type="button"
-                    onClick={() => chooseService(s.id)}
-                    className={`flex flex-col rounded-sm border p-5 text-left transition hover:border-ink ${
-                      s.id === serviceId ? "border-ink bg-cream" : "border-sand"
-                    }`}
+                    className={`flex flex-col rounded-sm border p-5 transition ${s.id === serviceId ? "border-ink bg-cream" : "border-sand"}`}
                   >
-                    <span className="font-serif text-xl text-ink">{s.name}</span>
-                    <span className="mt-2 text-[0.8rem] leading-relaxed font-light text-muted">{s.description}</span>
-                    <span className="mt-4 flex items-center gap-3 text-[0.8rem] text-ink-soft">
-                      <span>{formatDuration(s.durationMinutes)}</span>
-                      <span className="h-3 w-px bg-sand" />
-                      <span className="text-ink">{formatPrice(s.priceCents)}</span>
-                    </span>
-                  </button>
+                    <h3 className="font-serif text-xl text-ink">{s.name}</h3>
+                    <p className="mt-2 flex-1 text-[0.8rem] leading-relaxed font-light text-muted">{s.description}</p>
+                    <div className="mt-4 grid grid-cols-3 gap-2">
+                      {s.options.map((o) => {
+                        const selected = s.id === serviceId && o.durationMinutes === durationMinutes;
+                        return (
+                          <button
+                            key={o.durationMinutes}
+                            type="button"
+                            onClick={() => chooseOption(s.id, o.durationMinutes)}
+                            aria-pressed={selected}
+                            aria-label={`${s.name}, ${formatDuration(o.durationMinutes)}, ${formatPrice(o.priceCents)}`}
+                            className={`flex min-h-14 flex-col items-center justify-center rounded-sm border px-1 text-center transition ${
+                              selected ? "border-ink bg-ink text-cream" : "border-sand bg-white text-ink hover:border-ink"
+                            }`}
+                          >
+                            <span className="text-[0.75rem]">{formatDuration(o.durationMinutes)}</span>
+                            <span className="text-[0.85rem] font-medium">{formatPrice(o.priceCents)}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
           </div>
         )}
 
-        {step === 2 && service && (
+        {step === 2 && service && option && (
           <div>
-            <StepTitle title="Pick a date" subtitle={`${service.name} · ${formatDuration(service.durationMinutes)}`} />
+            <StepTitle
+              title="Pick a date"
+              subtitle={`${service.name} · ${formatDuration(option.durationMinutes)} · ${formatPrice(option.priceCents)}`}
+            />
             <div className="mt-6 grid grid-cols-4 gap-2 sm:grid-cols-7">
               {days.map((d) => {
                 const parts = dayParts(d.date);
@@ -344,15 +370,18 @@ export default function BookingFlow({ services, days, initialServiceSlug }: Prop
           </div>
         )}
 
-        {step === 3 && service && date && (
+        {step === 3 && service && option && date && (
           <div>
-            <StepTitle title="Choose a time" subtitle={`${service.name} · ${formatLongDate(new Date(`${date}T12:00:00.000Z`))}`} />
+            <StepTitle
+              title="Choose a time"
+              subtitle={`${service.name} · ${formatDuration(option.durationMinutes)} · ${formatLongDate(new Date(`${date}T12:00:00.000Z`))}`}
+            />
             {slotsLoading && slots.length === 0 ? (
               <p className="mt-6 text-[0.9rem] text-ink-soft">Loading available times…</p>
             ) : slotsError ? (
               <div className="mt-6 space-y-4">
                 <p role="alert" className="text-[0.9rem] text-red-700">{slotsError}</p>
-                <Button variant="outline" size="sm" onClick={() => void loadSlots(service.id, date)}>Try again</Button>
+                <Button variant="outline" size="sm" onClick={() => void loadSlots(service.id, option.durationMinutes, date)}>Try again</Button>
               </div>
             ) : slots.length === 0 ? (
               <div className="mt-6 space-y-4">
@@ -446,17 +475,17 @@ export default function BookingFlow({ services, days, initialServiceSlug }: Prop
           </form>
         )}
 
-        {step === 5 && service && slot && (
+        {step === 5 && service && option && slot && (
           <div>
             <StepTitle title="Review your reservation" />
             <dl className="mt-6 divide-y divide-sand border-y border-sand text-[0.9rem]">
               <SummaryRow label="Service" value={service.name} />
               <SummaryRow label="Date" value={formatLongDate(new Date(slot.startAt))} />
-              <SummaryRow label="Time" value={`${slot.time} (${formatDuration(service.durationMinutes)})`} />
+              <SummaryRow label="Time" value={`${slot.time} (${formatDuration(option.durationMinutes)})`} />
               <SummaryRow label="Name" value={details.customerName.replace(/\s+/g, " ").trim()} />
               <SummaryRow label="Phone" value={normalizedPhone.success ? formatPhone(normalizedPhone.data) : details.customerPhone} />
               {details.note.trim() && <SummaryRow label="Note" value={details.note.trim()} />}
-              <SummaryRow label="Price" value={formatPrice(service.priceCents)} strong />
+              <SummaryRow label="Price" value={formatPrice(option.priceCents)} strong />
             </dl>
             <p className="mt-4 text-[0.75rem] text-muted">Payment is made at the salon.</p>
             {submitError && (

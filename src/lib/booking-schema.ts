@@ -44,6 +44,8 @@ export const customerDetailsSchema = z.object({
 
 export const createBookingSchema = customerDetailsSchema.extend({
   serviceId: z.string().min(1).max(40),
+  /** One of the service's offered durations; the shortest one when omitted. */
+  durationMinutes: z.number({ error: "Invalid duration." }).int().min(5).max(600).optional(),
   startAt: z.iso.datetime({ offset: true, error: "Invalid start time." }),
   idempotencyKey: z.string().min(8).max(100).optional(),
   website: z.string().max(500).optional(),

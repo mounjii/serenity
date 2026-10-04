@@ -24,6 +24,7 @@ type Props = { services: PublicService[]; today: string; initialDate: string };
 export default function AdminBookingForm({ services, today, initialDate }: Props) {
   const router = useRouter();
   const [serviceId, setServiceId] = useState(services[0]?.id ?? "");
+  const [durationMinutes, setDurationMinutes] = useState(services[0]?.options[0]?.durationMinutes ?? 0);
   const [date, setDate] = useState(initialDate < today ? today : initialDate);
   const [availability, setAvailability] = useState<Availability | null>(null);
   const [slotsError, setSlotsError] = useState<string | null>(null);
@@ -39,12 +40,12 @@ export default function AdminBookingForm({ services, today, initialDate }: Props
 
   const service = services.find((s) => s.id === serviceId) ?? null;
 
-  const loadSlots = useCallback(async (forService: string, forDate: string) => {
+  const loadSlots = useCallback(async (forService: string, forDuration: number, forDate: string) => {
     request.current?.abort();
     const controller = new AbortController();
     request.current = controller;
     try {
-      const params = new URLSearchParams({ serviceId: forService, date: forDate });
+      const params = new URLSearchParams({ serviceId: forService, duration: String(forDuration), date: forDate });
       const res = await fetch(`/api/admin/availability?${params}`, { cache: "no-store", signal: controller.signal });
       if (res.status === 401) {
         router.push("/admin/login");
@@ -63,10 +64,10 @@ export default function AdminBookingForm({ services, today, initialDate }: Props
   }, [router]);
 
   useEffect(() => {
-    if (!serviceId || !date) return;
-    const timer = window.setTimeout(() => void loadSlots(serviceId, date), 0);
+    if (!serviceId || !durationMinutes || !date) return;
+    const timer = window.setTimeout(() => void loadSlots(serviceId, durationMinutes, date), 0);
     return () => window.clearTimeout(timer);
-  }, [serviceId, date, loadSlots]);
+  }, [serviceId, durationMinutes, date, loadSlots]);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -88,6 +89,7 @@ export default function AdminBookingForm({ services, today, initialDate }: Props
     setSubmitting(true);
     const result = await createAdminBookingAction({
       serviceId: service.id,
+      durationMinutes,
       startAt: slot.startAt,
       customerName: name,
       customerPhone: phone,
@@ -107,7 +109,7 @@ export default function AdminBookingForm({ services, today, initialDate }: Props
     } else {
       setFormError(error.message);
       idempotencyKey.current = newKey();
-      if (error.status === 409 || error.status === 422) void loadSlots(service.id, date);
+      if (error.status === 409 || error.status === 422) void loadSlots(service.id, durationMinutes, date);
     }
   };
 
@@ -118,18 +120,24 @@ export default function AdminBookingForm({ services, today, initialDate }: Props
           <label htmlFor="service" className="mb-1.5 block text-[0.8rem]">Service</label>
           <select
             id="service"
-            value={serviceId}
+            value={`${serviceId}|${durationMinutes}`}
             onChange={(e) => {
-              setServiceId(e.target.value);
+              const [id, minutes] = e.target.value.split("|");
+              setServiceId(id);
+              setDurationMinutes(Number(minutes));
               setSlot(null);
               idempotencyKey.current = newKey();
             }}
             className={inputClass()}
           >
             {services.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name} · {formatDuration(s.durationMinutes)} · {formatPrice(s.priceCents)}
-              </option>
+              <optgroup key={s.id} label={s.name}>
+                {s.options.map((o) => (
+                  <option key={o.durationMinutes} value={`${s.id}|${o.durationMinutes}`}>
+                    {s.name} · {formatDuration(o.durationMinutes)} · {formatPrice(o.priceCents)}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </div>

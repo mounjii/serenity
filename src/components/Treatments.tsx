@@ -9,16 +9,33 @@ import Reveal from "./Reveal";
 
 const imageBySlug: Record<string, string> = {
   "swedish-massage": images.swedish,
-  "deep-tissue-massage": images.deepTissue,
-  "aromatherapy-massage": images.aromatherapy,
-  "relaxation-massage": images.relaxation,
+  "thai-oil-massage": images.thaiOil,
+  "aroma-massage": images.aromatherapy,
+  "head-neck-shoulder-massage": images.headNeck,
+  "thai-massage": images.thai,
+  "sports-massage": images.sports,
+  "foot-reflexology": images.footReflexology,
+  "hot-herbal-compress": images.herbalCompress,
 };
 
+const fallback = (slug: string, name: string, description: string, options: [number, number][]): PublicService => ({
+  id: slug,
+  slug,
+  name,
+  description,
+  options: options.map(([durationMinutes, mad]) => ({ durationMinutes, priceCents: mad * 100 })),
+});
+
+/** Shown only if the database is unreachable; mirrors prisma/seed.ts. */
 const fallbackServices: PublicService[] = [
-  { id: "swedish-massage", slug: "swedish-massage", name: "Swedish Massage", description: "Gentle, flowing strokes to relieve tension and promote relaxation.", durationMinutes: 60, priceCents: 7000 },
-  { id: "deep-tissue-massage", slug: "deep-tissue-massage", name: "Deep Tissue Massage", description: "Targeted pressure to release muscle tension and improve mobility.", durationMinutes: 60, priceCents: 8000 },
-  { id: "aromatherapy-massage", slug: "aromatherapy-massage", name: "Aromatherapy Massage", description: "Essential oils to calm your mind and balance your energy.", durationMinutes: 60, priceCents: 7500 },
-  { id: "relaxation-massage", slug: "relaxation-massage", name: "Relaxation Massage", description: "A full-body experience for deep relaxation and mental clarity.", durationMinutes: 60, priceCents: 6500 },
+  fallback("swedish-massage", "Swedish Massage", "Gentle, flowing strokes to relieve tension and promote deep relaxation.", [[60, 400], [90, 500], [120, 600]]),
+  fallback("thai-oil-massage", "Thai Oil Massage", "Traditional Thai techniques with warm oil to loosen muscles and restore energy.", [[60, 350], [90, 450], [120, 550]]),
+  fallback("aroma-massage", "Aroma Massage", "Soothing essential oils to calm your mind and balance your body.", [[60, 350], [90, 450], [120, 550]]),
+  fallback("head-neck-shoulder-massage", "Head, Neck & Shoulder", "Focused work on the upper body to release stress, stiffness and headaches.", [[60, 300], [90, 450], [120, 550]]),
+  fallback("thai-massage", "Thai Massage", "Assisted stretching and acupressure for flexibility, circulation and balance.", [[60, 300], [90, 450], [120, 550]]),
+  fallback("sports-massage", "Sports Massage", "Deep, targeted pressure to ease muscle tension and speed up recovery.", [[60, 450], [90, 550], [120, 700]]),
+  fallback("foot-reflexology", "Foot Reflexology", "Pressure on reflex points of the feet to relax the whole body.", [[30, 180], [60, 300], [90, 400]]),
+  fallback("hot-herbal-compress", "Hot Herbal Compress", "Warm Thai herbal compresses to soothe sore muscles and deeply relax.", [[90, 600], [120, 700]]),
 ];
 
 async function loadServices(): Promise<PublicService[]> {
@@ -54,7 +71,7 @@ export default async function Treatments() {
             <Reveal
               as="article"
               key={t.slug}
-              delay={i * 120}
+              delay={(i % 4) * 120}
               className="group relative flex flex-col overflow-hidden rounded-sm bg-white shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)] transition-shadow duration-500 hover:shadow-[0_30px_60px_-25px_rgba(60,40,20,0.4)]"
             >
               <Link
@@ -76,11 +93,15 @@ export default async function Treatments() {
                 <p className="mt-3 flex-1 text-[0.8rem] leading-relaxed font-light text-muted">
                   {t.description}
                 </p>
-                <div className="mt-6 flex items-center gap-3 border-t border-sand pt-4 text-[0.78rem] text-ink-soft">
-                  <span>{formatDuration(t.durationMinutes)}</span>
-                  <span className="h-3 w-px bg-sand" />
-                  <span className="text-ink">{formatPrice(t.priceCents)}</span>
-                </div>
+                <ul className="mt-6 space-y-1.5 border-t border-sand pt-4 text-[0.78rem] text-ink-soft">
+                  {t.options.map((o) => (
+                    <li key={o.durationMinutes} className="flex items-baseline gap-2">
+                      <span>{formatDuration(o.durationMinutes)}</span>
+                      <span className="flex-1 border-b border-dotted border-sand" aria-hidden />
+                      <span className="text-ink">{formatPrice(o.priceCents)}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </Reveal>
           ))}
