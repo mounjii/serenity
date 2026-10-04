@@ -379,40 +379,46 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                     key={s.id}
                     type="button"
                     onClick={() => openDetail(s.id)}
+                    aria-label={`${s.name}: details and prices`}
                     style={{ animationDelay: `${(hasMoved ? 40 : 380) + index * 50}ms` }}
-                    className={`animate-fade-up group relative flex gap-3 rounded-lg border bg-white p-3 text-left transition hover:-translate-y-0.5 hover:shadow-[0_16px_32px_-22px_rgba(60,40,20,0.5)] sm:gap-4 sm:p-4 ${
-                      s.id === serviceId ? "border-olive/50" : "border-sand/70 hover:border-sand"
+                    className={`animate-fade-up group relative isolate flex min-h-[10rem] overflow-hidden rounded-lg border bg-gradient-to-r from-[#f7f2eb] to-[#efe8de] text-left transition-[box-shadow,border-color,translate] duration-500 outline-none hover:-translate-y-0.5 hover:shadow-[0_22px_40px_-24px_rgba(40,30,15,0.65)] focus-visible:ring-2 focus-visible:ring-olive/60 sm:min-h-[10.5rem] ${
+                      s.id === serviceId ? "border-olive/50" : "border-sand/60"
                     }`}
                   >
-                    <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-md sm:h-28 sm:w-28">
+                    {/* The photo widens from a side panel to the whole card on hover/focus. */}
+                    <span className="absolute inset-y-0 left-0 -z-20 w-[36%] overflow-hidden transition-[width] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full group-focus-visible:w-full">
                       <Image
                         src={serviceImage(s.slug)}
                         alt=""
                         fill
-                        sizes="112px"
-                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        sizes="(min-width: 1024px) 560px, 100vw"
+                        className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105 group-focus-visible:scale-105"
                       />
-                    </div>
-                    <div className="flex min-w-0 flex-1 flex-col">
-                      <LeafIcon className="absolute top-3 right-3 h-4 w-4 text-sand" aria-hidden />
-                      <span className="pr-6 font-serif text-xl leading-tight text-ink sm:text-[1.35rem]">{s.name}</span>
-                      <span className="mt-1 text-[0.78rem] leading-relaxed font-light text-muted">{s.description}</span>
-                      <span className="mt-auto flex items-center justify-between gap-2 pt-3">
-                        <span className="flex flex-wrap gap-1.5">
-                          {s.options.map((o) => (
-                            <span key={o.durationMinutes} className="rounded-full border border-sand px-2.5 py-0.5 text-[0.68rem] text-ink-soft">
-                              {formatDuration(o.durationMinutes)}
-                            </span>
-                          ))}
+                    </span>
+                    <span
+                      aria-hidden
+                      className="absolute inset-0 -z-10 bg-gradient-to-r from-black/20 via-black/45 to-black/65 opacity-0 transition-opacity duration-700 group-hover:opacity-100 group-focus-visible:opacity-100"
+                    />
+
+                    <span className="ml-[36%] flex min-w-0 flex-1 flex-col py-4 pr-4 pl-4 sm:py-5 sm:pr-5 sm:pl-6">
+                      <span className="text-[0.65rem] tracking-[0.2em] text-muted transition-colors duration-500 group-hover:text-white/70 group-focus-visible:text-white/70">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span className="mt-1.5 font-serif text-xl leading-tight text-ink transition-colors duration-500 group-hover:text-white group-focus-visible:text-white sm:text-[1.4rem]">
+                        {s.name}
+                      </span>
+                      <span className="mt-1.5 line-clamp-2 text-[0.76rem] leading-relaxed font-light text-muted transition-colors duration-500 group-hover:text-white/85 group-focus-visible:text-white/85">
+                        {s.description}
+                      </span>
+                      <span className="mt-auto flex items-center justify-between gap-3 pt-3">
+                        <span className="text-[0.66rem] tracking-[0.18em] text-ink-soft uppercase transition-colors duration-500 group-hover:text-white/85 group-focus-visible:text-white/85">
+                          {s.options.map((o) => o.durationMinutes).join(" · ")} min
                         </span>
-                        <span className="flex shrink-0 items-center gap-2 text-[0.68rem] tracking-[0.15em] text-ink uppercase">
-                          <span className="hidden sm:inline">Details</span>
-                          <span className="grid h-9 w-9 place-items-center rounded-full border border-sand bg-cream transition group-hover:border-olive group-hover:bg-olive group-hover:text-white">
-                            <ArrowRight className="h-4 w-4" />
-                          </span>
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-olive bg-olive text-white transition-all duration-500 group-hover:border-white/80 group-hover:bg-white/10 group-hover:backdrop-blur-sm group-focus-visible:border-white/80 group-focus-visible:bg-white/10">
+                          <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-0.5" />
                         </span>
                       </span>
-                    </div>
+                    </span>
                   </button>
                 ))}
               </div>
