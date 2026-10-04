@@ -10,11 +10,14 @@
   --color-bronze: #9a8366;
   --color-gold: #c8a250;
   --color-forest: #1f241c;
+  --color-olive: #4b5537;
+  --color-olive-dark: #3c442b;
 }
 
 @theme inline {
   --font-serif: var(--font-cormorant), "Times New Roman", serif;
   --font-sans: var(--font-jost), system-ui, sans-serif;
+  --font-script: var(--font-great-vibes), cursive;
 }
 
 html {

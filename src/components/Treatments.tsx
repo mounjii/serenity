@@ -1,22 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { connection } from "next/server";
-import { images } from "@/lib/images";
+import { serviceImage } from "@/lib/images";
 import { RESERVATION_PATH } from "@/lib/navigation";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { getActiveServices, type PublicService } from "@/server/booking/services";
 import Reveal from "./Reveal";
-
-const imageBySlug: Record<string, string> = {
-  "swedish-massage": images.swedish,
-  "thai-oil-massage": images.thaiOil,
-  "aroma-massage": images.aromatherapy,
-  "head-neck-shoulder-massage": images.headNeck,
-  "thai-massage": images.thai,
-  "sports-massage": images.sports,
-  "foot-reflexology": images.footReflexology,
-  "hot-herbal-compress": images.herbalCompress,
-};
 
 const fallback = (slug: string, name: string, description: string, options: [number, number][]): PublicService => ({
   id: slug,
@@ -81,7 +70,7 @@ export default async function Treatments() {
               />
               <div className="relative aspect-[4/3] overflow-hidden">
                 <Image
-                  src={imageBySlug[t.slug] ?? images.gallery[0]}
+                  src={serviceImage(t.slug)}
                   alt={t.name}
                   fill
                   sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"

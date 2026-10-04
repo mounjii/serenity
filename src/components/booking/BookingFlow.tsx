@@ -1,12 +1,15 @@
 "use client";
 
 import { formatInTimeZone } from "date-fns-tz";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ArrowRight, LeafIcon } from "@/components/Icons";
 import { Button } from "@/components/ui/Button";
 import { DEFAULT_PHONE_PREFIX, NOTE_MAX } from "@/lib/booking-rules";
 import { customerDetailsSchema } from "@/lib/booking-schema";
 import { formatDuration, formatPrice } from "@/lib/format";
+import { serviceImage } from "@/lib/images";
 import { formatPhone } from "@/lib/phone";
 import { pickOption } from "@/lib/service-options";
 import { formatLongDate } from "@/lib/time";
@@ -70,6 +73,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
   const [step, setStep] = useState<Step>(initialOption ? 2 : 1);
   const [serviceId, setServiceId] = useState<string | null>(initialService?.id ?? null);
   const [durationMinutes, setDurationMinutes] = useState<number | null>(initialOption?.durationMinutes ?? null);
+  const [pickedDurations, setPickedDurations] = useState<Record<string, number>>({});
   const [date, setDate] = useState<string | null>(null);
   const [slot, setSlot] = useState<Slot | null>(null);
   const [details, setDetails] = useState<Details>({
@@ -259,25 +263,37 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
   const normalizedPhone = customerDetailsSchema.shape.customerPhone.safeParse(details.customerPhone);
 
   return (
-    <div className="mt-12">
-      <ol className="flex items-center justify-between gap-1 sm:gap-2" aria-label="Reservation steps">
-        {STEPS.map((s) => {
+    <div className="-mt-6 sm:-mt-8">
+      <ol className="mx-auto flex max-w-3xl items-start" aria-label="Reservation steps">
+        {STEPS.map((s, index) => {
           const current = s.id === step;
           const done = s.id < step;
           return (
-            <li key={s.id} className="flex flex-1 flex-col items-center gap-2">
+            <li key={s.id} className="relative flex flex-1 flex-col items-center gap-2.5">
+              {index > 0 && (
+                <span
+                  aria-hidden
+                  className={`absolute top-[1.15rem] h-px -translate-y-1/2 sm:top-5 ${s.id <= step ? "bg-olive/50" : "bg-sand"}`}
+                  style={{ left: "calc(-50% + 1.6rem)", right: "calc(50% + 1.6rem)" }}
+                />
+              )}
               <button
                 type="button"
                 onClick={() => goTo(s.id)}
                 disabled={!canOpen(s.id)}
                 aria-current={current ? "step" : undefined}
-                className={`grid h-9 w-9 place-items-center rounded-full text-[0.78rem] transition ${
-                  current ? "bg-ink text-cream" : done ? "bg-sand text-ink hover:bg-ink hover:text-cream" : "border border-sand text-muted"
+                aria-label={`Step ${s.id}: ${s.label}`}
+                className={`relative grid h-9 w-9 place-items-center rounded-full text-[0.8rem] transition sm:h-10 sm:w-10 ${
+                  current
+                    ? "bg-olive text-white shadow-[0_6px_16px_-6px_rgba(75,85,55,0.8)] ring-4 ring-olive/15"
+                    : done
+                      ? "border border-olive/40 bg-white text-olive hover:bg-olive hover:text-white"
+                      : "border border-sand bg-white/80 text-muted"
                 }`}
               >
                 {s.id}
               </button>
-              <span className={`text-[0.65rem] tracking-[0.15em] uppercase sm:text-[0.7rem] ${current ? "text-ink" : "text-muted"}`}>
+              <span className={`text-[0.6rem] tracking-[0.2em] uppercase sm:text-[0.68rem] ${current ? "font-medium text-ink" : "text-muted"}`}>
                 {s.label}
               </span>
             </li>
@@ -286,48 +302,86 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
       </ol>
 
       {notice && (
-        <div role="alert" className="mt-8 rounded-sm border border-gold/40 bg-gold/10 px-5 py-4 text-[0.85rem] text-ink">
+        <div role="alert" className="mt-8 rounded-lg border border-gold/40 bg-gold/10 px-5 py-4 text-[0.85rem] text-ink">
           {notice}
         </div>
       )}
 
-      <section className="mt-8 rounded-sm bg-white p-5 shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)] sm:p-8">
+      <section className="mt-8 rounded-xl border border-sand/60 bg-[#fcfaf7] p-4 shadow-[0_30px_60px_-35px_rgba(60,40,20,0.35)] sm:p-8 lg:p-10">
         {step === 1 && (
           <div>
-            <StepTitle title="Choose your treatment" subtitle="Tap the duration you would like." />
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <LeafIcon className="h-9 w-9 shrink-0 -rotate-12 text-olive sm:h-11 sm:w-11" aria-hidden />
+                <div>
+                  <h2 className="font-serif text-2xl text-ink sm:text-[2.1rem] sm:leading-tight">Choose your treatment</h2>
+                  <p className="mt-0.5 text-[0.85rem] font-light text-ink-soft">Tap the duration you would like, then continue.</p>
+                </div>
+              </div>
+              <p className="hidden -rotate-6 pt-1 font-script text-2xl leading-none text-bronze/80 md:block" aria-hidden>
+                Your wellness
+                <br />
+                <span className="pl-6">matters ♡</span>
+              </p>
+            </div>
             {services.length === 0 ? (
               <p className="mt-6 text-[0.9rem] text-ink-soft">No treatments are available for booking right now.</p>
             ) : (
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                {services.map((s) => (
-                  <div
-                    key={s.id}
-                    className={`flex flex-col rounded-sm border p-5 transition ${s.id === serviceId ? "border-ink bg-cream" : "border-sand"}`}
-                  >
-                    <h3 className="font-serif text-xl text-ink">{s.name}</h3>
-                    <p className="mt-2 flex-1 text-[0.8rem] leading-relaxed font-light text-muted">{s.description}</p>
-                    <div className="mt-4 grid grid-cols-3 gap-2">
-                      {s.options.map((o) => {
-                        const selected = s.id === serviceId && o.durationMinutes === durationMinutes;
-                        return (
+              <div className="mt-7 grid gap-4 lg:grid-cols-2">
+                {services.map((s) => {
+                  const picked = pickedDurations[s.id] ?? (s.id === serviceId && durationMinutes ? durationMinutes : s.options[0].durationMinutes);
+                  const pickedOption = pickOption(s.options, picked) ?? s.options[0];
+                  const active = s.id === serviceId;
+                  return (
+                    <article
+                      key={s.id}
+                      className={`relative flex gap-3 rounded-lg border bg-white p-3 transition sm:gap-4 sm:p-4 ${
+                        active ? "border-olive/50 shadow-[0_12px_30px_-20px_rgba(75,85,55,0.6)]" : "border-sand/70 hover:border-sand"
+                      }`}
+                    >
+                      <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-md sm:h-28 sm:w-28">
+                        <Image src={serviceImage(s.slug)} alt={s.name} fill sizes="112px" className="object-cover" />
+                      </div>
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <LeafIcon className="absolute top-3 right-3 h-4 w-4 text-sand" aria-hidden />
+                        <h3 className="pr-6 font-serif text-xl leading-tight text-ink sm:text-[1.35rem]">{s.name}</h3>
+                        <p className="mt-1 text-[0.78rem] leading-relaxed font-light text-muted">{s.description}</p>
+                        <div className="mt-3 flex items-center gap-2">
+                          <div className="grid flex-1 grid-cols-3 gap-1.5 sm:gap-2">
+                            {s.options.map((o) => {
+                              const selected = o.durationMinutes === pickedOption.durationMinutes;
+                              return (
+                                <button
+                                  key={o.durationMinutes}
+                                  type="button"
+                                  onClick={() => setPickedDurations((p) => ({ ...p, [s.id]: o.durationMinutes }))}
+                                  aria-pressed={selected}
+                                  aria-label={`${s.name}, ${formatDuration(o.durationMinutes)}, ${formatPrice(o.priceCents)}`}
+                                  className={`flex min-h-12 flex-col items-center justify-center rounded-md border px-1 text-center leading-tight transition ${
+                                    selected
+                                      ? "border-olive bg-olive text-white shadow-[0_6px_14px_-8px_rgba(75,85,55,0.9)]"
+                                      : "border-sand bg-white text-ink hover:border-olive/50"
+                                  }`}
+                                >
+                                  <span className="text-[0.68rem] opacity-90">{formatDuration(o.durationMinutes)}</span>
+                                  <span className="text-[0.78rem] font-medium">{formatPrice(o.priceCents)}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
                           <button
-                            key={o.durationMinutes}
                             type="button"
-                            onClick={() => chooseOption(s.id, o.durationMinutes)}
-                            aria-pressed={selected}
-                            aria-label={`${s.name}, ${formatDuration(o.durationMinutes)}, ${formatPrice(o.priceCents)}`}
-                            className={`flex min-h-14 flex-col items-center justify-center rounded-sm border px-1 text-center transition ${
-                              selected ? "border-ink bg-ink text-cream" : "border-sand bg-white text-ink hover:border-ink"
-                            }`}
+                            onClick={() => chooseOption(s.id, pickedOption.durationMinutes)}
+                            aria-label={`Continue with ${s.name}, ${formatDuration(pickedOption.durationMinutes)}`}
+                            className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-sand bg-cream text-ink transition hover:border-olive hover:bg-olive hover:text-white"
                           >
-                            <span className="text-[0.75rem]">{formatDuration(o.durationMinutes)}</span>
-                            <span className="text-[0.85rem] font-medium">{formatPrice(o.priceCents)}</span>
+                            <ArrowRight className="h-4 w-4" />
                           </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -351,11 +405,11 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                     onClick={() => chooseDate(d.date)}
                     aria-pressed={selected}
                     aria-label={d.open ? formatLongDate(new Date(`${d.date}T12:00:00.000Z`)) : `${parts.weekday} ${parts.day} ${parts.month} (closed)`}
-                    className={`flex min-h-16 flex-col items-center justify-center rounded-sm border text-center transition ${
+                    className={`flex min-h-16 flex-col items-center justify-center rounded-md border text-center transition ${
                       selected
-                        ? "border-ink bg-ink text-cream"
+                        ? "border-olive bg-olive text-white"
                         : d.open
-                          ? "border-sand text-ink hover:border-ink"
+                          ? "border-sand bg-white text-ink hover:border-olive/50"
                           : "cursor-not-allowed border-transparent bg-cream-dark/50 text-muted/60 line-through"
                     }`}
                   >
@@ -396,8 +450,8 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                     type="button"
                     onClick={() => chooseSlot(s)}
                     aria-pressed={slot?.startAt === s.startAt}
-                    className={`min-h-12 rounded-sm border text-[0.9rem] transition ${
-                      slot?.startAt === s.startAt ? "border-ink bg-ink text-cream" : "border-sand text-ink hover:border-ink"
+                    className={`min-h-12 rounded-md border text-[0.9rem] transition ${
+                      slot?.startAt === s.startAt ? "border-olive bg-olive text-white" : "border-sand bg-white text-ink hover:border-olive/50"
                     }`}
                   >
                     {s.time}
