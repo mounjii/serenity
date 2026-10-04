@@ -67,6 +67,14 @@ export function ArrowLeft(props: IconProps) {
   );
 }
 
+export function ArrowDown(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} strokeWidth={1.5} {...props}>
+      <path d="M12 5v14M6 13l6 6 6-6" />
+    </svg>
+  );
+}
+
 export function ArrowUp(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" {...base} strokeWidth={1.5} {...props}>

@@ -12,6 +12,7 @@ import { formatDuration, formatPrice } from "@/lib/format";
 import { serviceImage } from "@/lib/images";
 import { formatPhone } from "@/lib/phone";
 import { pickOption } from "@/lib/service-options";
+import { NAVBAR_OFFSET, smoothScrollTo } from "@/lib/smooth-scroll";
 import { formatLongDate } from "@/lib/time";
 import type { BookableDay } from "@/server/booking/calendar";
 import type { PublicService } from "@/server/booking/services";
@@ -91,6 +92,40 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
   const [submitError, setSubmitError] = useState<string | null>(null);
   const idempotencyKey = useRef<string>(newIdempotencyKey());
   const slotsRequest = useRef<AbortController | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const scrolledForStep = useRef<Step>(step);
+  const [shownStep, setShownStep] = useState<Step>(step);
+  const [direction, setDirection] = useState<1 | -1>(1);
+  const [hasMoved, setHasMoved] = useState(false);
+  if (step !== shownStep) {
+    setDirection(step > shownStep ? 1 : -1);
+    setShownStep(step);
+    setHasMoved(true);
+  }
+
+  // Arriving from a "Book" button: let the hero settle, then glide down to the steps.
+  useEffect(() => {
+    if (window.scrollY > 40 || !rootRef.current) return undefined;
+    const root = rootRef.current;
+    let cancel = () => {};
+    const timer = window.setTimeout(() => {
+      cancel = smoothScrollTo(root, 1300);
+    }, 750);
+    return () => {
+      window.clearTimeout(timer);
+      cancel();
+    };
+  }, []);
+
+  // On each step change, bring the steps back into view if the visitor had scrolled away from them.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (scrolledForStep.current === step || !root) return undefined;
+    scrolledForStep.current = step;
+    const top = root.getBoundingClientRect().top;
+    if (top >= NAVBAR_OFFSET - 8 && top <= window.innerHeight * 0.4) return undefined;
+    return smoothScrollTo(root, 700);
+  }, [step]);
 
   const service = services.find((s) => s.id === serviceId) ?? null;
   const option = service && durationMinutes ? pickOption(service.options, durationMinutes) : null;
@@ -263,8 +298,8 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
   const normalizedPhone = customerDetailsSchema.shape.customerPhone.safeParse(details.customerPhone);
 
   return (
-    <div className="-mt-6 sm:-mt-8">
-      <ol className="mx-auto flex max-w-3xl items-start" aria-label="Reservation steps">
+    <div ref={rootRef} id="book" className="-mt-6 scroll-mt-24 sm:-mt-8">
+      <ol className="animate-fade-up mx-auto flex max-w-3xl items-start [animation-delay:350ms]" aria-label="Reservation steps">
         {STEPS.map((s, index) => {
           const current = s.id === step;
           const done = s.id < step;
@@ -307,7 +342,8 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
         </div>
       )}
 
-      <section className="mt-8 rounded-xl border border-sand/60 bg-[#fcfaf7] p-4 shadow-[0_30px_60px_-35px_rgba(60,40,20,0.35)] sm:p-8 lg:p-10">
+      <section className="animate-fade-up mt-8 overflow-hidden rounded-xl border border-sand/60 bg-[#fcfaf7] p-4 shadow-[0_30px_60px_-35px_rgba(60,40,20,0.35)] [animation-delay:500ms] sm:p-8 lg:p-10">
+        <div key={step} className={direction > 0 ? "animate-step-next" : "animate-step-prev"}>
         {step === 1 && (
           <div>
             <div className="flex items-start justify-between gap-4">
@@ -328,14 +364,15 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
               <p className="mt-6 text-[0.9rem] text-ink-soft">No treatments are available for booking right now.</p>
             ) : (
               <div className="mt-7 grid gap-4 lg:grid-cols-2">
-                {services.map((s) => {
+                {services.map((s, index) => {
                   const picked = pickedDurations[s.id] ?? (s.id === serviceId && durationMinutes ? durationMinutes : s.options[0].durationMinutes);
                   const pickedOption = pickOption(s.options, picked) ?? s.options[0];
                   const active = s.id === serviceId;
                   return (
                     <article
                       key={s.id}
-                      className={`relative flex gap-3 rounded-lg border bg-white p-3 transition sm:gap-4 sm:p-4 ${
+                      style={{ animationDelay: `${(hasMoved ? 80 : 650) + index * 80}ms` }}
+                      className={`animate-fade-up relative flex gap-3 rounded-lg border bg-white p-3 transition sm:gap-4 sm:p-4 ${
                         active ? "border-olive/50 shadow-[0_12px_30px_-20px_rgba(75,85,55,0.6)]" : "border-sand/70 hover:border-sand"
                       }`}
                     >
@@ -555,6 +592,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
             </div>
           </div>
         )}
+        </div>
       </section>
     </div>
   );

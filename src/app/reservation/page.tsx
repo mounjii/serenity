@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Great_Vibes } from "next/font/google";
 import Image from "next/image";
 import { connection } from "next/server";
+import { ArrowDown } from "@/components/Icons";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BookingFlow from "@/components/booking/BookingFlow";
@@ -38,14 +39,25 @@ export default async function ReservationPage({ searchParams }: PageProps<"/rese
           <div className="absolute inset-0 -z-10 bg-gradient-to-r from-cream via-cream/85 to-cream/10 sm:via-cream/60 sm:to-transparent" />
           <div className="absolute inset-x-0 bottom-0 -z-10 h-24 bg-gradient-to-t from-cream to-transparent" />
           <div className="mx-auto max-w-6xl px-5 pt-36 pb-20 sm:px-6 sm:pt-40 sm:pb-24 lg:pb-28">
-            <p className="flex items-center gap-3 text-[0.7rem] tracking-[0.32em] text-bronze uppercase">
+            <p className="animate-fade-up flex items-center gap-3 text-[0.7rem] tracking-[0.32em] text-bronze uppercase">
               <span className="h-px w-8 bg-bronze/60" aria-hidden />
               Reservation
             </p>
-            <h1 className="mt-5 max-w-md font-serif text-5xl leading-[1.05] text-ink sm:text-6xl lg:text-7xl">Book Your Massage</h1>
-            <p className="mt-6 max-w-sm text-[0.95rem] leading-relaxed font-light text-ink-soft">
+            <h1 className="animate-fade-up mt-5 max-w-md font-serif text-5xl leading-[1.05] text-ink [animation-delay:120ms] sm:text-6xl lg:text-7xl">
+              Book Your Massage
+            </h1>
+            <p className="animate-fade-up mt-6 max-w-sm text-[0.95rem] leading-relaxed font-light text-ink-soft [animation-delay:240ms]">
               Choose your treatment, pick a time that suits you and confirm in a minute.
             </p>
+            <a
+              href="#book"
+              className="animate-fade-up mt-8 inline-flex items-center gap-3 text-[0.7rem] tracking-[0.25em] text-ink uppercase [animation-delay:360ms] hover:text-olive"
+            >
+              Start booking
+              <span className="grid h-8 w-8 place-items-center rounded-full border border-ink/25">
+                <ArrowDown className="animate-scroll-cue h-3.5 w-3.5" />
+              </span>
+            </a>
           </div>
         </section>
 
