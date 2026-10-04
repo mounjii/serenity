@@ -45,7 +45,7 @@ export default function BookingRow({ booking, showDate = false, highlighted = fa
         >
           WhatsApp
         </a>
-        <Link href={`/admin/bookings/${booking.id}`} className="rounded-full bg-ink px-3 py-1.5 text-[0.75rem] text-cream transition hover:bg-black">
+        <Link href={`/admin/bookings/${booking.id}`} className="rounded-full bg-olive px-3 py-1.5 text-[0.75rem] text-white transition hover:bg-olive-dark">
           Details
         </Link>
       </div>

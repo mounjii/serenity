@@ -75,13 +75,13 @@ export default function Navbar() {
         <div className="hidden items-center gap-3 md:flex">
           <Link
             href="/admin/login"
-            className="rounded-full border border-ink/30 px-5 py-2.5 text-[0.78rem] tracking-wide text-ink transition hover:border-ink hover:bg-ink hover:text-cream"
+            className="rounded-full border border-ink/30 px-5 py-2.5 text-[0.78rem] tracking-wide text-ink transition hover:border-olive hover:bg-olive hover:text-white"
           >
             Login
           </Link>
           <Link
             href={RESERVATION_PATH}
-            className="rounded-full bg-ink px-6 py-2.5 text-[0.78rem] tracking-wide text-cream transition hover:bg-black"
+            className="rounded-full bg-olive px-6 py-2.5 text-[0.78rem] tracking-wide text-white transition hover:bg-olive-dark"
           >
             Book Now
           </Link>
@@ -117,7 +117,7 @@ export default function Navbar() {
             <Link
               href={RESERVATION_PATH}
               onClick={() => setOpen(false)}
-              className="inline-block rounded-full bg-ink px-6 py-2.5 text-sm text-cream"
+              className="inline-block rounded-full bg-olive px-6 py-2.5 text-sm text-white"
             >
               Book Now
             </Link>

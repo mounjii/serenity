@@ -7,8 +7,8 @@ const base =
   "inline-flex items-center justify-center gap-2 rounded-full tracking-wide transition disabled:cursor-not-allowed disabled:opacity-50";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-ink text-cream hover:bg-black enabled:hover:-translate-y-0.5 enabled:hover:shadow-lg",
-  outline: "border border-sand bg-white text-ink hover:border-ink",
+  primary: "bg-olive text-white hover:bg-olive-dark enabled:hover:-translate-y-0.5 enabled:hover:shadow-lg",
+  outline: "border border-sand bg-white text-ink hover:border-olive",
   ghost: "text-ink-soft hover:text-ink",
   danger: "border border-red-200 bg-white text-red-700 hover:border-red-400 hover:bg-red-50",
 };

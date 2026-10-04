@@ -32,7 +32,7 @@ export default function Hero() {
           </p>
           <Link
             href={RESERVATION_PATH}
-            className="mt-9 inline-block rounded-full bg-ink px-8 py-3.5 text-[0.8rem] tracking-wide text-cream transition hover:-translate-y-0.5 hover:bg-black hover:shadow-lg"
+            className="mt-9 inline-block rounded-full bg-olive px-8 py-3.5 text-[0.8rem] tracking-wide text-white transition hover:-translate-y-0.5 hover:bg-olive-dark hover:shadow-lg"
           >
             Book Your Session
           </Link>

@@ -94,7 +94,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
                 key={f.view}
                 href={`/admin?view=${f.view}`}
                 className={`rounded-full px-4 py-2 text-[0.78rem] transition ${
-                  activeView === f.view ? "bg-ink text-cream" : "border border-sand bg-white text-ink hover:border-ink"
+                  activeView === f.view ? "bg-olive text-white" : "border border-sand bg-white text-ink hover:border-olive"
                 }`}
               >
                 {f.label}
