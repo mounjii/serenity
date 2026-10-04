@@ -8,6 +8,7 @@ import { addClosedDay, removeClosedDay, type ClosedDayItem } from "@/server/admi
 import { clearLoginFailures, isLoginThrottled, recordLoginFailure, verifyCredentials } from "@/server/auth/credentials";
 import { endSession, startSession } from "@/server/auth/session";
 import { createBooking } from "@/server/booking/create-booking";
+import { scheduleBookingCancelledNotification, scheduleBookingCreatedNotifications } from "@/server/notifications/booking-notifications";
 
 export type LoginState = { error: string | null };
 
@@ -50,7 +51,11 @@ export async function logoutAction(): Promise<void> {
 }
 
 export async function cancelBookingAction(id: string): Promise<ActionResult<AdminBooking>> {
-  return adminAction(() => cancelBooking(id));
+  return adminAction(async () => {
+    const booking = await cancelBooking(id);
+    scheduleBookingCancelledNotification(booking.id);
+    return booking;
+  });
 }
 
 export async function completeBookingAction(id: string): Promise<ActionResult<AdminBooking>> {
@@ -68,7 +73,7 @@ export type AdminBookingInput = {
 
 export async function createAdminBookingAction(input: AdminBookingInput): Promise<ActionResult<{ id: string }>> {
   return adminAction(async () => {
-    const { booking } = await createBooking(
+    const { kind, booking } = await createBooking(
       {
         serviceId: input.serviceId,
         startAt: input.startAt,
@@ -79,6 +84,7 @@ export async function createAdminBookingAction(input: AdminBookingInput): Promis
       },
       { source: "ADMIN" },
     );
+    if (kind === "created") scheduleBookingCreatedNotifications(booking.id);
     return { id: booking.id };
   });
 }

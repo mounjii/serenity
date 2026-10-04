@@ -1,11 +1,13 @@
 import { createBooking } from "@/server/booking/create-booking";
 import { errorResponse, jsonResponse, readJsonBody } from "@/server/errors";
+import { scheduleBookingCreatedNotifications } from "@/server/notifications/booking-notifications";
 
 export async function POST(request: Request) {
   try {
     const body = await readJsonBody(request);
     const result = await createBooking(body, { source: "ONLINE" });
     const { booking } = result;
+    if (result.kind === "created") scheduleBookingCreatedNotifications(booking.id);
     return jsonResponse(
       {
         id: booking.id,

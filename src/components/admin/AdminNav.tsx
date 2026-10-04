@@ -7,6 +7,7 @@ const links = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/bookings/new", label: "New booking" },
   { href: "/admin/closed-days", label: "Closed days" },
+  { href: "/admin/notifications", label: "Notifications" },
 ];
 
 export default function AdminNav() {
