@@ -1,6 +1,8 @@
 import Image from "next/image";
+import Link from "next/link";
 import { connection } from "next/server";
 import { images } from "@/lib/images";
+import { RESERVATION_PATH } from "@/lib/navigation";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { getActiveServices, type PublicService } from "@/server/booking/services";
 import Reveal from "./Reveal";
@@ -53,8 +55,13 @@ export default async function Treatments() {
               as="article"
               key={t.slug}
               delay={i * 120}
-              className="group flex flex-col overflow-hidden rounded-sm bg-white shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)] transition-shadow duration-500 hover:shadow-[0_30px_60px_-25px_rgba(60,40,20,0.4)]"
+              className="group relative flex flex-col overflow-hidden rounded-sm bg-white shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)] transition-shadow duration-500 hover:shadow-[0_30px_60px_-25px_rgba(60,40,20,0.4)]"
             >
+              <Link
+                href={`${RESERVATION_PATH}?service=${t.slug}`}
+                aria-label={`Book ${t.name}`}
+                className="absolute inset-0 z-10"
+              />
               <div className="relative aspect-[4/3] overflow-hidden">
                 <Image
                   src={imageBySlug[t.slug] ?? images.gallery[0]}

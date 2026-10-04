@@ -1,15 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Logo from "./Logo";
 import { CloseIcon, MenuIcon } from "./Icons";
-import { navLinks } from "@/lib/navigation";
+import { navLinks, RESERVATION_PATH } from "@/lib/navigation";
+
+const hashOf = (href: string) => href.slice(href.indexOf("#"));
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState("#home");
+  const [activeHash, setActiveHash] = useState("#home");
+  const active = isHome ? activeHash : null;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -19,20 +25,21 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    if (!isHome) return;
     const sections = navLinks
-      .map((l) => document.querySelector(l.href))
+      .map((l) => document.querySelector(hashOf(l.href)))
       .filter((el): el is Element => el !== null);
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
-          if (e.isIntersecting) setActive(`#${e.target.id}`);
+          if (e.isIntersecting) setActiveHash(`#${e.target.id}`);
         });
       },
       { rootMargin: "-45% 0px -50% 0px" },
     );
     sections.forEach((s) => observer.observe(s));
     return () => observer.disconnect();
-  }, []);
+  }, [isHome]);
 
   return (
     <header
@@ -51,13 +58,13 @@ export default function Navbar() {
               <Link
                 href={link.href}
                 className={`relative pb-1.5 text-[0.82rem] tracking-wide transition-colors hover:text-ink ${
-                  active === link.href ? "text-ink" : "text-ink-soft"
+                  active === hashOf(link.href) ? "text-ink" : "text-ink-soft"
                 }`}
               >
                 {link.label}
                 <span
                   className={`absolute -bottom-0.5 left-1/2 h-px -translate-x-1/2 bg-ink transition-all duration-300 ${
-                    active === link.href ? "w-full" : "w-0"
+                    active === hashOf(link.href) ? "w-full" : "w-0"
                   }`}
                 />
               </Link>
@@ -66,7 +73,7 @@ export default function Navbar() {
         </ul>
 
         <Link
-          href="#contact"
+          href={RESERVATION_PATH}
           className="hidden rounded-full bg-ink px-6 py-2.5 text-[0.78rem] tracking-wide text-cream transition hover:bg-black md:inline-block"
         >
           Book Now
@@ -100,7 +107,7 @@ export default function Navbar() {
           ))}
           <li>
             <Link
-              href="#contact"
+              href={RESERVATION_PATH}
               onClick={() => setOpen(false)}
               className="mt-2 inline-block rounded-full bg-ink px-6 py-2.5 text-sm text-cream"
             >

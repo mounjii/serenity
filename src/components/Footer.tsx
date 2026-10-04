@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Logo from "./Logo";
-import { navLinks } from "@/lib/navigation";
+import { navLinks, RESERVATION_PATH } from "@/lib/navigation";
 import { ArrowUp, FacebookIcon, InstagramIcon, PinterestIcon } from "./Icons";
 
 const socials = [
@@ -44,10 +44,10 @@ export default function Footer() {
           <p>© {new Date().getFullYear()} Serenity. All rights reserved.</p>
           <div className="flex items-center gap-8">
             <Link href="#" className="hover:text-ink">Privacy</Link>
-            <Link href="#" className="hover:text-ink">Bookings</Link>
+            <Link href={RESERVATION_PATH} className="hover:text-ink">Bookings</Link>
             <Link href="#" className="hover:text-ink">Wholesale</Link>
             <Link
-              href="#home"
+              href="#"
               aria-label="Back to top"
               className="grid h-9 w-9 place-items-center rounded-full bg-sand/70 text-ink transition hover:bg-ink hover:text-cream"
             >

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { images } from "@/lib/images";
+import { RESERVATION_PATH } from "@/lib/navigation";
 
 export default function Hero() {
   return (
@@ -30,7 +31,7 @@ export default function Hero() {
             Escape the everyday and give your body and mind the care they deserve.
           </p>
           <Link
-            href="#contact"
+            href={RESERVATION_PATH}
             className="mt-9 inline-block rounded-full bg-ink px-8 py-3.5 text-[0.8rem] tracking-wide text-cream transition hover:-translate-y-0.5 hover:bg-black hover:shadow-lg"
           >
             Book Your Session

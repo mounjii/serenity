@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { images } from "@/lib/images";
+import { RESERVATION_PATH } from "@/lib/navigation";
 import Reveal from "./Reveal";
 
 export default function BookingCTA() {
@@ -24,7 +25,7 @@ export default function BookingCTA() {
           Take the first step towards a healthier, happier you.
         </p>
         <Link
-          href="mailto:hello@serenity-spa.com"
+          href={RESERVATION_PATH}
           className="mt-9 inline-block rounded-full bg-cream px-8 py-3.5 text-[0.8rem] tracking-wide text-ink transition hover:-translate-y-0.5 hover:bg-white hover:shadow-xl"
         >
           Book Now

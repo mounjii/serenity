@@ -3,7 +3,7 @@ import { LotusIcon } from "./Icons";
 
 export default function Logo({ className = "" }: { className?: string }) {
   return (
-    <Link href="#home" className={`flex items-center gap-2.5 ${className}`}>
+    <Link href="/" className={`flex items-center gap-2.5 ${className}`}>
       <LotusIcon className="h-8 w-8 text-ink" />
       <span className="flex flex-col leading-none">
         <span className="font-serif text-[1.55rem] tracking-wide text-ink">
