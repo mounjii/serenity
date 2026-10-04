@@ -34,3 +34,8 @@ const imageBySlug: Record<string, string> = {
 export function serviceImage(slug: string): string {
   return imageBySlug[slug] ?? images.gallery[0];
 }
+
+/** Wide 16:9 photos with the subject in the left third, for the booking cards that reveal the full image on hover. */
+export function serviceCardImage(slug: string): string {
+  return slug in imageBySlug ? `/images/cards/${slug}.jpg` : serviceImage(slug);
+}

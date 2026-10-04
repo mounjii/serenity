@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { DEFAULT_PHONE_PREFIX, NOTE_MAX } from "@/lib/booking-rules";
 import { customerDetailsSchema } from "@/lib/booking-schema";
 import { formatDuration, formatPrice } from "@/lib/format";
-import { serviceImage } from "@/lib/images";
+import { serviceCardImage, serviceImage } from "@/lib/images";
 import { formatPhone } from "@/lib/phone";
 import { serviceDetails } from "@/lib/service-details";
 import { pickOption } from "@/lib/service-options";
@@ -385,14 +385,14 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                       s.id === serviceId ? "border-olive/50" : "border-sand/60"
                     }`}
                   >
-                    {/* The photo widens from a side panel to the whole card on hover/focus. */}
-                    <span className="absolute inset-y-0 left-0 -z-20 w-[36%] overflow-hidden transition-[width] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full group-focus-visible:w-full">
+                    {/* The photo always spans the whole card; the clip only uncovers its left third until hover/focus. */}
+                    <span className="absolute inset-0 -z-20 overflow-hidden transition-[clip-path] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] [clip-path:inset(0_64%_0_0)] group-hover:[clip-path:inset(0_0_0_0)] group-focus-visible:[clip-path:inset(0_0_0_0)]">
                       <Image
-                        src={serviceImage(s.slug)}
+                        src={serviceCardImage(s.slug)}
                         alt=""
                         fill
                         sizes="(min-width: 1024px) 560px, 100vw"
-                        className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105 group-focus-visible:scale-105"
+                        className="origin-left object-cover object-left transition-transform duration-[1.2s] ease-out group-hover:scale-[1.03] group-focus-visible:scale-[1.03]"
                       />
                     </span>
                     <span
