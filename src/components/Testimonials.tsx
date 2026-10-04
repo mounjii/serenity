@@ -111,7 +111,7 @@ export default function Testimonials() {
                 onClick={() => setIndex(i)}
                 aria-label={`Show testimonial ${i + 1}`}
                 className={`h-[3px] rounded-full transition-all duration-500 ${
-                  i === index ? "w-8 bg-olive" : "w-4 bg-sand"
+                  i === index ? "w-8 bg-ink" : "w-4 bg-sand"
                 }`}
               />
             ))}

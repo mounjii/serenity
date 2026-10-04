@@ -32,7 +32,7 @@ export default function About() {
           </p>
           <Link
             href="#services"
-            className="group mt-9 inline-flex items-center gap-3 rounded-full bg-olive px-7 py-3 text-[0.8rem] tracking-wide text-white transition hover:bg-olive-dark"
+            className="group mt-9 inline-flex items-center gap-3 rounded-full bg-ink px-7 py-3 text-[0.8rem] tracking-wide text-cream transition hover:bg-black"
           >
             Learn More
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

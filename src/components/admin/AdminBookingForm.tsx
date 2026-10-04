@@ -182,7 +182,7 @@ export default function AdminBookingForm({ services, today, initialDate }: Props
                 }}
                 aria-pressed={slot?.startAt === s.startAt}
                 className={`min-h-11 rounded-sm border text-[0.9rem] transition ${
-                  slot?.startAt === s.startAt ? "border-olive bg-olive text-white" : "border-sand text-ink hover:border-olive"
+                  slot?.startAt === s.startAt ? "border-ink bg-ink text-cream" : "border-sand text-ink hover:border-ink"
                 }`}
               >
                 {s.time}

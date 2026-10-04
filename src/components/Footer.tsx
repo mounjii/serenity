@@ -49,7 +49,7 @@ export default function Footer() {
             <Link
               href="#"
               aria-label="Back to top"
-              className="grid h-9 w-9 place-items-center rounded-full bg-sand/70 text-ink transition hover:bg-olive hover:text-white"
+              className="grid h-9 w-9 place-items-center rounded-full bg-sand/70 text-ink transition hover:bg-ink hover:text-cream"
             >
               <ArrowUp className="h-4 w-4" />
             </Link>
