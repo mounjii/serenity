@@ -1,4 +1,19 @@
+export type Goal = "relax" | "pain" | "neck" | "sport" | "feet" | "flexibility";
+
+export type Pressure = "Light" | "Light to medium" | "Medium" | "Medium to firm" | "Firm";
+
+/** 1 (lightest) to 5 (firmest). */
+export const PRESSURE_LEVEL: Record<Pressure, number> = {
+  Light: 1,
+  "Light to medium": 2,
+  Medium: 3,
+  "Medium to firm": 4,
+  Firm: 5,
+};
+
 export type ServiceDetails = {
+  /** Needs this treatment answers, best first; used by the treatment finder. */
+  goals: Goal[];
   /** One line under “Overview” in the treatment details. */
   summary: string;
   /** One line under “What to expect”. */
@@ -7,7 +22,7 @@ export type ServiceDetails = {
   benefits: [string, string, string];
   intro: string;
   highlights: string[];
-  pressure: "Light" | "Light to medium" | "Medium" | "Medium to firm" | "Firm";
+  pressure: Pressure;
   idealFor: string;
   /** Why someone would pick this treatment, in one sentence. */
   why: string;
@@ -17,6 +32,7 @@ export type ServiceDetails = {
 
 const details: Record<string, ServiceDetails> = {
   "swedish-massage": {
+    goals: ["relax", "pain"],
     summary: "A gentle, full-body massage designed to relax and restore balance.",
     expectSummary: "Warm oil, long strokes and calming pressure.",
     benefits: ["Relieves Tension", "Improves Circulation", "Promotes Relaxation"],
@@ -29,6 +45,7 @@ const details: Record<string, ServiceDetails> = {
     helpsWith: ["Stress & anxiety", "General muscle tension", "Poor sleep", "Fatigue", "Poor circulation"],
   },
   "thai-oil-massage": {
+    goals: ["pain", "sport"],
     summary: "Thai pressure techniques with warm oil to release deep tension.",
     expectSummary: "Warm oil, firm pressure on key points and slow stretches.",
     benefits: ["Releases Muscle Knots", "Restores Energy", "Eases Stiffness"],
@@ -41,6 +58,7 @@ const details: Record<string, ServiceDetails> = {
     helpsWith: ["Muscle knots", "Back pain", "Stiffness", "Low energy", "Physical fatigue"],
   },
   "aroma-massage": {
+    goals: ["relax"],
     summary: "A soft, scented massage that calms both body and mind.",
     expectSummary: "Essential oils, light strokes and a slow, soothing rhythm.",
     benefits: ["Reduces Stress", "Improves Sleep", "Calms the Mind"],
@@ -53,6 +71,7 @@ const details: Record<string, ServiceDetails> = {
     helpsWith: ["Stress & anxiety", "Insomnia", "Mental fatigue", "Low mood", "Headaches"],
   },
   "head-neck-shoulder-massage": {
+    goals: ["neck"],
     summary: "Targeted work on the upper body, where stress builds up.",
     expectSummary: "Scalp, neck and shoulder massage with focused pressure.",
     benefits: ["Eases Neck Pain", "Relieves Headaches", "Clears the Mind"],
@@ -65,6 +84,7 @@ const details: Record<string, ServiceDetails> = {
     helpsWith: ["Neck pain", "Tight shoulders", "Tension headaches", "Eye strain", "Poor posture"],
   },
   "thai-massage": {
+    goals: ["flexibility", "sport"],
     summary: "A traditional clothed massage with stretches and acupressure.",
     expectSummary: "Comfortable clothes, assisted stretches and rhythmic pressure.",
     benefits: ["Improves Flexibility", "Boosts Energy", "Balances the Body"],
@@ -77,6 +97,7 @@ const details: Record<string, ServiceDetails> = {
     helpsWith: ["Stiff joints", "Limited flexibility", "Lower back tension", "Low energy", "Poor posture"],
   },
   "sports-massage": {
+    goals: ["sport", "pain"],
     summary: "Deep, focused massage to relieve tight, overworked muscles.",
     expectSummary: "Firm pressure on problem areas and deep-tissue techniques.",
     benefits: ["Relieves Soreness", "Speeds Up Recovery", "Improves Mobility"],
@@ -89,6 +110,7 @@ const details: Record<string, ServiceDetails> = {
     helpsWith: ["Sore muscles", "Muscle tightness", "Post-workout recovery", "Reduced mobility", "Chronic back pain"],
   },
   "foot-reflexology": {
+    goals: ["feet", "relax"],
     summary: "Reflex-point pressure on the feet to relax the whole body.",
     expectSummary: "A warm foot soak, then precise pressure on the soles.",
     benefits: ["Relieves Tired Feet", "Improves Circulation", "Deep Relaxation"],
@@ -101,6 +123,7 @@ const details: Record<string, ServiceDetails> = {
     helpsWith: ["Tired, aching feet", "Heavy legs", "Stress", "Poor sleep", "Poor circulation"],
   },
   "hot-herbal-compress": {
+    goals: ["pain", "relax"],
     summary: "Warm Thai herbal compresses to melt away aches.",
     expectSummary: "Steamed herbal compresses pressed along the body, then massage.",
     benefits: ["Soothes Muscle Aches", "Warms the Body", "Deep Relaxation"],
@@ -117,6 +140,7 @@ const details: Record<string, ServiceDetails> = {
 export function serviceDetails(slug: string, description: string): ServiceDetails {
   return (
     details[slug] ?? {
+      goals: ["relax"],
       summary: description,
       expectSummary: "A relaxing, personalised treatment.",
       benefits: ["Relieves Tension", "Restores Energy", "Promotes Relaxation"],

@@ -11,9 +11,11 @@ import { customerDetailsSchema } from "@/lib/booking-schema";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { serviceCardImage, serviceImage } from "@/lib/images";
 import { formatPhone } from "@/lib/phone";
-import { serviceDetails, type ServiceDetails } from "@/lib/service-details";
+import { PRESSURE_LEVEL, serviceDetails, type ServiceDetails } from "@/lib/service-details";
 import { pickOption } from "@/lib/service-options";
 import { NAVBAR_OFFSET, smoothScrollTo } from "@/lib/smooth-scroll";
+import type { FinderMatch } from "@/lib/treatment-finder";
+import TreatmentFinder from "./TreatmentFinder";
 import { formatLongDate } from "@/lib/time";
 import type { BookableDay } from "@/server/booking/calendar";
 import type { PublicService } from "@/server/booking/services";
@@ -79,6 +81,8 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
   const [durationMinutes, setDurationMinutes] = useState<number | null>(initialOption?.durationMinutes ?? null);
   const [detailId, setDetailId] = useState<string | null>(initialService && !initialOption ? initialService.id : null);
   const [pickedDurations, setPickedDurations] = useState<Record<string, number>>({});
+  const [finderOpen, setFinderOpen] = useState(false);
+  const [recommendedId, setRecommendedId] = useState<string | null>(null);
   const [date, setDate] = useState<string | null>(null);
   const [slot, setSlot] = useState<Slot | null>(null);
   const [details, setDetails] = useState<Details>({
@@ -98,13 +102,16 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
   const idempotencyKey = useRef<string>(newIdempotencyKey());
   const slotsRequest = useRef<AbortController | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
-  const detailService = step === 1 ? (services.find((s) => s.id === detailId) ?? null) : null;
+  const showFinder = step === 1 && finderOpen;
+  const detailService = step === 1 && !finderOpen ? (services.find((s) => s.id === detailId) ?? null) : null;
   const detailOption = detailService
     ? (pickOption(detailService.options, pickedDurations[detailService.id] ?? (detailService.id === serviceId ? durationMinutes ?? undefined : undefined)) ??
       detailService.options[0])
     : null;
   // The details view sits between the list (step 1) and the date (step 2).
-  const position = detailService ? 1.5 : step;
+  const position = showFinder ? 1.25 : detailService ? 1.5 : step;
+  const recommended = services.find((s) => s.id === recommendedId);
+  const orderedServices = recommended ? [recommended, ...services.filter((s) => s !== recommended)] : services;
   const scrolledForPosition = useRef(position);
   const [shownPosition, setShownPosition] = useState(position);
   const [direction, setDirection] = useState<1 | -1>(1);
@@ -194,6 +201,13 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
   };
 
   const closeDetail = () => setDetailId(null);
+
+  const pickFromFinder = (match: FinderMatch) => {
+    setRecommendedId(match.serviceId);
+    setPickedDurations((p) => ({ ...p, [match.serviceId]: match.durationMinutes }));
+    setFinderOpen(false);
+    openDetail(match.serviceId);
+  };
 
   const chooseOption = (id: string, duration: number) => {
     if (id !== serviceId || duration !== durationMinutes) {
@@ -365,7 +379,9 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
 
       <section className="animate-fade-up mt-8 overflow-hidden rounded-xl border border-sand/60 bg-[#fcfaf7] p-4 shadow-[0_30px_60px_-35px_rgba(60,40,20,0.35)] [animation-delay:300ms] sm:p-8 lg:p-10">
         <div key={position} className={direction > 0 ? "animate-step-next" : "animate-step-prev"}>
-        {step === 1 && !detailService && (
+        {showFinder && <TreatmentFinder services={services} onPick={pickFromFinder} onClose={() => setFinderOpen(false)} />}
+
+        {step === 1 && !showFinder && !detailService && (
           <div>
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3 sm:gap-4">
@@ -381,11 +397,32 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                 <span className="pl-6">matters ♡</span>
               </p>
             </div>
+            {services.length > 1 && (
+              <div className="mt-6 flex flex-col gap-3 rounded-xl border border-sand bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-cream-dark text-ink-soft">
+                    <LotusIcon className="h-5 w-5" aria-hidden />
+                  </span>
+                  <div>
+                    <p className="text-[0.9rem] text-ink">{recommended ? "Want to try again?" : "Not sure which one to choose?"}</p>
+                    <p className="text-[0.76rem] font-light text-muted">Answer 3 quick questions and we&apos;ll suggest the best treatment for you.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFinderOpen(true)}
+                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-ink px-6 py-2.5 text-[0.8rem] tracking-wide text-cream transition hover:-translate-y-0.5 hover:bg-black"
+                >
+                  Help me choose
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            )}
             {services.length === 0 ? (
               <p className="mt-6 text-[0.9rem] text-ink-soft">No treatments are available for booking right now.</p>
             ) : (
-              <div className="mt-7 grid gap-4 lg:grid-cols-2">
-                {services.map((s, index) => (
+              <div className="mt-6 grid gap-4 lg:grid-cols-2">
+                {orderedServices.map((s, index) => (
                   <button
                     key={s.id}
                     type="button"
@@ -412,8 +449,15 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                     />
 
                     <span className="ml-[36%] flex min-w-0 flex-1 flex-col py-4 pr-4 pl-4 sm:py-5 sm:pr-5 sm:pl-6">
-                      <span className="text-[0.65rem] tracking-[0.2em] text-muted transition-colors duration-500 group-hover:text-white/70 group-focus-visible:text-white/70">
-                        {String(index + 1).padStart(2, "0")}
+                      <span className="flex items-center justify-between gap-2">
+                        <span className="text-[0.65rem] tracking-[0.2em] text-muted transition-colors duration-500 group-hover:text-white/70 group-focus-visible:text-white/70">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        {s.id === recommendedId && (
+                          <span className="rounded-full bg-ink px-2.5 py-1 text-[0.58rem] tracking-[0.15em] text-cream uppercase transition-colors duration-500 group-hover:bg-white group-hover:text-ink">
+                            Recommended for you
+                          </span>
+                        )}
                       </span>
                       <span className="mt-1.5 font-serif text-xl leading-tight text-ink transition-colors duration-500 group-hover:text-white group-focus-visible:text-white sm:text-[1.4rem]">
                         {s.name}
@@ -696,14 +740,6 @@ function Field({
 type ServiceOption = PublicService["options"][number];
 
 const BENEFIT_ICONS = [LeafIcon, HeartIcon, LotusIcon];
-
-const PRESSURE_LEVEL: Record<ServiceDetails["pressure"], number> = {
-  Light: 1,
-  "Light to medium": 2,
-  Medium: 3,
-  "Medium to firm": 4,
-  Firm: 5,
-};
 
 function ServiceDetailView({
   service,
