@@ -20,8 +20,8 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
             <Image
               src="/images/logo-horizontal.png"
               alt="Touch Sense Thai Massage"
-              width={1012}
-              height={193}
+              width={986}
+              height={197}
               priority
               className="h-8 w-auto"
             />

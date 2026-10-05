@@ -10,8 +10,8 @@ export default async function AdminLoginPage({ searchParams }: PageProps<"/admin
         <Image
           src="/images/logo.png"
           alt="Touch Sense Thai Massage"
-          width={677}
-          height={435}
+          width={650}
+          height={451}
           priority
           className="mx-auto h-24 w-auto"
         />
