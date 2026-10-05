@@ -1,4 +1,4 @@
-const local = (name: string) => `/images/${name}.jpg`;
+const local = (name: string) => `/images/${name}.webp`;
 
 export const images = {
   hero: local("hero"),
@@ -37,5 +37,5 @@ export function serviceImage(slug: string): string {
 
 /** Wide 16:9 photos with the subject in the left third, for the booking cards that reveal the full image on hover. */
 export function serviceCardImage(slug: string): string {
-  return slug in imageBySlug ? `/images/cards/${slug}.jpg` : serviceImage(slug);
+  return slug in imageBySlug ? `/images/cards/${slug}.webp` : serviceImage(slug);
 }

@@ -7,10 +7,10 @@ export default function Logo({ className = "", variant = "horizontal" }: Props) 
   return (
     <Link href="/" aria-label="Touch Sense Thai Massage — home" className={`inline-flex shrink-0 ${className}`}>
       {variant === "stacked" ? (
-        <Image src="/images/touch-sense-logo.png" alt="Touch Sense Thai Massage" width={650} height={451} className="h-24 w-auto" />
+        <Image src="/images/touch-sense-logo.webp" alt="Touch Sense Thai Massage" width={650} height={451} className="h-24 w-auto" />
       ) : (
         <Image
-          src="/images/touch-sense-logo-horizontal.png"
+          src="/images/touch-sense-logo-horizontal.webp"
           alt="Touch Sense Thai Massage"
           width={986}
           height={197}
