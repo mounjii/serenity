@@ -1,18 +1,23 @@
+import Image from "next/image";
 import Link from "next/link";
-import { LotusIcon } from "./Icons";
 
-export default function Logo({ className = "" }: { className?: string }) {
+type Props = { className?: string; variant?: "horizontal" | "stacked" };
+
+export default function Logo({ className = "", variant = "horizontal" }: Props) {
   return (
-    <Link href="/" className={`flex items-center gap-2.5 ${className}`}>
-      <LotusIcon className="h-8 w-8 text-ink" />
-      <span className="flex flex-col leading-none">
-        <span className="font-serif text-[1.55rem] tracking-wide text-ink">
-          Serenity
-        </span>
-        <span className="mt-0.5 text-[0.55rem] tracking-[0.2em] text-muted">
-          Massage & Wellness Spa
-        </span>
-      </span>
+    <Link href="/" aria-label="Touch Sense Thai Massage — home" className={`inline-flex shrink-0 ${className}`}>
+      {variant === "stacked" ? (
+        <Image src="/images/logo.png" alt="Touch Sense Thai Massage" width={677} height={435} className="h-24 w-auto" />
+      ) : (
+        <Image
+          src="/images/logo-horizontal.png"
+          alt="Touch Sense Thai Massage"
+          width={1012}
+          height={193}
+          priority
+          className="h-9 w-auto sm:h-10"
+        />
+      )}
     </Link>
   );
 }

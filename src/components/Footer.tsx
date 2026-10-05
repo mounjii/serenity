@@ -14,7 +14,7 @@ export default function Footer() {
     <footer className="bg-cream">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
         <div className="flex flex-col items-center gap-8 border-t border-sand py-12 md:flex-row md:justify-between">
-          <Logo />
+          <Logo variant="stacked" />
 
           <ul className="flex flex-wrap justify-center gap-8">
             {navLinks.map((l) => (
@@ -41,7 +41,7 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col items-center gap-4 border-t border-sand py-6 text-[0.72rem] text-muted md:flex-row md:justify-between">
-          <p>© {new Date().getFullYear()} Serenity. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Touch Sense Thai Massage. All rights reserved.</p>
           <div className="flex items-center gap-8">
             <Link href="#" className="hover:text-ink">Privacy</Link>
             <Link href={RESERVATION_PATH} className="hover:text-ink">Bookings</Link>

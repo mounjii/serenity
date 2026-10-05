@@ -13,7 +13,7 @@ import { getActiveServices } from "@/server/booking/services";
 const greatVibes = Great_Vibes({ variable: "--font-great-vibes", subsets: ["latin"], weight: "400" });
 
 export const metadata: Metadata = {
-  title: "Book a massage — Serenity",
+  title: "Book a massage — Touch Sense",
   description: "Choose your treatment, pick a time and confirm your reservation in a minute.",
 };
 

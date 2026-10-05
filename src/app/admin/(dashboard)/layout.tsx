@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import AdminNav from "@/components/admin/AdminNav";
@@ -15,8 +16,15 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
     <>
       <header className="sticky top-0 z-30 border-b border-sand/70 bg-cream/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 py-4 sm:px-6">
-          <div className="flex items-baseline gap-3">
-            <span className="font-serif text-2xl text-ink">Serenity</span>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/images/logo-horizontal.png"
+              alt="Touch Sense Thai Massage"
+              width={1012}
+              height={193}
+              priority
+              className="h-8 w-auto"
+            />
             <span className="text-[0.65rem] tracking-[0.25em] text-muted uppercase">Admin</span>
           </div>
           <form action={logoutAction} className="sm:order-last">

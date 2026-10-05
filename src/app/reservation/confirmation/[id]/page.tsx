@@ -8,7 +8,7 @@ import { formatPrice } from "@/lib/format";
 import { getPublicBooking } from "@/server/booking/public-booking";
 
 export const metadata: Metadata = {
-  title: "Reservation confirmed — Serenity",
+  title: "Reservation confirmed — Touch Sense",
   robots: { index: false, follow: false },
 };
 

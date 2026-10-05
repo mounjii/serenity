@@ -16,7 +16,7 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: "Serenity — Massage & Wellness Spa",
+  title: "Touch Sense — Thai Massage",
   description:
     "Escape the everyday and give your body and mind the care they deserve. Professional massage and wellness treatments.",
 };
