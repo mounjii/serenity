@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { connection } from "next/server";
-import { serviceImage } from "@/lib/images";
+import { blurProps, serviceImage } from "@/lib/images";
 import { RESERVATION_PATH } from "@/lib/navigation";
 import { formatDuration } from "@/lib/format";
 import { ArrowRight } from "./Icons";
@@ -71,7 +71,7 @@ export default async function Treatments() {
               />
               <div className="relative aspect-[4/3] overflow-hidden">
                 <Image
-                  src={serviceImage(t.slug)}
+                  src={serviceImage(t.slug)} {...blurProps(serviceImage(t.slug))}
                   alt={t.name}
                   fill
                   sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"

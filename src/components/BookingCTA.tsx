@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { images } from "@/lib/images";
+import { blurProps, images } from "@/lib/images";
 import { RESERVATION_PATH } from "@/lib/navigation";
 import Parallax from "./Parallax";
 import Reveal from "./Reveal";
@@ -9,7 +9,7 @@ export default function BookingCTA() {
   return (
     <section id="contact" className="relative overflow-hidden bg-forest">
       <Parallax speed={0.2}>
-        <Image src={images.cta} alt="" fill sizes="100vw" className="object-cover" />
+        <Image src={images.cta} {...blurProps(images.cta)} alt="" fill sizes="100vw" className="object-cover" />
       </Parallax>
       <div className="absolute inset-0 bg-forest/40" />
 

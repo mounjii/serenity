@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { BUFFER_MINUTES, DEFAULT_PHONE_PREFIX, NOTE_MAX } from "@/lib/booking-rules";
 import { customerDetailsSchema } from "@/lib/booking-schema";
 import { formatDuration, formatPrice } from "@/lib/format";
-import { serviceCardImage, serviceImage } from "@/lib/images";
+import { blurProps, serviceCardImage, serviceImage } from "@/lib/images";
 import { formatPhone } from "@/lib/phone";
 import { PRESSURE_LEVEL, serviceDetails, type ServiceDetails } from "@/lib/service-details";
 import { pickOption } from "@/lib/service-options";
@@ -457,7 +457,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                     {/* The photo always spans the whole card; the clip only uncovers its left third until hover/focus. */}
                     <span className="absolute inset-0 -z-20 overflow-hidden transition-[clip-path] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] [clip-path:inset(0_64%_0_0)] group-hover:[clip-path:inset(0_0_0_0)] group-focus-visible:[clip-path:inset(0_0_0_0)]">
                       <Image
-                        src={serviceCardImage(s.slug)}
+                        src={serviceCardImage(s.slug)} {...blurProps(serviceCardImage(s.slug))}
                         alt=""
                         fill
                         sizes="(min-width: 1024px) 560px, 100vw"
@@ -788,7 +788,7 @@ function ServiceDetailView({
 
       <div className="mt-5 grid gap-6 md:grid-cols-[0.85fr_1.5fr] md:gap-8">
         <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:aspect-auto md:min-h-[21rem]">
-          <Image src={serviceImage(service.slug)} alt={service.name} fill sizes="(min-width: 768px) 34vw, 100vw" className="object-cover" />
+          <Image src={serviceImage(service.slug)} {...blurProps(serviceImage(service.slug))} alt={service.name} fill sizes="(min-width: 768px) 34vw, 100vw" className="object-cover" />
         </div>
 
         <div className="flex flex-col">

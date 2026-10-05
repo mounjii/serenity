@@ -1,4 +1,12 @@
+import { BLUR_DATA } from "./image-blur";
+
 const local = (name: string) => `/images/${name}.webp`;
+
+/** next/image props that show a blurred preview of the photo until it has loaded. */
+export function blurProps(src: string) {
+  const blurDataURL = BLUR_DATA[src];
+  return blurDataURL ? ({ placeholder: "blur", blurDataURL } as const) : {};
+}
 
 export const images = {
   hero: local("hero"),

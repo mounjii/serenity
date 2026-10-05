@@ -6,7 +6,7 @@ import { ArrowDown } from "@/components/Icons";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BookingFlow from "@/components/booking/BookingFlow";
-import { images } from "@/lib/images";
+import { blurProps, images } from "@/lib/images";
 import { getBookableDays } from "@/server/booking/calendar";
 import { getActiveServices } from "@/server/booking/services";
 
@@ -29,7 +29,7 @@ export default async function ReservationPage({ searchParams }: PageProps<"/rese
       <main className={`${greatVibes.variable} min-h-screen bg-cream pb-24`}>
         <section className="relative isolate overflow-hidden">
           <Image
-            src={images.reservationHero}
+            src={images.reservationHero} {...blurProps(images.reservationHero)}
             alt=""
             fill
             priority

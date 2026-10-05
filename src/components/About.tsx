@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { images } from "@/lib/images";
+import { blurProps, images } from "@/lib/images";
 import { ArrowRight } from "./Icons";
 import Reveal from "./Reveal";
 
@@ -10,7 +10,7 @@ export default function About() {
       <div className="mx-auto grid max-w-7xl items-center gap-14 px-6 py-24 md:grid-cols-2 lg:gap-24 lg:px-12 lg:py-28">
         <Reveal variant="curtain" className="relative aspect-[5/4] overflow-hidden rounded-sm shadow-[0_30px_60px_-30px_rgba(60,40,20,0.35)]">
           <Image
-            src={images.about}
+            src={images.about} {...blurProps(images.about)}
             alt="Rolled towels and candles"
             fill
             sizes="(min-width: 768px) 50vw, 100vw"

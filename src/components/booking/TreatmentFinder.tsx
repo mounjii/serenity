@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, CheckIcon, LotusIcon } from "@/components/Icons";
 import { formatDuration } from "@/lib/format";
-import { serviceImage } from "@/lib/images";
+import { blurProps, serviceImage } from "@/lib/images";
 import { serviceDetails } from "@/lib/service-details";
 import {
   GOAL_CHOICES,
@@ -207,7 +207,7 @@ function Results({
 
       <article className="animate-fade-up mt-6 grid overflow-hidden rounded-2xl border border-sand bg-white md:grid-cols-[0.9fr_1.4fr]">
         <div className="relative aspect-[16/10] md:aspect-auto md:min-h-[17rem]">
-          <Image src={serviceImage(bestService.slug)} alt={bestService.name} fill sizes="(min-width: 768px) 35vw, 100vw" className="object-cover" />
+          <Image src={serviceImage(bestService.slug)} {...blurProps(serviceImage(bestService.slug))} alt={bestService.name} fill sizes="(min-width: 768px) 35vw, 100vw" className="object-cover" />
           <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-[0.65rem] tracking-[0.18em] text-cream uppercase">
             <LotusIcon className="h-3.5 w-3.5" aria-hidden /> Best for you
           </span>
@@ -252,7 +252,7 @@ function Results({
                   className="animate-fade-up group flex items-center gap-4 rounded-xl border border-sand bg-white p-3 text-left transition hover:-translate-y-0.5 hover:border-ink"
                 >
                   <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
-                    <Image src={serviceImage(s.slug)} alt="" fill sizes="64px" className="object-cover" />
+                    <Image src={serviceImage(s.slug)} {...blurProps(serviceImage(s.slug))} alt="" fill sizes="64px" className="object-cover" />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block font-serif text-[1.15rem] leading-tight text-ink">{s.name}</span>

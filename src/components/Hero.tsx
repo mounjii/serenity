@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { images } from "@/lib/images";
+import { blurProps, images } from "@/lib/images";
 import { RESERVATION_PATH } from "@/lib/navigation";
 import { ArrowDown } from "./Icons";
 import Parallax from "./Parallax";
@@ -12,7 +12,7 @@ export default function Hero() {
     <section id="home" className="relative flex h-svh min-h-[640px] items-center overflow-hidden">
       <Parallax speed={0.18}>
         <Image
-          src={images.hero}
+          src={images.hero} {...blurProps(images.hero)}
           alt="Spa treatment room with a massage table, rolled towels and candles"
           fill
           priority

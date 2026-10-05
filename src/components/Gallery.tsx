@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { images } from "@/lib/images";
+import { blurProps, images } from "@/lib/images";
 import Reveal from "./Reveal";
 
 const alts = ["Treatment room", "Rolled towels and candle", "Stone bath with petals", "Relaxation lounge"];
@@ -25,7 +25,7 @@ export default function Gallery() {
               className="group relative aspect-[4/3] overflow-hidden rounded-sm"
             >
               <Image
-                src={src}
+                src={src} {...blurProps(src)}
                 alt={alts[i]}
                 fill
                 sizes="(min-width: 1024px) 25vw, 50vw"

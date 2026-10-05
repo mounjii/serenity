@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { images } from "@/lib/images";
+import { blurProps, images } from "@/lib/images";
 import { ArrowLeft, ArrowRight, StarIcon } from "./Icons";
 import Reveal from "./Reveal";
 
@@ -41,7 +41,7 @@ export default function Testimonials() {
       <div className="mx-auto grid max-w-7xl items-center gap-14 px-6 py-24 md:grid-cols-[1fr_1.15fr] lg:gap-24 lg:px-12 lg:py-28">
         <Reveal variant="curtain" className="relative aspect-[4/3] overflow-hidden rounded-sm shadow-[0_30px_60px_-30px_rgba(60,40,20,0.35)]">
           <Image
-            src={images.testimonial}
+            src={images.testimonial} {...blurProps(images.testimonial)}
             alt="Zen stones, candle and orchid"
             fill
             sizes="(min-width: 768px) 45vw, 100vw"
@@ -74,7 +74,7 @@ export default function Testimonials() {
           <div className="mt-6 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="relative h-12 w-12 overflow-hidden rounded-full ring-2 ring-white">
-                <Image src={images.avatar} alt="" fill sizes="48px" className="object-cover" />
+                <Image src={images.avatar} {...blurProps(images.avatar)} alt="" fill sizes="48px" className="object-cover" />
               </div>
               <div>
                 <p className="text-[0.88rem] text-ink">{testimonials[index].name}</p>
