@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, CheckIcon, ChevronDown, HeartIcon, LeafIcon, LotusIcon } from "@/components/Icons";
 import { Button } from "@/components/ui/Button";
-import { DEFAULT_PHONE_PREFIX, NOTE_MAX } from "@/lib/booking-rules";
+import { DEFAULT_PHONE_PREFIX, NOTE_MAX, SETTLE_MINUTES } from "@/lib/booking-rules";
 import { customerDetailsSchema } from "@/lib/booking-schema";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { serviceCardImage, serviceImage } from "@/lib/images";
@@ -759,6 +759,8 @@ function ServiceDetailView({
               );
             })}
           </div>
+
+          <p className="mt-2.5 text-[0.72rem] text-muted">Session time includes {SETTLE_MINUTES} minutes to settle in and change.</p>
 
           <button
             type="button"
