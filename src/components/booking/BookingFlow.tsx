@@ -530,7 +530,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                   )}
                 </div>
                 <p className="mt-4 text-[0.75rem] text-muted">
-                  Greyed-out times are already taken. Each treatment includes a 15-minute pause before the next guest.
+                  Greyed-out times are already taken.
                 </p>
               </>
             )}
