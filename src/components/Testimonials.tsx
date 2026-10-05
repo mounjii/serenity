@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { blurProps, images } from "@/lib/images";
 import { ArrowLeft, ArrowRight, StarIcon } from "./Icons";
 import Reveal from "./Reveal";
@@ -36,10 +36,23 @@ export default function Testimonials() {
   const prev = () => setIndex((i) => (i - 1 + count) % count);
   const next = () => setIndex((i) => (i + 1) % count);
 
+  const touchStartX = useRef<number | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0]?.clientX ?? null;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const start = touchStartX.current;
+    const end = e.changedTouches[0]?.clientX;
+    touchStartX.current = null;
+    if (start === null || end === undefined || Math.abs(end - start) < 40) return;
+    if (end < start) next();
+    else prev();
+  };
+
   return (
     <section className="bg-cream-dark/60">
-      <div className="mx-auto grid max-w-7xl items-center gap-14 px-6 py-24 md:grid-cols-[1fr_1.15fr] lg:gap-24 lg:px-12 lg:py-28">
-        <Reveal variant="curtain" className="relative aspect-[4/3] overflow-hidden rounded-sm shadow-[0_30px_60px_-30px_rgba(60,40,20,0.35)]">
+      <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-16 sm:gap-14 sm:px-6 sm:py-24 md:grid-cols-[1fr_1.15fr] lg:gap-24 lg:px-12 lg:py-28">
+        <Reveal variant="curtain" className="relative aspect-[16/9] overflow-hidden rounded-sm shadow-[0_30px_60px_-30px_rgba(60,40,20,0.35)] sm:aspect-[4/3]">
           <Image
             src={images.testimonial} {...blurProps(images.testimonial)}
             alt="Zen stones, candle and orchid"
@@ -51,20 +64,20 @@ export default function Testimonials() {
 
         <Reveal variant="right" delay={200}>
           <p className="eyebrow">Testimonials</p>
-          <h2 className="mt-4 font-serif text-5xl text-ink lg:text-[3.2rem]">
+          <h2 className="mt-4 font-serif text-[2.4rem] leading-[1.08] text-ink sm:text-5xl lg:text-[3.2rem]">
             What Our Clients Say
           </h2>
 
-          <div className="relative mt-8 min-h-[150px]">
+          <div className="relative mt-6 grid touch-pan-y sm:mt-8" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             {testimonials.map((t, i) => (
               <blockquote
                 key={t.name}
                 aria-hidden={i !== index}
-                className={`absolute inset-0 transition-all duration-700 ${
+                className={`col-start-1 row-start-1 transition-all duration-700 ${
                   i === index ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"
                 }`}
               >
-                <p className="max-w-lg font-serif text-xl leading-relaxed text-ink-soft italic">
+                <p className="max-w-lg font-serif text-[1.15rem] leading-relaxed text-ink-soft italic sm:text-xl">
                   &ldquo;{t.quote}&rdquo;
                 </p>
               </blockquote>

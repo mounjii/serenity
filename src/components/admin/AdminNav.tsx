@@ -13,7 +13,7 @@ const links = [
 export default function AdminNav({ className = "" }: { className?: string }) {
   const pathname = usePathname();
   return (
-    <nav className={`flex gap-7 overflow-x-auto ${className}`} aria-label="Admin">
+    <nav className={`no-scrollbar flex gap-6 overflow-x-auto sm:gap-7 ${className}`} aria-label="Admin">
       {links.map((link) => {
         const active = link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href);
         return (

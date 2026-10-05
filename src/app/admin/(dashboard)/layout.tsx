@@ -35,7 +35,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
             <Link
               href="/admin/bookings/new"
               aria-label="New booking"
-              className="grid h-9 w-9 place-items-center rounded-full bg-ink text-lg leading-none text-cream transition hover:bg-black md:hidden"
+              className="grid h-10 w-10 place-items-center rounded-full bg-ink text-lg leading-none text-cream transition hover:bg-black md:hidden"
             >
               +
             </Link>
@@ -47,7 +47,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
             </div>
             <span className="hidden h-5 w-px bg-sand lg:block" aria-hidden />
             <form action={logoutAction}>
-              <button type="submit" className="rounded-full px-3 py-1.5 text-[0.78rem] text-ink-soft transition hover:bg-white hover:text-ink">
+              <button type="submit" className="rounded-full px-3 py-2.5 text-[0.78rem] text-ink-soft transition hover:bg-white hover:text-ink">
                 Log out
               </button>
             </form>
@@ -55,7 +55,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
         </div>
         <AdminNav className="border-t border-sand/60 px-5 sm:px-8 md:hidden" />
       </header>
-      <main className="mx-auto max-w-[1240px] px-5 py-10 sm:px-8 sm:py-14">
+      <main className="mx-auto max-w-[1240px] px-4 py-8 sm:px-8 sm:py-14">
         <LiveBookings initialSince={pollingCursor()}>{children}</LiveBookings>
       </main>
     </>

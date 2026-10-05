@@ -487,8 +487,13 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                         {s.description}
                       </span>
                       <span className="mt-auto flex items-center justify-between gap-3 pt-3">
-                        <span className="text-[0.66rem] tracking-[0.18em] text-ink-soft uppercase transition-colors duration-500 group-hover:text-white/85 group-focus-visible:text-white/85">
-                          {s.options.map((o) => o.durationMinutes).join(" · ")} min
+                        <span className="flex min-w-0 flex-col leading-tight">
+                          <span className="font-serif text-[1.05rem] text-ink transition-colors duration-500 group-hover:text-white group-focus-visible:text-white">
+                            From {formatPrice(Math.min(...s.options.map((o) => o.priceCents)))}
+                          </span>
+                          <span className="mt-0.5 text-[0.62rem] tracking-[0.16em] text-ink-soft uppercase transition-colors duration-500 group-hover:text-white/85 group-focus-visible:text-white/85">
+                            {s.options.map((o) => o.durationMinutes).join(" · ")} min
+                          </span>
                         </span>
                         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-ink bg-ink text-cream transition-all duration-500 group-hover:border-white/80 group-hover:bg-white/10 group-hover:backdrop-blur-sm group-focus-visible:border-white/80 group-focus-visible:bg-white/10">
                           <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-0.5" />
@@ -575,7 +580,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                     <Button variant="outline" size="sm" onClick={() => setStep(2)}>Choose another date</Button>
                   </div>
                 )}
-                <div className="mt-6 grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-6">
+                <div className="mt-6 grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6">
                   {times.map((t) =>
                     t.available ? (
                       <button
@@ -942,9 +947,9 @@ function DetailItem({
 
 function SummaryRow({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
   return (
-    <div className="flex flex-col gap-1 py-3 sm:flex-row sm:justify-between sm:gap-6">
-      <dt className="text-muted">{label}</dt>
-      <dd className={`break-words sm:text-right ${strong ? "font-serif text-xl text-ink" : "text-ink"}`}>{value}</dd>
+    <div className="flex items-baseline justify-between gap-4 py-3 sm:gap-6">
+      <dt className="shrink-0 text-muted">{label}</dt>
+      <dd className={`min-w-0 text-right break-words ${strong ? "font-serif text-xl text-ink" : "text-ink"}`}>{value}</dd>
     </div>
   );
 }

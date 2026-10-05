@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Jost } from "next/font/google";
 import { INTRO_BOOT_SCRIPT } from "@/lib/intro";
 import "./globals.css";
@@ -20,6 +20,13 @@ export const metadata: Metadata = {
   title: "Touch Sense — Thai Massage",
   description:
     "Escape the everyday and give your body and mind the care they deserve. Professional massage and wellness treatments.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#f7f3ed",
 };
 
 export default function RootLayout({

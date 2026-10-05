@@ -27,11 +27,41 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Slide-in reveals start off to the side; without this, phones can scroll or wobble sideways.
+   clip (unlike hidden) does not create a scroll container, so sticky elements keep working. */
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   background: var(--color-cream);
   color: var(--color-ink);
   font-family: var(--font-jost), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  text-size-adjust: 100%;
+}
+
+/* iOS Safari zooms into any field whose text is smaller than 16px. */
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
 .eyebrow {
@@ -62,6 +92,16 @@ body {
   transform: translate3d(48px, 0, 0);
 }
 
+@media (max-width: 767px) {
+  .reveal[data-variant="left"] {
+    transform: translate3d(-20px, 0, 0);
+  }
+
+  .reveal[data-variant="right"] {
+    transform: translate3d(20px, 0, 0);
+  }
+}
+
 .reveal[data-variant="zoom"] {
   transform: scale(0.94);
 }
@@ -90,6 +130,13 @@ body {
 
 .reveal.is-visible > .reveal-curtain {
   clip-path: inset(0 0 0 0);
+}
+
+/* Cards in a swipe row reveal as they slide in; a stagger delay would make them appear late. */
+@media (max-width: 639px) {
+  .snap-x > .reveal {
+    transition-delay: 0ms !important;
+  }
 }
 
 @keyframes fade-up {

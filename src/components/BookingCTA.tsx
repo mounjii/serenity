@@ -13,7 +13,7 @@ export default function BookingCTA() {
       </Parallax>
       <div className="absolute inset-0 bg-forest/40" />
 
-      <Reveal className="relative mx-auto max-w-3xl px-6 py-24 text-center lg:py-28">
+      <Reveal className="relative mx-auto max-w-3xl px-5 py-20 text-center sm:px-6 sm:py-24 lg:py-28">
         <p className="eyebrow !text-cream/60">Ready to Feel Better?</p>
         <h2 className="mt-4 font-serif text-4xl text-cream sm:text-5xl lg:text-[3.4rem]">
           Book Your Massage Today
@@ -23,7 +23,7 @@ export default function BookingCTA() {
         </p>
         <Link
           href={RESERVATION_PATH}
-          className="mt-9 inline-block rounded-full bg-cream px-8 py-3.5 text-[0.8rem] tracking-wide text-ink transition hover:-translate-y-0.5 hover:bg-white hover:shadow-xl"
+          className="mt-8 inline-flex min-h-12 items-center rounded-full bg-cream px-9 text-[0.85rem] tracking-wide text-ink transition hover:-translate-y-0.5 hover:bg-white hover:shadow-xl sm:mt-9 sm:text-[0.8rem]"
         >
           Book Now
         </Link>

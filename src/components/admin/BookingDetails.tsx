@@ -76,8 +76,8 @@ export default function BookingDetailsProvider({
           aria-labelledby="booking-details-title"
           tabIndex={-1}
           inert={!visible}
-          className={`absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-cream shadow-[-24px_0_48px_-32px_rgba(42,40,36,0.35)] outline-none transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
-            visible ? "translate-x-0" : "translate-x-full"
+          className={`absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-cream outline-none transition-[translate,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+            visible ? "translate-x-0 shadow-[-24px_0_48px_-32px_rgba(42,40,36,0.35)]" : "translate-x-full shadow-none"
           }`}
         >
           {booking && <DetailsContent booking={booking} whatsappMode={whatsappMode} onClose={close} />}
@@ -90,7 +90,7 @@ export default function BookingDetailsProvider({
 function DetailsContent({ booking, whatsappMode, onClose }: { booking: AdminBooking; whatsappMode: WhatsAppMode; onClose: () => void }) {
   return (
     <>
-      <div className="flex items-center justify-between border-b border-sand/70 px-6 py-4">
+      <div className="flex items-center justify-between border-b border-sand/70 px-5 py-3 sm:px-6 sm:py-4">
         <p className="text-[0.66rem] tracking-[0.28em] text-muted uppercase">Reservation</p>
         <button
           type="button"
@@ -102,7 +102,7 @@ function DetailsContent({ booking, whatsappMode, onClose }: { booking: AdminBook
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-6">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-6 sm:px-6">
         <h2 id="booking-details-title" className="font-serif text-[2rem] leading-tight text-ink">
           {booking.customerName}
         </h2>
@@ -157,7 +157,7 @@ function DetailsContent({ booking, whatsappMode, onClose }: { booking: AdminBook
         </div>
       </div>
 
-      <div className="space-y-4 border-t border-sand/70 bg-cream px-6 py-5">
+      <div className="space-y-4 border-t border-sand/70 bg-cream px-5 pt-4 pb-safe sm:px-6 sm:py-5">
         <BookingActions booking={booking} whatsappMode={whatsappMode} />
         <Link href={`/admin/bookings/${booking.id}`} className="inline-block text-[0.75rem] text-ink-soft underline-offset-4 hover:text-ink hover:underline">
           Open full page →

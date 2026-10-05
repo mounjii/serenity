@@ -42,9 +42,9 @@ export default async function ConfirmationPage({ params }: PageProps<"/reservati
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-cream pt-32 pb-24">
+      <main className="min-h-screen bg-cream pt-24 pb-16 sm:pt-32 sm:pb-24">
         <div className="mx-auto max-w-xl px-5 sm:px-6">
-          <section className="rounded-sm bg-white p-6 text-center shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)] sm:p-10">
+          <section className="rounded-sm bg-white px-5 py-7 text-center shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)] sm:p-10">
             <div
               className={`mx-auto grid h-14 w-14 place-items-center rounded-full ${
                 booking.status === "CANCELLED"
