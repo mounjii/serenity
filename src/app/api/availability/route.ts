@@ -1,9 +1,11 @@
 import type { NextRequest } from "next/server";
 import { getTimeGrid, parseDurationParam } from "@/server/booking/availability";
+import { sweepExpiredBookings } from "@/server/booking/confirmation";
 import { errorResponse, jsonResponse } from "@/server/errors";
 
 export async function GET(request: NextRequest) {
   try {
+    await sweepExpiredBookings();
     const params = request.nextUrl.searchParams;
     const serviceId = params.get("serviceId") ?? "";
     const date = params.get("date") ?? "";

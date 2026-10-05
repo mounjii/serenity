@@ -3,12 +3,19 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { adminAction, type ActionResult } from "@/server/admin/action-result";
-import { cancelBooking, completeBooking, type AdminBooking } from "@/server/admin/bookings";
+import { cancelBooking, completeBooking, confirmBooking, type AdminBooking } from "@/server/admin/bookings";
 import { addClosedDay, removeClosedDay, type ClosedDayItem } from "@/server/admin/closed-days";
 import { clearLoginFailures, isLoginThrottled, recordLoginFailure, verifyCredentials } from "@/server/auth/credentials";
 import { endSession, startSession } from "@/server/auth/session";
+import { applyCustomerReply } from "@/server/booking/confirmation";
 import { createBooking } from "@/server/booking/create-booking";
-import { scheduleBookingCancelledNotification, scheduleBookingCreatedNotifications } from "@/server/notifications/booking-notifications";
+import { businessRule } from "@/server/errors";
+import {
+  scheduleBookingCancelledNotification,
+  scheduleBookingConfirmedNotification,
+  scheduleBookingCreatedNotifications,
+} from "@/server/notifications/booking-notifications";
+import { isMockWhatsApp } from "@/server/whatsapp";
 
 export type LoginState = { error: string | null };
 
@@ -55,6 +62,25 @@ export async function cancelBookingAction(id: string): Promise<ActionResult<Admi
     const booking = await cancelBooking(id);
     scheduleBookingCancelledNotification(booking.id);
     return booking;
+  });
+}
+
+export async function confirmBookingAction(id: string): Promise<ActionResult<AdminBooking>> {
+  return adminAction(async () => {
+    const booking = await confirmBooking(id);
+    scheduleBookingConfirmedNotification(booking.id, "ADMIN");
+    return booking;
+  });
+}
+
+/** Test helper while WhatsApp runs in mock mode: acts as if the customer tapped Confirm or Cancel. */
+export async function simulateCustomerReplyAction(id: string, action: "confirm" | "cancel"): Promise<ActionResult<{ outcome: string }>> {
+  return adminAction(async () => {
+    if (!isMockWhatsApp()) throw businessRule("CANNOT_CONFIRM", "Client replies can only be simulated in WhatsApp mock mode.");
+    if (action !== "confirm" && action !== "cancel") throw businessRule("CANNOT_CONFIRM", "Unknown reply.");
+    const outcome = await applyCustomerReply(id, action);
+    if (outcome === "IGNORED") throw businessRule("CANNOT_CONFIRM", "This reservation is no longer waiting for the client.");
+    return { outcome };
   });
 }
 

@@ -7,6 +7,8 @@ import { ButtonLink } from "@/components/ui/Button";
 import { formatDayHeading } from "@/lib/time";
 import { getDashboardSummary, listBookingsForDates, type AdminBooking } from "@/server/admin/bookings";
 import { requireAdminPage } from "@/server/auth/session";
+import { sweepExpiredBookings } from "@/server/booking/confirmation";
+import { isMockWhatsApp } from "@/server/whatsapp";
 
 function uniqueById(lists: (AdminBooking | null)[][]): AdminBooking[] {
   const map = new Map<string, AdminBooking>();
@@ -17,6 +19,7 @@ function uniqueById(lists: (AdminBooking | null)[][]): AdminBooking[] {
 export default async function AdminDashboardPage({ searchParams }: PageProps<"/admin">) {
   await connection();
   await requireAdminPage();
+  await sweepExpiredBookings();
   const params = await searchParams;
 
   const summary = await getDashboardSummary();
@@ -27,10 +30,11 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
   ]);
   const next = summary.nextBooking;
   const confirmedToday = todayBookings.filter((b) => b.status === "CONFIRMED").length;
+  const waiting = uniqueById([todayBookings, rangeBookings]).filter((b) => b.status === "PENDING").length;
   const plural = (n: number, word: string) => `${word}${n === 1 ? "" : "s"}`;
 
   return (
-    <BookingDetailsProvider bookings={uniqueById([todayBookings, rangeBookings, [next]])}>
+    <BookingDetailsProvider bookings={uniqueById([todayBookings, rangeBookings, [next]])} mockWhatsApp={isMockWhatsApp()}>
       <div className="space-y-14">
         <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -46,7 +50,11 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_1.5fr_1fr]" aria-label="Summary">
           <Stat label="Today" value={summary.todayCount} caption={plural(summary.todayCount, "Reservation")} />
           <NextBookingCard booking={next} isToday={next?.date === summary.today} />
-          <Stat label="Confirmed" value={confirmedToday} caption={`${plural(confirmedToday, "Appointment")} today`} />
+          <Stat
+            label="Confirmed"
+            value={confirmedToday}
+            caption={`${plural(confirmedToday, "Appointment")} today${waiting > 0 ? ` · ${waiting} waiting for WhatsApp` : ""}`}
+          />
         </section>
 
         <section>

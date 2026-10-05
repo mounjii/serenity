@@ -11,6 +11,7 @@ export const mockProvider: WhatsAppProvider = {
         `To:       ${message.to} (${message.recipient.toLowerCase()})`,
         `Template: ${message.template}`,
         `Message:  ${message.text}`,
+        ...(message.buttons?.length ? [`Buttons:  ${message.buttons.map((b) => `[${b.title}]`).join(" ")}`] : []),
         "─────────────────────────────────",
       ].join("\n"),
     );

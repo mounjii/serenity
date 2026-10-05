@@ -62,7 +62,7 @@ export async function addClosedDay(rawInput: unknown, now = new Date()): Promise
 
         const active = await tx.booking.findMany({
           where: {
-            status: "CONFIRMED",
+            status: { in: ["CONFIRMED", "PENDING"] },
             startAt: { gte: localToUtc(input.date, 0), lt: localToUtc(addDays(input.date, 1), 0) },
           },
           orderBy: { startAt: "asc" },

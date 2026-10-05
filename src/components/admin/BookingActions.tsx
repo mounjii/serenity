@@ -2,24 +2,28 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { cancelBookingAction, completeBookingAction } from "@/app/admin/actions";
+import { cancelBookingAction, completeBookingAction, confirmBookingAction, simulateCustomerReplyAction } from "@/app/admin/actions";
 import { Button } from "@/components/ui/Button";
-import { canCancel, canComplete } from "@/lib/booking-status";
+import { canCancel, canComplete, canConfirm } from "@/lib/booking-status";
 import type { AdminBooking } from "@/server/admin/bookings";
 import type { ActionResult } from "@/server/admin/action-result";
 
-export default function BookingActions({ booking }: { booking: AdminBooking }) {
+type ActionKind = "cancel" | "complete" | "confirm" | "client-confirm" | "client-cancel";
+
+export default function BookingActions({ booking, mockWhatsApp = false }: { booking: AdminBooking; mockWhatsApp?: boolean }) {
   const router = useRouter();
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  const [pendingAction, setPendingAction] = useState<"cancel" | "complete" | null>(null);
+  const [pendingAction, setPendingAction] = useState<ActionKind | null>(null);
 
   const now = new Date();
   const cancellable = canCancel(booking, now);
   const completable = canComplete(booking, now);
+  const confirmable = canConfirm(booking, now);
+  const waitingUntil = booking.labels.confirmUntil;
 
-  const run = (kind: "cancel" | "complete", action: () => Promise<ActionResult<AdminBooking>>) => {
+  const run = (kind: ActionKind, action: () => Promise<ActionResult<unknown>>) => {
     setError(null);
     setPendingAction(kind);
     startTransition(async () => {
@@ -36,7 +40,7 @@ export default function BookingActions({ booking }: { booking: AdminBooking }) {
     });
   };
 
-  if (!cancellable && !completable) {
+  if (!cancellable && !completable && !confirmable) {
     return (
       <p className="text-[0.85rem] text-muted">
         {booking.status === "CONFIRMED" ? "No actions available." : "This reservation is closed. No further actions are available."}
@@ -46,6 +50,13 @@ export default function BookingActions({ booking }: { booking: AdminBooking }) {
 
   return (
     <div className="space-y-4">
+      {waitingUntil && (
+        <p className="rounded-sm bg-gold/10 px-3 py-2 text-[0.82rem] text-ink-soft">
+          Waiting for the client to confirm on WhatsApp. Cancelled automatically at{" "}
+          <strong className="font-medium text-ink">{waitingUntil}</strong> without a reply.
+        </p>
+      )}
+
       {confirmingCancel ? (
         <div className="rounded-sm border border-red-200 bg-red-50 p-4">
           <p className="text-[0.9rem] text-red-800">Cancel this reservation? The customer will be notified.</p>
@@ -60,6 +71,11 @@ export default function BookingActions({ booking }: { booking: AdminBooking }) {
         </div>
       ) : (
         <div className="flex flex-wrap gap-3">
+          {confirmable && (
+            <Button size="sm" loading={pending && pendingAction === "confirm"} disabled={pending} onClick={() => run("confirm", () => confirmBookingAction(booking.id))}>
+              Confirm reservation
+            </Button>
+          )}
           {completable && (
             <Button size="sm" loading={pending && pendingAction === "complete"} onClick={() => run("complete", () => completeBookingAction(booking.id))}>
               Mark as completed
@@ -72,6 +88,33 @@ export default function BookingActions({ booking }: { booking: AdminBooking }) {
           )}
         </div>
       )}
+
+      {mockWhatsApp && confirmable && !confirmingCancel && (
+        <div className="rounded-sm border border-dashed border-sand p-3">
+          <p className="text-[0.66rem] tracking-[0.2em] text-muted uppercase">Test mode · simulate the client&apos;s WhatsApp reply</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              loading={pending && pendingAction === "client-confirm"}
+              disabled={pending}
+              onClick={() => run("client-confirm", () => simulateCustomerReplyAction(booking.id, "confirm"))}
+            >
+              Client taps Confirm
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              loading={pending && pendingAction === "client-cancel"}
+              disabled={pending}
+              onClick={() => run("client-cancel", () => simulateCustomerReplyAction(booking.id, "cancel"))}
+            >
+              Client taps Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+
       {error && (
         <p role="alert" className="text-[0.85rem] text-red-700">
           {error}

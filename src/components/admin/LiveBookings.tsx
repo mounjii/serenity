@@ -52,7 +52,7 @@ export default function LiveBookings({ initialSince, children }: { initialSince:
       for (const b of fresh) seen.current.set(b.id, b.updatedAt);
       if (fresh.length === 0) return;
 
-      const created = fresh.filter((b) => b.createdAt > requestedSince && b.status === "CONFIRMED");
+      const created = fresh.filter((b) => b.createdAt > requestedSince && b.status !== "CANCELLED");
       if (created.length > 0) {
         const ids = created.map((b) => b.id);
         setHighlighted((prev) => new Set([...prev, ...ids]));

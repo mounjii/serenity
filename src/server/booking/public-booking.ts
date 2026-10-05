@@ -1,3 +1,4 @@
+import type { BookingStatusValue } from "@/lib/booking-status";
 import { formatLongDate, toLocalTimeString } from "@/lib/time";
 import { getDb } from "@/server/db";
 
@@ -10,7 +11,9 @@ export type PublicBooking = {
   time: string;
   priceCents: number;
   firstName: string;
-  status: "CONFIRMED" | "COMPLETED" | "CANCELLED";
+  status: BookingStatusValue;
+  /** Local HH:mm before which a waiting booking must be confirmed on WhatsApp. */
+  confirmUntil: string | null;
 };
 
 /** Only what the confirmation page needs. Never the phone number or the note. */
@@ -25,6 +28,7 @@ export async function getPublicBooking(id: string): Promise<PublicBooking | null
       priceCents: true,
       customerName: true,
       status: true,
+      confirmationExpiresAt: true,
       service: { select: { name: true } },
     },
   });
@@ -39,5 +43,6 @@ export async function getPublicBooking(id: string): Promise<PublicBooking | null
     priceCents: row.priceCents,
     firstName: row.customerName.split(" ")[0] ?? "",
     status: row.status,
+    confirmUntil: row.status === "PENDING" && row.confirmationExpiresAt ? toLocalTimeString(row.confirmationExpiresAt) : null,
   };
 }

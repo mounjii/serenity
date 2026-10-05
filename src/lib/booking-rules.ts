@@ -10,6 +10,10 @@ export const SLOT_STEP_MINUTES = 15;
 export const BUFFER_MINUTES = 15;
 export const MIN_LEAD_MINUTES = 120;
 export const MAX_DAYS_AHEAD = 30;
+/** An online booking waits this long for the customer's WhatsApp confirmation... */
+export const CONFIRMATION_WINDOW_MINUTES = 120;
+/** ...but never closer to the session than this; then it is cancelled and the slot is freed. */
+export const CONFIRMATION_CUTOFF_BEFORE_START_MINUTES = 60;
 
 export const CUSTOMER_NAME_MIN = 2;
 export const CUSTOMER_NAME_MAX = 80;

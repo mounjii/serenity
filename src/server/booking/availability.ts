@@ -4,6 +4,7 @@ import { getDb } from "@/server/db";
 import { invalidInput, notFound } from "@/server/errors";
 import { pickOption } from "@/lib/service-options";
 import { getDaySchedule } from "./schedule";
+import { holdsSlot } from "./slot-hold";
 
 export type Slot = { time: string; startAt: string };
 
@@ -82,7 +83,7 @@ export async function getTimeGrid(
   const bookings = await db.booking.findMany({
     where: {
       therapistId: { in: therapistIds },
-      status: { not: "CANCELLED" },
+      ...holdsSlot(now),
       startAt: { lt: windowEnd },
       blockedUntil: { gt: windowStart },
     },

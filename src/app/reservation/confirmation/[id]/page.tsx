@@ -3,23 +3,27 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import RefreshWhilePending from "@/components/RefreshWhilePending";
 import { ButtonLink } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/format";
+import { sweepExpiredBookings } from "@/server/booking/confirmation";
 import { getPublicBooking } from "@/server/booking/public-booking";
 
 export const metadata: Metadata = {
-  title: "Reservation confirmed — Touch Sense",
+  title: "Your reservation — Touch Sense",
   robots: { index: false, follow: false },
 };
 
 const STATUS_TEXT = {
-  CONFIRMED: { title: "Your reservation is confirmed", note: "A confirmation will be sent to you on WhatsApp." },
+  PENDING: { title: "Confirm your reservation on WhatsApp", note: "We sent you a WhatsApp message. Tap “Confirm” to secure your time." },
+  CONFIRMED: { title: "Your reservation is confirmed", note: "Your confirmation has been sent to you on WhatsApp." },
   COMPLETED: { title: "Thank you for your visit", note: "We hope to see you again soon." },
   CANCELLED: { title: "This reservation was cancelled", note: "Feel free to book another time that suits you." },
 } as const;
 
 export default async function ConfirmationPage({ params }: PageProps<"/reservation/confirmation/[id]">) {
   await connection();
+  await sweepExpiredBookings();
   const { id } = await params;
   const booking = await getPublicBooking(id);
   if (!booking) notFound();
@@ -34,11 +38,20 @@ export default async function ConfirmationPage({ params }: PageProps<"/reservati
           <section className="rounded-sm bg-white p-6 text-center shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)] sm:p-10">
             <div
               className={`mx-auto grid h-14 w-14 place-items-center rounded-full ${
-                booking.status === "CANCELLED" ? "bg-cream-dark text-muted" : "bg-forest text-cream"
+                booking.status === "CANCELLED"
+                  ? "bg-cream-dark text-muted"
+                  : booking.status === "PENDING"
+                    ? "bg-gold/15 text-[#8a6a22]"
+                    : "bg-forest text-cream"
               }`}
               aria-hidden
             >
-              {booking.status === "CANCELLED" ? (
+              {booking.status === "PENDING" ? (
+                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <circle cx="12" cy="12" r="8.5" />
+                  <path d="M12 7.5V12l3 2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              ) : booking.status === "CANCELLED" ? (
                 <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
                 </svg>
@@ -61,6 +74,15 @@ export default async function ConfirmationPage({ params }: PageProps<"/reservati
               <Row label="Price" value={formatPrice(booking.priceCents)} />
             </dl>
 
+            {booking.status === "PENDING" && (
+              <>
+                <RefreshWhilePending />
+                <p className="mt-4 rounded-sm bg-gold/10 px-4 py-3 text-[0.85rem] text-ink-soft">
+                  Your time is held until <strong className="font-medium text-ink">{booking.confirmUntil ?? "soon"}</strong>. Without
+                  confirmation, the reservation is cancelled automatically.
+                </p>
+              </>
+            )}
             <p className="mt-6 text-[0.8rem] text-muted">{text.note}</p>
             <p className="mt-1 text-[0.8rem] text-muted">Payment is made at the salon.</p>
 

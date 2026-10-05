@@ -5,19 +5,22 @@ import { ButtonLink } from "@/components/ui/Button";
 import { formatDayHeading, toLocalDateString } from "@/lib/time";
 import { listBookingsForDates } from "@/server/admin/bookings";
 import { requireAdminPage } from "@/server/auth/session";
+import { sweepExpiredBookings } from "@/server/booking/confirmation";
+import { isMockWhatsApp } from "@/server/whatsapp";
 
 export const metadata = { title: "Bookings — Touch Sense" };
 
 export default async function AdminBookingsPage({ searchParams }: PageProps<"/admin/bookings">) {
   await connection();
   await requireAdminPage();
+  await sweepExpiredBookings();
   const params = await searchParams;
   const today = toLocalDateString(new Date());
   const range = resolveRange(params, today);
   const bookings = await listBookingsForDates(range.from, range.to);
 
   return (
-    <BookingDetailsProvider bookings={bookings}>
+    <BookingDetailsProvider bookings={bookings} mockWhatsApp={isMockWhatsApp()}>
       <div className="space-y-12">
         <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>

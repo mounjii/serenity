@@ -7,6 +7,7 @@ import { addMinutes, dateStringToDbDate, localToUtc, toLocalDateString, toLocalM
 import { getDb } from "@/server/db";
 import { AppError, businessRule } from "@/server/errors";
 import { getDaySchedule } from "./schedule";
+import { confirmationDeadline, holdsSlot } from "./slot-hold";
 
 export type BookingSummary = {
   id: string;
@@ -127,7 +128,7 @@ export async function createBooking(rawInput: unknown, options: CreateBookingOpt
           const overlapping = await tx.booking.findMany({
             where: {
               therapistId: { in: locked.map((t) => t.id) },
-              status: { not: "CANCELLED" },
+              ...holdsSlot(now),
               startAt: { lt: blockedUntil },
               blockedUntil: { gt: startAt },
             },
@@ -149,7 +150,10 @@ export async function createBooking(rawInput: unknown, options: CreateBookingOpt
               customerName: input.customerName,
               customerPhone: input.customerPhone,
               note: input.note ?? null,
-              status: "CONFIRMED",
+              // Online bookings wait for the customer's WhatsApp confirmation; the admin books on the customer's behalf.
+              ...(options.source === "ONLINE"
+                ? { status: "PENDING" as const, confirmationExpiresAt: confirmationDeadline(now, startAt) }
+                : { status: "CONFIRMED" as const, confirmedAt: now }),
               source: options.source,
               idempotencyKey: input.idempotencyKey ?? null,
             },
