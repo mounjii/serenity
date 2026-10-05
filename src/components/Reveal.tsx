@@ -7,6 +7,7 @@ type RevealProps = {
   className?: string;
   delay?: number;
   as?: "div" | "section" | "article";
+  variant?: "up" | "left" | "right" | "zoom" | "fade" | "curtain";
 };
 
 export default function Reveal({
@@ -14,6 +15,7 @@ export default function Reveal({
   className = "",
   delay = 0,
   as: Tag = "div",
+  variant = "up",
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -36,6 +38,7 @@ export default function Reveal({
   return (
     <Tag
       ref={ref}
+      data-variant={variant === "up" ? undefined : variant}
       className={`reveal ${className}`}
       style={{ transitionDelay: `${delay}ms` }}
     >

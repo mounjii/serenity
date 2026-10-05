@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Logo from "./Logo";
 import { CloseIcon, MenuIcon } from "./Icons";
 import { navLinks, RESERVATION_PATH } from "@/lib/navigation";
@@ -17,11 +17,32 @@ export default function Navbar() {
   const [activeHash, setActiveHash] = useState("#home");
   const active = isHome ? activeHash : null;
 
+  const [hidden, setHidden] = useState(false);
+  const progressRef = useRef<HTMLSpanElement>(null);
+
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
+    let lastY = window.scrollY;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const y = window.scrollY;
+      setScrolled(y > 24);
+      if (Math.abs(y - lastY) > 6) {
+        setHidden(y > lastY && y > 320);
+        lastY = y;
+      }
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      if (progressRef.current) progressRef.current.style.transform = `scaleX(${max > 0 ? Math.min(y / max, 1) : 0})`;
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -44,11 +65,18 @@ export default function Navbar() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+        hidden && !open ? "-translate-y-full" : "translate-y-0"
+      } ${
         scrolled
           ? "bg-cream/90 py-3 shadow-[0_1px_0_rgba(0,0,0,0.05)] backdrop-blur-md"
           : "bg-transparent py-6 [&_ul_a]:font-medium [&_ul_a]:text-ink"
       }`}
     >
+      <span
+        ref={progressRef}
+        aria-hidden
+        className={`absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-ink/50 transition-opacity duration-500 ${scrolled ? "opacity-100" : "opacity-0"}`}
+      />
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-12">
         <Logo />
 

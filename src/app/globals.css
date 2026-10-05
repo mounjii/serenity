@@ -12,6 +12,9 @@
   --color-forest: #1f241c;
   --color-olive: #4b5537;
   --color-olive-dark: #3c442b;
+
+  --default-transition-duration: 300ms;
+  --default-transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @theme inline {
@@ -38,17 +41,51 @@ body {
   color: var(--color-muted);
 }
 
+::selection {
+  background: var(--color-sand);
+  color: var(--color-ink);
+}
+
 .reveal {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translate3d(0, 32px, 0);
   transition:
-    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+    clip-path 1.3s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.reveal[data-variant="left"] {
+  transform: translate3d(-48px, 0, 0);
+}
+
+.reveal[data-variant="right"] {
+  transform: translate3d(48px, 0, 0);
+}
+
+.reveal[data-variant="zoom"] {
+  transform: scale(0.94);
+}
+
+.reveal[data-variant="fade"] {
+  transform: none;
+}
+
+/* Curtain that opens upwards over images. */
+.reveal[data-variant="curtain"] {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(100% 0 0 0);
 }
 
 .reveal.is-visible {
   opacity: 1;
   transform: none;
+}
+
+/* Opens past the edges so the image shadow is not cut off. */
+.reveal[data-variant="curtain"].is-visible {
+  clip-path: inset(-20% -20% -20% -20%);
 }
 
 @keyframes fade-up {
@@ -112,17 +149,52 @@ body {
   animation: scroll-cue 1.8s ease-in-out infinite;
 }
 
+@keyframes page-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Opacity only: a transform here would break the position:fixed navbar inside pages. */
+.animate-page-in {
+  animation: page-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes hero-zoom {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.animate-hero-zoom {
+  animation: hero-zoom 2.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal,
+  .reveal[data-variant] {
     opacity: 1;
     transform: none;
+    clip-path: none;
     transition: none;
   }
 
   .animate-fade-up,
   .animate-step-next,
   .animate-step-prev,
-  .animate-scroll-cue {
+  .animate-scroll-cue,
+  .animate-page-in,
+  .animate-hero-zoom {
     animation: none;
   }
 }

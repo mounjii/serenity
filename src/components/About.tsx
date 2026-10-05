@@ -8,7 +8,7 @@ export default function About() {
   return (
     <section id="about" className="bg-cream-dark/60">
       <div className="mx-auto grid max-w-7xl items-center gap-14 px-6 py-24 md:grid-cols-2 lg:gap-24 lg:px-12 lg:py-28">
-        <Reveal className="relative aspect-[5/4] overflow-hidden rounded-sm shadow-[0_30px_60px_-30px_rgba(60,40,20,0.35)]">
+        <Reveal variant="curtain" className="relative aspect-[5/4] overflow-hidden rounded-sm shadow-[0_30px_60px_-30px_rgba(60,40,20,0.35)]">
           <Image
             src={images.about}
             alt="Rolled towels and candles"
@@ -18,7 +18,7 @@ export default function About() {
           />
         </Reveal>
 
-        <Reveal delay={150} className="max-w-md">
+        <Reveal variant="right" delay={200} className="max-w-md">
           <p className="eyebrow">About Us</p>
           <h2 className="mt-4 font-serif text-5xl leading-[1.05] text-ink lg:text-[3.4rem]">
             Your Wellness

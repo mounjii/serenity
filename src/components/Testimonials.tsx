@@ -39,7 +39,7 @@ export default function Testimonials() {
   return (
     <section className="bg-cream-dark/60">
       <div className="mx-auto grid max-w-7xl items-center gap-14 px-6 py-24 md:grid-cols-[1fr_1.15fr] lg:gap-24 lg:px-12 lg:py-28">
-        <Reveal className="relative aspect-[4/3] overflow-hidden rounded-sm shadow-[0_30px_60px_-30px_rgba(60,40,20,0.35)]">
+        <Reveal variant="curtain" className="relative aspect-[4/3] overflow-hidden rounded-sm shadow-[0_30px_60px_-30px_rgba(60,40,20,0.35)]">
           <Image
             src={images.testimonial}
             alt="Zen stones, candle and orchid"
@@ -49,7 +49,7 @@ export default function Testimonials() {
           />
         </Reveal>
 
-        <Reveal delay={150}>
+        <Reveal variant="right" delay={200}>
           <p className="eyebrow">Testimonials</p>
           <h2 className="mt-4 font-serif text-5xl text-ink lg:text-[3.2rem]">
             What Our Clients Say

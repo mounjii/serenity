@@ -20,7 +20,8 @@ export default function Gallery() {
           {images.gallery.map((src, i) => (
             <Reveal
               key={src}
-              delay={i * 100}
+              variant="zoom"
+              delay={i * 110}
               className="group relative aspect-[4/3] overflow-hidden rounded-sm"
             >
               <Image

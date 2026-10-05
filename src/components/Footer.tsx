@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Logo from "./Logo";
+import Reveal from "./Reveal";
 import { navLinks, RESERVATION_PATH } from "@/lib/navigation";
 import { ArrowUp, FacebookIcon, InstagramIcon, PinterestIcon } from "./Icons";
 
@@ -13,7 +14,7 @@ export default function Footer() {
   return (
     <footer className="bg-cream">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
-        <div className="flex flex-col items-center gap-8 border-t border-sand py-12 md:flex-row md:justify-between">
+        <Reveal variant="fade" className="flex flex-col items-center gap-8 border-t border-sand py-12 md:flex-row md:justify-between">
           <Logo variant="stacked" />
 
           <ul className="flex flex-wrap justify-center gap-8">
@@ -38,7 +39,7 @@ export default function Footer() {
               </Link>
             ))}
           </div>
-        </div>
+        </Reveal>
 
         <div className="flex flex-col items-center gap-4 border-t border-sand py-6 text-[0.72rem] text-muted md:flex-row md:justify-between">
           <p>© {new Date().getFullYear()} Touch Sense Thai Massage. All rights reserved.</p>
