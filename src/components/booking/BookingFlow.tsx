@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, CheckIcon, ChevronDown, HeartIcon, LeafIcon, LotusIcon } from "@/components/Icons";
 import { Button } from "@/components/ui/Button";
-import { DEFAULT_PHONE_PREFIX, NOTE_MAX, SETTLE_MINUTES } from "@/lib/booking-rules";
+import { BUFFER_MINUTES, DEFAULT_PHONE_PREFIX, NOTE_MAX } from "@/lib/booking-rules";
 import { customerDetailsSchema } from "@/lib/booking-schema";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { serviceCardImage, serviceImage } from "@/lib/images";
@@ -20,7 +20,14 @@ import type { PublicService } from "@/server/booking/services";
 import type { ApiErrorBody } from "@/server/errors";
 
 type Slot = { time: string; startAt: string };
-type GridTime = Slot & { available: boolean };
+type GridStatus = "available" | "booked" | "rest" | "unavailable";
+type GridTime = Slot & { available: boolean; status?: GridStatus };
+
+const UNAVAILABLE_STYLE: Record<Exclude<GridStatus, "available">, { label: string; className: string }> = {
+  booked: { label: "Booked", className: "border-transparent bg-cream-dark/70 text-muted/70" },
+  rest: { label: "Rest", className: "border-dashed border-sand bg-white/60 text-bronze/80" },
+  unavailable: { label: "Too short", className: "border-transparent bg-cream-dark/35 text-muted/60" },
+};
 type Step = 1 | 2 | 3 | 4 | 5;
 type Details = { customerName: string; customerPhone: string; note: string; website: string };
 
@@ -518,20 +525,27 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                         {t.time}
                       </button>
                     ) : (
-                      <span
-                        key={t.startAt}
-                        aria-label={`${t.time}, booked`}
-                        className="flex min-h-12 cursor-not-allowed flex-col items-center justify-center rounded-md border border-transparent bg-cream-dark/60 leading-tight text-muted/70"
-                      >
-                        <span className="text-[0.85rem] line-through">{t.time}</span>
-                        <span className="text-[0.58rem] tracking-[0.15em] uppercase">Booked</span>
-                      </span>
+                      (() => {
+                        const look = UNAVAILABLE_STYLE[t.status && t.status !== "available" ? t.status : "booked"];
+                        return (
+                          <span
+                            key={t.startAt}
+                            aria-label={`${t.time}, ${look.label.toLowerCase()}`}
+                            className={`flex min-h-12 cursor-not-allowed flex-col items-center justify-center rounded-md border leading-tight ${look.className}`}
+                          >
+                            <span className="text-[0.85rem] line-through">{t.time}</span>
+                            <span className="text-[0.56rem] tracking-[0.15em] uppercase">{look.label}</span>
+                          </span>
+                        );
+                      })()
                     ),
                   )}
                 </div>
-                <p className="mt-4 text-[0.75rem] text-muted">
-                  Greyed-out times are already taken.
-                </p>
+                <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 text-[0.72rem] text-muted">
+                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm bg-cream-dark" aria-hidden /> Booked: a session is in progress</li>
+                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm border border-dashed border-sand" aria-hidden /> Rest: {BUFFER_MINUTES}-minute pause after each session</li>
+                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm bg-cream-dark/40" aria-hidden /> Too short: not enough time before the next guest</li>
+                </ul>
               </>
             )}
           </div>
@@ -760,7 +774,7 @@ function ServiceDetailView({
             })}
           </div>
 
-          <p className="mt-2.5 text-[0.72rem] text-muted">Session time includes {SETTLE_MINUTES} minutes to settle in and change.</p>
+          <p className="mt-2.5 text-[0.72rem] text-muted">A {BUFFER_MINUTES}-minute rest is kept after every session.</p>
 
           <button
             type="button"

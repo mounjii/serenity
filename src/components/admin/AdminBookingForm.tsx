@@ -10,7 +10,13 @@ import { formatDuration, formatPrice } from "@/lib/format";
 import type { PublicService } from "@/server/booking/services";
 
 type Slot = { time: string; startAt: string };
-type Availability = { closed: boolean; slots: Slot[]; times: (Slot & { available: boolean })[] };
+type Availability = {
+  closed: boolean;
+  slots: Slot[];
+  times: (Slot & { available: boolean; status?: "available" | "booked" | "rest" | "unavailable" })[];
+};
+
+const STATUS_LABEL = { booked: "Booked", rest: "Rest", unavailable: "Too short" } as const;
 
 const inputClass = (invalid = false) =>
   `block w-full rounded-sm border bg-white px-4 py-3 text-[0.95rem] text-ink outline-none transition focus:border-ink ${
@@ -171,11 +177,15 @@ export default function AdminBookingForm({ services, today, initialDate }: Props
             {availability.times.map((s) => !s.available ? (
               <span
                 key={s.startAt}
-                aria-label={`${s.time}, booked`}
-                className="flex min-h-11 cursor-not-allowed flex-col items-center justify-center rounded-sm bg-cream-dark/60 leading-tight text-muted/70"
+                aria-label={`${s.time}, ${STATUS_LABEL[s.status && s.status !== "available" ? s.status : "booked"].toLowerCase()}`}
+                className={`flex min-h-11 cursor-not-allowed flex-col items-center justify-center rounded-sm leading-tight ${
+                  s.status === "rest" ? "border border-dashed border-sand text-bronze/80" : "bg-cream-dark/60 text-muted/70"
+                }`}
               >
                 <span className="text-[0.85rem] line-through">{s.time}</span>
-                <span className="text-[0.55rem] tracking-[0.15em] uppercase">Booked</span>
+                <span className="text-[0.55rem] tracking-[0.15em] uppercase">
+                  {STATUS_LABEL[s.status && s.status !== "available" ? s.status : "booked"]}
+                </span>
               </span>
             ) : (
               <button

@@ -21,8 +21,14 @@ export function parseDurationParam(raw: string | null): number | null {
   return Number(raw);
 }
 
-/** A start time on the grid; `available` is false when it would overlap a booking (or its pause). */
-export type GridTime = Slot & { available: boolean };
+/**
+ * Why a start time can or cannot be chosen:
+ * "booked" = a session is in progress, "rest" = inside the pause after a session,
+ * "unavailable" = free, but too short before the next booking for this duration.
+ */
+export type GridStatus = "available" | "booked" | "rest" | "unavailable";
+
+export type GridTime = Slot & { available: boolean; status: GridStatus };
 
 export async function getAvailability(
   serviceId: string,
@@ -80,7 +86,7 @@ export async function getTimeGrid(
       startAt: { lt: windowEnd },
       blockedUntil: { gt: windowStart },
     },
-    select: { therapistId: true, startAt: true, blockedUntil: true },
+    select: { therapistId: true, startAt: true, endAt: true, blockedUntil: true },
   });
 
   const grid: GridTime[] = [];
@@ -91,7 +97,13 @@ export async function getTimeGrid(
     const hasFreeTherapist = therapistIds.some(
       (id) => !bookings.some((b) => b.therapistId === id && b.startAt < blockedUntil && b.blockedUntil > start),
     );
-    grid.push({ time: minutesToHHmm(minute), startAt: start.toISOString(), available: hasFreeTherapist });
+    let status: GridStatus = "available";
+    if (!hasFreeTherapist) {
+      if (bookings.some((b) => b.startAt <= start && b.endAt > start)) status = "booked";
+      else if (bookings.some((b) => b.endAt <= start && b.blockedUntil > start)) status = "rest";
+      else status = "unavailable";
+    }
+    grid.push({ time: minutesToHHmm(minute), startAt: start.toISOString(), available: hasFreeTherapist, status });
   }
   return grid;
 }
