@@ -122,28 +122,49 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
     setHasMoved(true);
   }
 
-  // Arriving from a "Book" button: let the hero settle, then glide down to the steps.
+  // Arriving on the page: let the hero settle, then glide down to the steps, unless the visitor
+  // already scrolled on their own. Decided when the timer fires, once the browser has settled the
+  // initial scroll position.
   useEffect(() => {
-    if (window.scrollY > 40 || !rootRef.current) return undefined;
     const root = rootRef.current;
+    if (!root) return undefined;
     let cancel = () => {};
+    let userScrolled = false;
+    const markUserScroll = () => {
+      userScrolled = true;
+    };
+    const inputs = ["wheel", "touchmove"] as const;
+    for (const e of inputs) window.addEventListener(e, markUserScroll, { passive: true });
+    const removeInputs = () => {
+      for (const e of inputs) window.removeEventListener(e, markUserScroll);
+    };
     const timer = window.setTimeout(() => {
+      removeInputs();
+      if (userScrolled || root.getBoundingClientRect().top <= NAVBAR_OFFSET + 8) return;
       cancel = smoothScrollTo(root, 850);
     }, 400);
     return () => {
       window.clearTimeout(timer);
+      removeInputs();
       cancel();
     };
   }, []);
 
-  // On each step change, bring the steps back into view if the visitor had scrolled away from them.
+  // On each step change, line the steps up under the navbar once the new step has been laid out.
   useEffect(() => {
     const root = rootRef.current;
     if (scrolledForPosition.current === position || !root) return undefined;
     scrolledForPosition.current = position;
-    const top = root.getBoundingClientRect().top;
-    if (top >= NAVBAR_OFFSET - 8 && top <= window.innerHeight * 0.4) return undefined;
-    return smoothScrollTo(root, 500);
+    let cancel = () => {};
+    const frame = requestAnimationFrame(() => {
+      const top = root.getBoundingClientRect().top;
+      if (Math.abs(top - NAVBAR_OFFSET) <= 24) return;
+      cancel = smoothScrollTo(root, 550);
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      cancel();
+    };
   }, [position]);
 
   const service = services.find((s) => s.id === serviceId) ?? null;

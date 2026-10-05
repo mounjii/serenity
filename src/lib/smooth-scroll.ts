@@ -7,9 +7,13 @@ export function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+/** Trackpads and phones keep firing inertia events for a moment after the click that started the scroll. */
+const CANCEL_GRACE_MS = 300;
+const SCROLL_KEYS = new Set(["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "]);
+
 /**
- * Eased scroll that stops as soon as the visitor scrolls, swipes or presses a key.
- * Returns a function that cancels it.
+ * Eased scroll that stops when the visitor clearly takes over (scrolls, swipes, clicks or uses a
+ * scroll key). Returns a function that cancels it.
  */
 export function smoothScrollTo(element: HTMLElement, duration = 1100): () => void {
   const start = window.scrollY;
@@ -24,11 +28,18 @@ export function smoothScrollTo(element: HTMLElement, duration = 1100): () => voi
 
   let frame = 0;
   let startedAt: number | null = null;
+  const calledAt = performance.now();
   const events = ["wheel", "touchstart", "keydown", "mousedown"] as const;
 
   const stop = () => {
     cancelAnimationFrame(frame);
-    for (const e of events) window.removeEventListener(e, stop);
+    for (const e of events) window.removeEventListener(e, onUserInput);
+  };
+
+  const onUserInput = (e: Event) => {
+    if (performance.now() - calledAt < CANCEL_GRACE_MS) return;
+    if (e instanceof KeyboardEvent && !SCROLL_KEYS.has(e.key)) return;
+    stop();
   };
 
   const step = (now: number) => {
@@ -40,7 +51,7 @@ export function smoothScrollTo(element: HTMLElement, duration = 1100): () => voi
     else stop();
   };
 
-  for (const e of events) window.addEventListener(e, stop, { passive: true });
+  for (const e of events) window.addEventListener(e, onUserInput, { passive: true });
   frame = requestAnimationFrame(step);
   return stop;
 }
