@@ -6,7 +6,9 @@ import { CloseIcon } from "@/components/Icons";
 import { CANCEL_REASON_LABEL } from "@/lib/booking-status";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { formatPhone, whatsappLink } from "@/lib/phone";
+import { bookingRef } from "@/lib/whatsapp-text";
 import type { AdminBooking } from "@/server/admin/bookings";
+import type { WhatsAppMode } from "@/server/whatsapp";
 import BookingActions from "./BookingActions";
 import StatusBadge from "./StatusBadge";
 
@@ -20,11 +22,11 @@ export function useOpenBooking() {
 /** Side panel with the full reservation; rows anywhere inside call useOpenBooking()(id). */
 export default function BookingDetailsProvider({
   bookings,
-  mockWhatsApp = false,
+  whatsappMode = "mock",
   children,
 }: {
   bookings: AdminBooking[];
-  mockWhatsApp?: boolean;
+  whatsappMode?: WhatsAppMode;
   children: React.ReactNode;
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -78,14 +80,14 @@ export default function BookingDetailsProvider({
             visible ? "translate-x-0" : "translate-x-full"
           }`}
         >
-          {booking && <DetailsContent booking={booking} mockWhatsApp={mockWhatsApp} onClose={close} />}
+          {booking && <DetailsContent booking={booking} whatsappMode={whatsappMode} onClose={close} />}
         </aside>
       </div>
     </OpenBookingContext.Provider>
   );
 }
 
-function DetailsContent({ booking, mockWhatsApp, onClose }: { booking: AdminBooking; mockWhatsApp: boolean; onClose: () => void }) {
+function DetailsContent({ booking, whatsappMode, onClose }: { booking: AdminBooking; whatsappMode: WhatsAppMode; onClose: () => void }) {
   return (
     <>
       <div className="flex items-center justify-between border-b border-sand/70 px-6 py-4">
@@ -138,6 +140,7 @@ function DetailsContent({ booking, mockWhatsApp, onClose }: { booking: AdminBook
           <Row label="Treatment">{booking.serviceName}</Row>
           <Row label="Price">{formatPrice(booking.priceCents)}</Row>
           <Row label="Therapist">{booking.therapistName}</Row>
+          <Row label="Ref">{bookingRef(booking.id)}</Row>
           <Row label="Booked">{`${booking.labels.created} · ${booking.source === "ADMIN" ? "by admin" : "online"}`}</Row>
           {booking.labels.confirmed && <Row label="Confirmed">{booking.labels.confirmed}</Row>}
           {booking.labels.cancelled && (
@@ -155,7 +158,7 @@ function DetailsContent({ booking, mockWhatsApp, onClose }: { booking: AdminBook
       </div>
 
       <div className="space-y-4 border-t border-sand/70 bg-cream px-6 py-5">
-        <BookingActions booking={booking} mockWhatsApp={mockWhatsApp} />
+        <BookingActions booking={booking} whatsappMode={whatsappMode} />
         <Link href={`/admin/bookings/${booking.id}`} className="inline-block text-[0.75rem] text-ink-soft underline-offset-4 hover:text-ink hover:underline">
           Open full page →
         </Link>

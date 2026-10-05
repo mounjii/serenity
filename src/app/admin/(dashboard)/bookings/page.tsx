@@ -6,7 +6,7 @@ import { formatDayHeading, toLocalDateString } from "@/lib/time";
 import { listBookingsForDates } from "@/server/admin/bookings";
 import { requireAdminPage } from "@/server/auth/session";
 import { sweepExpiredBookings } from "@/server/booking/confirmation";
-import { isMockWhatsApp } from "@/server/whatsapp";
+import { getWhatsAppMode } from "@/server/whatsapp";
 
 export const metadata = { title: "Bookings — Touch Sense" };
 
@@ -20,7 +20,7 @@ export default async function AdminBookingsPage({ searchParams }: PageProps<"/ad
   const bookings = await listBookingsForDates(range.from, range.to);
 
   return (
-    <BookingDetailsProvider bookings={bookings} mockWhatsApp={isMockWhatsApp()}>
+    <BookingDetailsProvider bookings={bookings} whatsappMode={getWhatsAppMode()}>
       <div className="space-y-12">
         <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>

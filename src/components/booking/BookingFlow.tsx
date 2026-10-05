@@ -618,7 +618,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
 
         {step === 4 && (
           <form onSubmit={submitDetails} noValidate>
-            <StepTitle title="Your details" subtitle="We'll message you on WhatsApp: tap Confirm there to secure your time." />
+            <StepTitle title="Your details" subtitle="After booking, you confirm your time on WhatsApp in one tap." />
             <div className="mt-6 space-y-5">
               <Field label="Full name" htmlFor="customerName" error={fieldErrors.customerName}>
                 <input

@@ -8,7 +8,7 @@ import { formatDayHeading } from "@/lib/time";
 import { getDashboardSummary, listBookingsForDates, type AdminBooking } from "@/server/admin/bookings";
 import { requireAdminPage } from "@/server/auth/session";
 import { sweepExpiredBookings } from "@/server/booking/confirmation";
-import { isMockWhatsApp } from "@/server/whatsapp";
+import { getWhatsAppMode } from "@/server/whatsapp";
 
 function uniqueById(lists: (AdminBooking | null)[][]): AdminBooking[] {
   const map = new Map<string, AdminBooking>();
@@ -34,7 +34,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
   const plural = (n: number, word: string) => `${word}${n === 1 ? "" : "s"}`;
 
   return (
-    <BookingDetailsProvider bookings={uniqueById([todayBookings, rangeBookings, [next]])} mockWhatsApp={isMockWhatsApp()}>
+    <BookingDetailsProvider bookings={uniqueById([todayBookings, rangeBookings, [next]])} whatsappMode={getWhatsAppMode()}>
       <div className="space-y-14">
         <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>

@@ -4,10 +4,14 @@ import { connection } from "next/server";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import RefreshWhilePending from "@/components/RefreshWhilePending";
-import { ButtonLink } from "@/components/ui/Button";
+import { WhatsAppIcon } from "@/components/Icons";
+import { ButtonAnchor, ButtonLink } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/format";
+import { normalizePhone, whatsappLink } from "@/lib/phone";
+import { customerCancelText, customerConfirmText } from "@/lib/whatsapp-text";
 import { sweepExpiredBookings } from "@/server/booking/confirmation";
 import { getPublicBooking } from "@/server/booking/public-booking";
+import { getWhatsAppMode } from "@/server/whatsapp";
 
 export const metadata: Metadata = {
   title: "Your reservation — Touch Sense",
@@ -28,7 +32,12 @@ export default async function ConfirmationPage({ params }: PageProps<"/reservati
   const booking = await getPublicBooking(id);
   if (!booking) notFound();
 
-  const text = STATUS_TEXT[booking.status];
+  const ownerPhone = normalizePhone(process.env.OWNER_WHATSAPP_PHONE ?? "");
+  const selfConfirm = booking.status === "PENDING" && getWhatsAppMode() !== "meta" && ownerPhone !== null;
+  const messageInfo = { customerName: booking.firstName, serviceName: booking.serviceName, date: booking.date, time: booking.time, bookingId: booking.id };
+  const text = selfConfirm
+    ? { title: "One last step: confirm on WhatsApp", note: "Tap the button, then press send in WhatsApp. We confirm your time as soon as we see your message." }
+    : STATUS_TEXT[booking.status];
 
   return (
     <>
@@ -82,6 +91,17 @@ export default async function ConfirmationPage({ params }: PageProps<"/reservati
                   confirmation, the reservation is cancelled automatically.
                 </p>
               </>
+            )}
+            {selfConfirm && ownerPhone && (
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <ButtonAnchor href={whatsappLink(ownerPhone, customerConfirmText(messageInfo))} target="_blank" rel="noopener noreferrer">
+                  <WhatsAppIcon className="h-4 w-4" aria-hidden />
+                  Confirm on WhatsApp
+                </ButtonAnchor>
+                <ButtonAnchor href={whatsappLink(ownerPhone, customerCancelText(messageInfo))} target="_blank" rel="noopener noreferrer" variant="outline">
+                  Cancel on WhatsApp
+                </ButtonAnchor>
+              </div>
             )}
             <p className="mt-6 text-[0.8rem] text-muted">{text.note}</p>
             <p className="mt-1 text-[0.8rem] text-muted">Payment is made at the salon.</p>

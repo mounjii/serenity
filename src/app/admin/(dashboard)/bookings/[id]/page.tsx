@@ -6,11 +6,12 @@ import StatusBadge from "@/components/admin/StatusBadge";
 import { CANCEL_REASON_LABEL } from "@/lib/booking-status";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { formatPhone, whatsappLink } from "@/lib/phone";
+import { bookingRef } from "@/lib/whatsapp-text";
 import { formatLongDate, toLocalTimeString } from "@/lib/time";
 import { getAdminBooking } from "@/server/admin/bookings";
 import { requireAdminPage } from "@/server/auth/session";
 import { sweepExpiredBookings } from "@/server/booking/confirmation";
-import { isMockWhatsApp } from "@/server/whatsapp";
+import { getWhatsAppMode } from "@/server/whatsapp";
 
 const stamp = (iso: string) => `${formatLongDate(new Date(iso))}, ${toLocalTimeString(new Date(iso))}`;
 
@@ -56,6 +57,7 @@ export default async function AdminBookingPage({ params }: PageProps<"/admin/boo
           <Item label="Time">{`${booking.time} – ${booking.endTime} (${formatDuration(booking.durationMinutes)})`}</Item>
           <Item label="Price">{formatPrice(booking.priceCents)}</Item>
           <Item label="Therapist">{booking.therapistName}</Item>
+          <Item label="Ref">{bookingRef(booking.id)}</Item>
           <Item label="Booked">{`${stamp(booking.createdAt)} · ${booking.source === "ADMIN" ? "by admin" : "online"}`}</Item>
           {booking.confirmedAt && <Item label="Confirmed">{stamp(booking.confirmedAt)}</Item>}
           {booking.cancelledAt && (
@@ -71,7 +73,7 @@ export default async function AdminBookingPage({ params }: PageProps<"/admin/boo
         </dl>
 
         <div className="mt-8 border-t border-sand pt-6">
-          <BookingActions booking={booking} mockWhatsApp={isMockWhatsApp()} />
+          <BookingActions booking={booking} whatsappMode={getWhatsAppMode()} />
         </div>
       </section>
     </div>

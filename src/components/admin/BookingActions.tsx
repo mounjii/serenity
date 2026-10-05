@@ -3,14 +3,18 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { cancelBookingAction, completeBookingAction, confirmBookingAction, simulateCustomerReplyAction } from "@/app/admin/actions";
-import { Button } from "@/components/ui/Button";
+import { WhatsAppIcon } from "@/components/Icons";
+import { Button, ButtonAnchor } from "@/components/ui/Button";
 import { canCancel, canComplete, canConfirm } from "@/lib/booking-status";
+import { whatsappLink } from "@/lib/phone";
+import { ownerCancelledText, ownerConfirmedText, ownerRequestText } from "@/lib/whatsapp-text";
 import type { AdminBooking } from "@/server/admin/bookings";
 import type { ActionResult } from "@/server/admin/action-result";
+import type { WhatsAppMode } from "@/server/whatsapp";
 
 type ActionKind = "cancel" | "complete" | "confirm" | "client-confirm" | "client-cancel";
 
-export default function BookingActions({ booking, mockWhatsApp = false }: { booking: AdminBooking; mockWhatsApp?: boolean }) {
+export default function BookingActions({ booking, whatsappMode = "mock" }: { booking: AdminBooking; whatsappMode?: WhatsAppMode }) {
   const router = useRouter();
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +26,30 @@ export default function BookingActions({ booking, mockWhatsApp = false }: { book
   const completable = canComplete(booking, now);
   const confirmable = canConfirm(booking, now);
   const waitingUntil = booking.labels.confirmUntil;
+  const manual = whatsappMode === "manual";
+  const messageInfo = { customerName: booking.customerName, serviceName: booking.serviceName, date: booking.dateLabel, time: booking.time, bookingId: booking.id };
+  const whatsappMessage =
+    whatsappMode === "meta"
+      ? null
+      : booking.status === "PENDING"
+        ? { label: "Ask client to confirm", text: ownerRequestText(messageInfo) }
+        : booking.status === "CONFIRMED" && new Date(booking.startAt) > now
+          ? { label: "Send confirmation", text: ownerConfirmedText(messageInfo) }
+          : booking.status === "CANCELLED" && new Date(booking.startAt) > now
+            ? { label: "Send cancellation", text: ownerCancelledText(messageInfo) }
+            : null;
+  const whatsappButton = whatsappMessage && (
+    <ButtonAnchor
+      href={whatsappLink(booking.customerPhone, whatsappMessage.text)}
+      target="_blank"
+      rel="noopener noreferrer"
+      variant="outline"
+      size="sm"
+    >
+      <WhatsAppIcon className="h-3.5 w-3.5 text-[#25D366]" aria-hidden />
+      {whatsappMessage.label}
+    </ButtonAnchor>
+  );
 
   const run = (kind: ActionKind, action: () => Promise<ActionResult<unknown>>) => {
     setError(null);
@@ -42,9 +70,12 @@ export default function BookingActions({ booking, mockWhatsApp = false }: { book
 
   if (!cancellable && !completable && !confirmable) {
     return (
-      <p className="text-[0.85rem] text-muted">
-        {booking.status === "CONFIRMED" ? "No actions available." : "This reservation is closed. No further actions are available."}
-      </p>
+      <div className="space-y-3">
+        <p className="text-[0.85rem] text-muted">
+          {booking.status === "CONFIRMED" ? "No actions available." : "This reservation is closed. No further actions are available."}
+        </p>
+        {whatsappButton}
+      </div>
     );
   }
 
@@ -52,14 +83,18 @@ export default function BookingActions({ booking, mockWhatsApp = false }: { book
     <div className="space-y-4">
       {waitingUntil && (
         <p className="rounded-sm bg-gold/10 px-3 py-2 text-[0.82rem] text-ink-soft">
-          Waiting for the client to confirm on WhatsApp. Cancelled automatically at{" "}
-          <strong className="font-medium text-ink">{waitingUntil}</strong> without a reply.
+          {manual
+            ? "Waiting for the client's WhatsApp message. When they confirm, tap Confirm reservation. Cancelled automatically at "
+            : "Waiting for the client to confirm on WhatsApp. Cancelled automatically at "}
+          <strong className="font-medium text-ink">{waitingUntil}</strong> without confirmation.
         </p>
       )}
 
       {confirmingCancel ? (
         <div className="rounded-sm border border-red-200 bg-red-50 p-4">
-          <p className="text-[0.9rem] text-red-800">Cancel this reservation? The customer will be notified.</p>
+          <p className="text-[0.9rem] text-red-800">
+            {manual ? "Cancel this reservation? The time becomes free again." : "Cancel this reservation? The customer will be notified."}
+          </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Button variant="danger" size="sm" loading={pending && pendingAction === "cancel"} onClick={() => run("cancel", () => cancelBookingAction(booking.id))}>
               Yes, cancel reservation
@@ -86,10 +121,11 @@ export default function BookingActions({ booking, mockWhatsApp = false }: { book
               Cancel reservation
             </Button>
           )}
+          {whatsappButton}
         </div>
       )}
 
-      {mockWhatsApp && confirmable && !confirmingCancel && (
+      {whatsappMode === "mock" && confirmable && !confirmingCancel && (
         <div className="rounded-sm border border-dashed border-sand p-3">
           <p className="text-[0.66rem] tracking-[0.2em] text-muted uppercase">Test mode · simulate the client&apos;s WhatsApp reply</p>
           <div className="mt-2 flex flex-wrap gap-2">

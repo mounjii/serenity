@@ -19,3 +19,11 @@ export const mockProvider: WhatsAppProvider = {
     return { providerMessageId: `mock-${log.id}` };
   },
 };
+
+/** Manual mode: messages are sent by people through wa.me links, so automatic ones are skipped and not logged. */
+export const manualProvider: WhatsAppProvider = {
+  name: "manual",
+  async send(message) {
+    return { providerMessageId: `manual-skipped-${message.template}` };
+  },
+};

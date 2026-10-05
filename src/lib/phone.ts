@@ -13,7 +13,8 @@ export function formatPhone(e164: string): string {
   return parsePhoneNumberFromString(e164)?.formatInternational() ?? e164;
 }
 
-/** wa.me expects digits only. */
-export function whatsappLink(e164: string): string {
-  return `https://wa.me/${e164.replace(/\D/g, "")}`;
+/** wa.me expects digits only; `text` pre-fills the message, the user still presses send. */
+export function whatsappLink(e164: string, text?: string): string {
+  const base = `https://wa.me/${e164.replace(/\D/g, "")}`;
+  return text ? `${base}?text=${encodeURIComponent(text)}` : base;
 }

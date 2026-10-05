@@ -42,3 +42,10 @@ type ButtonLinkProps = React.ComponentProps<typeof Link> & { variant?: Variant; 
 export function ButtonLink({ variant = "primary", size = "md", className, ...rest }: ButtonLinkProps) {
   return <Link {...rest} className={classes(variant, size, className)} />;
 }
+
+type ButtonAnchorProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & { variant?: Variant; size?: Size };
+
+/** For external links (e.g. wa.me), which next/link should not handle. */
+export function ButtonAnchor({ variant = "primary", size = "md", className, ...rest }: ButtonAnchorProps) {
+  return <a {...rest} className={classes(variant, size, className)} />;
+}
