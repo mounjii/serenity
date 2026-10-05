@@ -42,7 +42,7 @@ export default function Reveal({
       className={`reveal ${className}`}
       style={{ transitionDelay: `${delay}ms` }}
     >
-      {children}
+      {variant === "curtain" ? <div className="reveal-curtain relative h-full w-full">{children}</div> : children}
     </Tag>
   );
 }
