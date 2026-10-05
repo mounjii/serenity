@@ -18,7 +18,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 py-4 sm:px-6">
           <div className="flex items-center gap-3">
             <Image
-              src="/images/logo-horizontal.png"
+              src="/images/touch-sense-logo-horizontal.png"
               alt="Touch Sense Thai Massage"
               width={986}
               height={197}
