@@ -15,6 +15,7 @@ export default function Logo({ className = "", variant = "horizontal" }: Props) 
           width={986}
           height={197}
           priority
+          data-nav-logo
           className="h-10 w-auto sm:h-11"
         />
       )}

@@ -180,6 +180,45 @@ body {
   animation: hero-zoom 2.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* First-visit intro (see IntroSplash): "play" while the logo sits centred, "leaving" while it flies. */
+.intro-overlay {
+  display: none;
+}
+
+html[data-intro] {
+  overflow: hidden;
+}
+
+html[data-intro] .intro-overlay {
+  display: block;
+}
+
+html[data-intro] [data-nav-logo] {
+  opacity: 0;
+}
+
+html[data-intro="play"] .animate-fade-up,
+html[data-intro="play"] .animate-hero-zoom {
+  animation-play-state: paused;
+}
+
+@keyframes intro-logo-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.intro-logo-in {
+  animation: intro-logo-in 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
