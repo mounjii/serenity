@@ -1,53 +1,63 @@
-import Link from "next/link";
-import { formatPhone, whatsappLink } from "@/lib/phone";
+"use client";
+
+import { whatsappLink } from "@/lib/phone";
 import type { AdminBooking } from "@/server/admin/bookings";
+import { useOpenBooking } from "./BookingDetails";
 import StatusBadge from "./StatusBadge";
 
 type Props = { booking: AdminBooking; showDate?: boolean; highlighted?: boolean };
 
 export default function BookingRow({ booking, showDate = false, highlighted = false }: Props) {
+  const openBooking = useOpenBooking();
   const cancelled = booking.status === "CANCELLED";
   return (
     <li
-      className={`flex flex-col gap-3 px-4 py-4 transition-colors duration-700 sm:flex-row sm:items-center sm:gap-6 sm:px-5 ${
-        highlighted ? "bg-gold/15" : ""
+      className={`group flex flex-col gap-4 rounded-md border border-sand/70 bg-white p-4 transition-colors duration-300 hover:bg-cream/60 sm:flex-row sm:items-center sm:gap-6 sm:rounded-none sm:border-0 sm:px-6 sm:py-5 ${
+        highlighted ? "bg-gold/10" : ""
       }`}
     >
-      <div className="flex items-center justify-between gap-3 sm:w-36 sm:flex-col sm:items-start sm:justify-center sm:gap-0.5">
-        <span className={`font-serif text-xl leading-none ${cancelled ? "text-muted line-through" : "text-ink"}`}>
-          {booking.time}
-          <span className="text-[0.8rem] text-muted"> – {booking.endTime}</span>
+      <button
+        type="button"
+        onClick={() => openBooking(booking.id)}
+        className="flex min-w-0 flex-1 flex-col gap-2 text-left sm:flex-row sm:items-center sm:gap-6"
+      >
+        <span className="shrink-0 sm:w-40">
+          <span className={`block font-serif text-[1.45rem] leading-none lining-nums tabular-nums ${cancelled ? "text-muted line-through" : "text-ink"}`}>
+            {booking.time}
+            <span className="text-[0.95rem] text-muted"> – {booking.endTime}</span>
+          </span>
+          {showDate && <span className="mt-1 block text-[0.7rem] text-muted">{booking.dateLabel}</span>}
         </span>
-        {showDate && <span className="text-[0.72rem] text-muted">{booking.dateLabel}</span>}
-      </div>
 
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="truncate font-medium text-ink">{booking.customerName}</span>
-          <StatusBadge status={booking.status} />
-          {highlighted && <span className="rounded-full bg-gold px-2 py-0.5 text-[0.65rem] tracking-wide text-white uppercase">New</span>}
-        </div>
-        <p className="mt-0.5 text-[0.8rem] text-ink-soft">
-          {booking.serviceName}
-          {booking.source === "ADMIN" && <span className="text-muted"> · added by admin</span>}
-        </p>
-      </div>
+        <span className="min-w-0 flex-1">
+          <span className="flex items-center gap-2">
+            <span className={`truncate text-[1rem] font-medium ${cancelled ? "text-muted" : "text-ink"}`}>{booking.customerName}</span>
+            {highlighted && <span className="rounded-full bg-gold px-2 py-0.5 text-[0.6rem] tracking-wide text-white uppercase">New</span>}
+          </span>
+          <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8rem] text-muted">
+            <span>{booking.serviceName}</span>
+            {booking.source === "ADMIN" && <span>· added by admin</span>}
+            <StatusBadge status={booking.status} />
+          </span>
+        </span>
+      </button>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <a href={`tel:${booking.customerPhone}`} className="rounded-full border border-sand px-3 py-1.5 text-[0.75rem] text-ink transition hover:border-ink">
-          {formatPhone(booking.customerPhone)}
-        </a>
+      <div className="flex items-center gap-2 border-t border-sand/60 pt-3 sm:border-0 sm:pt-0">
         <a
           href={whatsappLink(booking.customerPhone)}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-full border border-emerald-200 px-3 py-1.5 text-[0.75rem] text-emerald-800 transition hover:border-emerald-500"
+          className="flex-1 rounded-full border border-sand px-4 py-1.5 text-center text-[0.74rem] text-ink-soft transition hover:border-olive hover:text-olive sm:flex-none"
         >
           WhatsApp
         </a>
-        <Link href={`/admin/bookings/${booking.id}`} className="rounded-full bg-ink px-3 py-1.5 text-[0.75rem] text-cream transition hover:bg-black">
+        <button
+          type="button"
+          onClick={() => openBooking(booking.id)}
+          className="flex-1 rounded-full border border-transparent px-4 py-1.5 text-[0.74rem] text-ink transition group-hover:border-sand hover:border-ink! sm:flex-none"
+        >
           Details
-        </Link>
+        </button>
       </div>
     </li>
   );

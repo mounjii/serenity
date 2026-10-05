@@ -66,6 +66,11 @@ export function formatLongDate(instant: Date): string {
   return formatInTimeZone(instant, TIMEZONE, "EEEE d MMMM yyyy");
 }
 
+/** e.g. "Monday · 12 October" (or with the year) for a YYYY-MM-DD calendar date. */
+export function formatDayHeading(date: string, withYear = false): string {
+  return formatInTimeZone(new Date(`${date}T12:00:00.000Z`), "UTC", withYear ? "EEEE · d MMMM yyyy" : "EEEE · d MMMM");
+}
+
 /** e.g. "Mon 12 Oct" for a YYYY-MM-DD calendar date. */
 export function formatShortDate(date: string): string {
   return formatInTimeZone(new Date(`${date}T12:00:00.000Z`), "UTC", "EEE d MMM");

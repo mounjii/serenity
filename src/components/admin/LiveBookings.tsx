@@ -139,7 +139,7 @@ export default function LiveBookings({ initialSince, children }: { initialSince:
       )}
       {children}
       <p className="mt-10 flex items-center gap-2 text-[0.72rem] text-muted" aria-live="polite">
-        <span className={`h-2 w-2 rounded-full ${online ? "bg-emerald-500" : "bg-red-500"}`} aria-hidden />
+        <span className={`h-2 w-2 rounded-full ${online ? "bg-olive" : "bg-red-500"}`} aria-hidden />
         {online ? "Live updates on" : "Connection lost, retrying…"}
         {lastSync && ` · last checked ${lastSync.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`}
       </p>
@@ -149,7 +149,11 @@ export default function LiveBookings({ initialSince, children }: { initialSince:
 
 type LiveBookingListProps = Omit<React.ComponentProps<typeof BookingList>, "highlightedIds">;
 
+export function useHighlightedBookings() {
+  return useContext(HighlightContext);
+}
+
 export function LiveBookingList(props: LiveBookingListProps) {
-  const highlighted = useContext(HighlightContext);
+  const highlighted = useHighlightedBookings();
   return <BookingList {...props} highlightedIds={highlighted} />;
 }
