@@ -7,7 +7,7 @@ import Reveal from "./Reveal";
 
 export default function BookingCTA() {
   return (
-    <section id="contact" className="relative overflow-hidden bg-forest">
+    <section id="book" className="relative overflow-hidden bg-forest">
       <Parallax speed={0.2}>
         <Image src={images.cta} {...blurProps(images.cta)} alt="" fill sizes="100vw" className="object-cover" />
       </Parallax>
