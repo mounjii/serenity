@@ -25,18 +25,18 @@ export default function Hero() {
 
       <div className="relative mx-auto w-full max-w-7xl px-5 pt-24 pb-24 sm:px-6 sm:pt-28 sm:pb-20 lg:px-12">
         <div className="max-w-2xl">
-          <p className="eyebrow animate-fade-up text-halo !text-ink-soft lg:!text-muted" style={stagger(150)}>
+          <p className="eyebrow animate-fade-up text-shade !text-cream lg:!text-muted" style={stagger(150)}>
             Relax <span className="mx-2">•</span> Recharge <span className="mx-2">•</span> Reconnect
           </p>
           <h1
-            className="animate-fade-up mt-4 font-serif text-[2.9rem] leading-[1.02] font-normal text-ink sm:mt-5 sm:text-6xl lg:text-[4.6rem]"
+            className="animate-fade-up mt-4 font-serif text-[2.9rem] leading-[1.02] text-shade font-normal text-cream sm:mt-5 lg:text-ink sm:text-6xl lg:text-[4.6rem]"
             style={stagger(300)}
           >
             More Than a Massage,
             <br />
             It&rsquo;s a Reset
           </h1>
-          <p className="animate-fade-up mt-5 max-w-[19rem] text-halo text-[0.95rem] leading-relaxed text-ink sm:mt-6 lg:text-ink-soft sm:max-w-sm sm:font-light" style={stagger(480)}>
+          <p className="animate-fade-up mt-5 max-w-[19rem] text-shade text-[0.95rem] leading-relaxed text-cream sm:mt-6 lg:text-ink-soft sm:max-w-sm sm:font-light" style={stagger(480)}>
             Escape the everyday and give your body and mind the care they deserve.
           </p>
           <div className="animate-fade-up mt-8 flex flex-wrap items-center gap-x-7 gap-y-4 sm:mt-9" style={stagger(640)}>
@@ -46,7 +46,7 @@ export default function Hero() {
             >
               Book Your Session
             </Link>
-            <Link href="#services" className="text-halo py-2 text-[0.72rem] tracking-[0.2em] text-ink uppercase underline-offset-8 hover:underline">
+            <Link href="#services" className="py-2 text-[0.72rem] tracking-[0.2em] text-ink uppercase underline-offset-8 hover:underline">
               Our treatments
             </Link>
           </div>
