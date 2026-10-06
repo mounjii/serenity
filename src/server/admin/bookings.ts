@@ -28,7 +28,7 @@ export const adminBookingSelect = {
   cancelledAt: true,
   cancelReason: true,
   completedAt: true,
-  service: { select: { name: true } },
+  service: { select: { name: true, slug: true } },
   therapist: { select: { name: true } },
 } satisfies Prisma.BookingSelect;
 
@@ -38,6 +38,7 @@ type AdminBookingRow = Prisma.BookingGetPayload<{ select: typeof adminBookingSel
 export type AdminBooking = {
   id: string;
   serviceName: string;
+  serviceSlug: string;
   therapistName: string;
   startAt: string;
   endAt: string;
@@ -75,6 +76,7 @@ export function toAdminBooking(row: AdminBookingRow): AdminBooking {
   return {
     id: row.id,
     serviceName: row.service.name,
+    serviceSlug: row.service.slug,
     therapistName: row.therapist.name,
     startAt: row.startAt.toISOString(),
     endAt: row.endAt.toISOString(),
@@ -131,6 +133,12 @@ export async function getDashboardSummary(now = new Date()) {
     }),
   ]);
   return { today, todayCount, nextBooking: next ? toAdminBooking(next) : null };
+}
+
+/** Bookings most recently created or changed, newest first. */
+export async function listRecentlyUpdated(take = 5): Promise<AdminBooking[]> {
+  const rows = await getDb().booking.findMany({ orderBy: { updatedAt: "desc" }, take, select: adminBookingSelect });
+  return rows.map(toAdminBooking);
 }
 
 export async function getAdminBooking(id: string): Promise<AdminBooking | null> {

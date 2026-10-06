@@ -149,6 +149,99 @@ export function CloseIcon(props: IconProps) {
   );
 }
 
+export function HomeIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} strokeWidth={1.5} {...props}>
+      <path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1v-8.5Z" />
+    </svg>
+  );
+}
+
+export function CalendarIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} strokeWidth={1.5} {...props}>
+      <rect x="4" y="5.5" width="16" height="14.5" rx="2" />
+      <path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" />
+    </svg>
+  );
+}
+
+export function CalendarOffIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} strokeWidth={1.5} {...props}>
+      <rect x="4" y="5.5" width="16" height="14.5" rx="2" />
+      <path d="M4 10h16M8.5 3.5v4M15.5 3.5v4M10 13l4 4M14 13l-4 4" />
+    </svg>
+  );
+}
+
+export function BellIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} strokeWidth={1.5} {...props}>
+      <path d="M6.5 16.5V11a5.5 5.5 0 0 1 11 0v5.5l1.5 1.5H5l1.5-1.5Z" />
+      <path d="M10 20a2 2 0 0 0 4 0" />
+    </svg>
+  );
+}
+
+export function PlusIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} strokeWidth={1.8} {...props}>
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+export function LogoutIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} strokeWidth={1.5} {...props}>
+      <path d="M14 4.5H6.5a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1H14M10 12h10M16.5 8.5 20 12l-3.5 3.5" />
+    </svg>
+  );
+}
+
+export function ChevronLeft(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} strokeWidth={1.6} {...props}>
+      <path d="m14.5 6-6 6 6 6" />
+    </svg>
+  );
+}
+
+export function ChevronRight(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} strokeWidth={1.6} {...props}>
+      <path d="m9.5 6 6 6-6 6" />
+    </svg>
+  );
+}
+
+export function CheckCircleIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} strokeWidth={1.6} {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="m8.5 12.2 2.4 2.4 4.6-4.9" />
+    </svg>
+  );
+}
+
+export function XCircleIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} strokeWidth={1.6} {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="m9.5 9.5 5 5M14.5 9.5l-5 5" />
+    </svg>
+  );
+}
+
+export function TrendIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} strokeWidth={1.8} {...props}>
+      <path d="M5 17 17 5M9 5h8v8" />
+    </svg>
+  );
+}
+
 export function PhoneIcon(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" {...base} strokeWidth={1.4} {...props}>
