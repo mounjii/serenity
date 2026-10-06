@@ -21,7 +21,7 @@ export default function Hero() {
         />
       </Parallax>
       <div className="absolute inset-y-0 left-0 hidden w-3/5 bg-gradient-to-r from-cream/45 to-transparent lg:block" />
-      <div className="absolute inset-x-0 bottom-0 hidden h-20 bg-gradient-to-t from-cream to-transparent lg:block" />
+      <div className="absolute inset-x-0 bottom-0 hidden h-6 bg-gradient-to-t from-cream to-transparent lg:block" />
 
       <div className="relative mx-auto w-full max-w-7xl px-5 pt-24 pb-24 sm:px-6 sm:pt-28 sm:pb-20 lg:px-12">
         <div className="max-w-2xl">
