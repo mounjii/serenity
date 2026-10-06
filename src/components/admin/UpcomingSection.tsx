@@ -36,9 +36,12 @@ type Props = {
   bookings: AdminBooking[];
   today: string;
   heading?: string;
+  /** Appended to the period links and the date form, e.g. "&status=confirmed". */
+  extraQuery?: string;
 };
 
-export default function UpcomingSection({ basePath, range, bookings, today, heading = "Upcoming" }: Props) {
+export default function UpcomingSection({ basePath, range, bookings, today, heading = "Upcoming", extraQuery = "" }: Props) {
+  const status = new URLSearchParams(extraQuery).get("status");
   return (
     <section id="upcoming" className="scroll-mt-28">
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -52,7 +55,7 @@ export default function UpcomingSection({ basePath, range, bookings, today, head
             {FILTERS.map((f) => (
               <Link
                 key={f.view}
-                href={`${basePath}?view=${f.view}#upcoming`}
+                href={`${basePath}?view=${f.view}${extraQuery}#upcoming`}
                 aria-current={range.view === f.view ? "true" : undefined}
                 className={`rounded-full px-4 py-1.5 text-[0.76rem] transition ${
                   range.view === f.view ? "bg-ink text-cream" : "text-ink-soft hover:text-ink"
@@ -64,6 +67,7 @@ export default function UpcomingSection({ basePath, range, bookings, today, head
           </div>
           <form method="get" action={`${basePath}#upcoming`} className="flex items-center gap-1 rounded-full border border-sand/80 bg-white p-1 pl-3">
             <input type="hidden" name="view" value="date" />
+            {status && <input type="hidden" name="status" value={status} />}
             <label htmlFor="filter-date" className="sr-only">
               Custom date
             </label>

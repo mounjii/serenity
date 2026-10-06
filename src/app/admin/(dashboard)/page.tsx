@@ -18,7 +18,6 @@ import {
   ChevronLeft,
   ChevronRight,
   PlusIcon,
-  TrendIcon,
   XCircleIcon,
 } from "@/components/Icons";
 import { addDays, formatDayHeading, isValidDateString, toLocalMinuteOfDay, weekdayOf } from "@/lib/time";
@@ -86,30 +85,19 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
   const month = resolveMonth(params.month, today);
   const monthStart = `${month}-01`;
   const monthEnd = addDays(`${shiftMonth(month, 1)}-01`, -1);
-  const weekStart = addDays(today, -6);
 
-  const [history, rangeBookings, monthBookings, recent] = await Promise.all([
-    listBookingsForDates(weekStart, today),
+  const [todayBookings, rangeBookings, monthBookings, recent] = await Promise.all([
+    listBookingsForDates(today, today),
     listBookingsForDates(range.from, range.to),
     listBookingsForDates(monthStart, monthEnd),
     listRecentlyUpdated(5),
   ]);
-  const todayBookings = history.filter((b) => b.date === today);
   const next = summary.nextBooking;
-
-  const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
-  const series = (keep: (b: AdminBooking) => boolean) => days.map((d) => history.filter((b) => b.date === d && keep(b)).length);
-  const totalSeries = series(() => true);
-  const confirmedSeries = series((b) => b.status === "CONFIRMED" || b.status === "COMPLETED");
-  const cancelledSeries = series((b) => b.status === "CANCELLED");
-  const total = totalSeries[6];
-  const confirmed = confirmedSeries[6];
-  const cancelled = cancelledSeries[6];
-  const diff = total - totalSeries[5];
-  const share = (n: number) => (total === 0 ? "No bookings yet" : `${Math.round((n / total) * 100)}% of today`);
+  const confirmed = todayBookings.filter((b) => b.status === "CONFIRMED" || b.status === "COMPLETED").length;
+  const cancelled = todayBookings.filter((b) => b.status === "CANCELLED").length;
 
   return (
-    <BookingDetailsProvider bookings={uniqueById([history, rangeBookings, recent, [next]])} whatsappMode={getWhatsAppMode()}>
+    <BookingDetailsProvider bookings={uniqueById([todayBookings, rangeBookings, recent, [next]])} whatsappMode={getWhatsAppMode()}>
       <div className="space-y-5 sm:space-y-6">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
@@ -142,21 +130,23 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
             icon={<CalendarIcon className="h-[1.1rem] w-[1.1rem]" />}
             label="Total bookings"
             short="Total"
-            value={total}
-            series={totalSeries}
-            caption={
-              diff === 0 ? (
-                "Same as yesterday"
-              ) : (
-                <span className={diff > 0 ? "text-olive" : "text-red-600/80"}>
-                  <TrendIcon className={`mr-1 inline h-3 w-3 ${diff < 0 ? "rotate-90" : ""}`} />
-                  {diff > 0 ? `+${diff}` : diff} <span className="text-ink-soft">vs yesterday</span>
-                </span>
-              )
-            }
+            value={todayBookings.length}
+            href="/admin/bookings?view=today"
           />
-          <Stat tone="green" icon={<CheckCircleIcon className="h-[1.1rem] w-[1.1rem]" />} label="Confirmed" value={confirmed} series={confirmedSeries} caption={share(confirmed)} />
-          <Stat tone="rose" icon={<XCircleIcon className="h-[1.1rem] w-[1.1rem]" />} label="Cancelled" value={cancelled} series={cancelledSeries} caption={share(cancelled)} />
+          <Stat
+            tone="green"
+            icon={<CheckCircleIcon className="h-[1.1rem] w-[1.1rem]" />}
+            label="Confirmed"
+            value={confirmed}
+            href="/admin/bookings?view=today&status=confirmed"
+          />
+          <Stat
+            tone="rose"
+            icon={<XCircleIcon className="h-[1.1rem] w-[1.1rem]" />}
+            label="Cancelled"
+            value={cancelled}
+            href="/admin/bookings?view=today&status=cancelled"
+          />
         </section>
 
         <div className="grid gap-5 sm:gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
@@ -179,9 +169,9 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
 }
 
 const tones = {
-  peach: { card: "border-[#f2e2cf] bg-[#fdf6ee]", icon: "bg-[#f8e3cb] text-[#b0733a]", line: "#d39a5c" },
-  green: { card: "border-[#dfe9d8] bg-[#f3f7f0]", icon: "bg-[#dfead6] text-olive", line: "#6f8f5c" },
-  rose: { card: "border-[#f3dcdc] bg-[#fdf3f3]", icon: "bg-[#f8dede] text-[#b4505a]", line: "#d47a83" },
+  peach: { card: "border-[#f2e2cf] bg-[#fdf6ee] hover:border-[#e5c9a8]", icon: "bg-[#f8e3cb] text-[#b0733a]" },
+  green: { card: "border-[#dfe9d8] bg-[#f3f7f0] hover:border-[#bfd3b2]", icon: "bg-[#dfead6] text-olive" },
+  rose: { card: "border-[#f3dcdc] bg-[#fdf3f3] hover:border-[#e6b8b8]", icon: "bg-[#f8dede] text-[#b4505a]" },
 };
 
 function Stat({
@@ -190,20 +180,19 @@ function Stat({
   label,
   short,
   value,
-  series,
-  caption,
+  href,
 }: {
   tone: keyof typeof tones;
   icon: React.ReactNode;
   label: string;
   short?: string;
   value: number;
-  series: number[];
-  caption: React.ReactNode;
+  href: string;
 }) {
   const t = tones[tone];
   return (
-    <div className={`relative overflow-hidden rounded-2xl border p-3.5 sm:p-5 ${t.card}`}>
+    <Link href={href} className={`group relative block rounded-2xl border p-3.5 transition sm:p-5 ${t.card}`}>
+      <ChevronRight className="absolute top-4 right-3 h-4 w-4 text-ink-soft transition group-hover:translate-x-0.5 group-hover:text-ink sm:top-5 sm:right-4" />
       <span className={`grid h-8 w-8 place-items-center rounded-lg sm:h-9 sm:w-9 ${t.icon}`}>{icon}</span>
       <p className="mt-3 truncate text-[0.74rem] text-ink-soft sm:text-[0.78rem]">
         {short ? (
@@ -216,22 +205,8 @@ function Stat({
         )}
       </p>
       <p className="mt-1 font-serif text-[2rem] leading-none text-ink lining-nums tabular-nums sm:text-[2.3rem]">{value}</p>
-      <p className="mt-2 hidden text-[0.74rem] text-ink-soft sm:block">{caption}</p>
-      <Sparkline values={series} color={t.line} />
-    </div>
-  );
-}
-
-function Sparkline({ values, color }: { values: number[]; color: string }) {
-  const w = 96;
-  const h = 34;
-  const max = Math.max(...values, 1);
-  const step = w / (values.length - 1);
-  const points = values.map((v, i) => `${(i * step).toFixed(1)},${(h - 3 - (v / max) * (h - 6)).toFixed(1)}`).join(" ");
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="absolute right-4 bottom-4 hidden h-[34px] w-24 sm:block" aria-hidden>
-      <polyline points={points} fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+      <p className="mt-2 hidden text-[0.74rem] text-ink-soft underline-offset-4 group-hover:underline sm:block">View bookings</p>
+    </Link>
   );
 }
 
