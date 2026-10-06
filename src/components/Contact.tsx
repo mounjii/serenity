@@ -1,12 +1,11 @@
-import Image from "next/image";
 import { connection } from "next/server";
-import { blurProps, images } from "@/lib/images";
 import { formatPhone, normalizePhone, whatsappLink } from "@/lib/phone";
 import Reveal from "./Reveal";
 import { ButtonAnchor } from "./ui/Button";
 import { ClockIcon, MailIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "./Icons";
 
 const WHATSAPP_GREETING = "Hello Touch Sense, I would like some information.";
+const DEFAULT_ADDRESS = "2nd floor, 42 Ave Al Haouz, Rabat 10140";
 
 type Item = { icon: (p: React.SVGProps<SVGSVGElement>) => React.JSX.Element; label: string; value: string; href?: string; external?: boolean };
 
@@ -14,15 +13,13 @@ export default async function Contact() {
   // Contact details come from the hosting panel at runtime, not from the build environment.
   await connection();
   const phone = normalizePhone(process.env.CONTACT_PHONE || process.env.OWNER_WHATSAPP_PHONE || "");
-  const address = process.env.CONTACT_ADDRESS?.trim() || null;
+  const address = process.env.CONTACT_ADDRESS?.trim() || DEFAULT_ADDRESS;
   const email = process.env.CONTACT_EMAIL?.trim() || null;
-  const mapQuery = address ? encodeURIComponent(address) : null;
+  const mapQuery = encodeURIComponent(`Touch Sense Thai Massage, ${address}`);
 
   const items: Item[] = [];
   if (phone) items.push({ icon: PhoneIcon, label: "Call us", value: formatPhone(phone), href: `tel:${phone}` });
-  if (address && mapQuery) {
-    items.push({ icon: PinIcon, label: "Visit us", value: address, href: `https://www.google.com/maps/search/?api=1&query=${mapQuery}`, external: true });
-  }
+  items.push({ icon: PinIcon, label: "Visit us", value: address, href: `https://www.google.com/maps/search/?api=1&query=${mapQuery}`, external: true });
   if (email) items.push({ icon: MailIcon, label: "Email", value: email, href: `mailto:${email}` });
   items.push({ icon: ClockIcon, label: "Opening hours", value: "Monday – Saturday · 10:00 – 20:00" });
 
@@ -81,27 +78,15 @@ export default async function Contact() {
           </ul>
         </Reveal>
 
-        {mapQuery ? (
-          <Reveal variant="fade" delay={150} className="relative aspect-[4/3] overflow-hidden rounded-sm border border-sand bg-sand lg:aspect-auto lg:min-h-[480px]">
-            <iframe
-              title="Map showing Touch Sense"
-              src={`https://maps.google.com/maps?q=${mapQuery}&z=16&output=embed`}
-              className="absolute inset-0 h-full w-full grayscale-[35%]"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </Reveal>
-        ) : (
-          <Reveal variant="zoom" delay={150} className="relative hidden overflow-hidden rounded-sm lg:block lg:min-h-[480px]">
-            <Image
-              src={images.gallery[4]} {...blurProps(images.gallery[4])}
-              alt="Waiting area at Touch Sense"
-              fill
-              sizes="(min-width: 1024px) 45vw, 100vw"
-              className="object-cover"
-            />
-          </Reveal>
-        )}
+        <Reveal variant="fade" delay={150} className="relative aspect-[4/3] overflow-hidden rounded-sm border border-sand bg-sand lg:aspect-auto lg:min-h-[480px]">
+          <iframe
+            title="Map showing Touch Sense"
+            src={`https://maps.google.com/maps?q=${mapQuery}&z=17&output=embed`}
+            className="absolute inset-0 h-full w-full grayscale-[35%]"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </Reveal>
       </div>
     </section>
   );
