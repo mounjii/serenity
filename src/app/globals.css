@@ -64,6 +64,15 @@ body {
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
+/* Keeps hero text readable over the full-colour photo on phones and tablets. */
+@media (max-width: 1023px) {
+  .text-halo {
+    text-shadow:
+      0 0 16px rgb(247 243 237 / 0.95),
+      0 0 4px rgb(247 243 237 / 0.9);
+  }
+}
+
 .eyebrow {
   font-size: 0.68rem;
   letter-spacing: 0.32em;
