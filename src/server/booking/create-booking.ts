@@ -6,6 +6,7 @@ import { pickOption } from "@/lib/service-options";
 import { addMinutes, dateStringToDbDate, localToUtc, toLocalDateString, toLocalMinuteOfDay } from "@/lib/time";
 import { getDb } from "@/server/db";
 import { AppError, businessRule } from "@/server/errors";
+import { getWhatsAppMode } from "@/server/whatsapp";
 import { getDaySchedule } from "./schedule";
 import { confirmationDeadline, holdsSlot } from "./slot-hold";
 
@@ -151,8 +152,12 @@ export async function createBooking(rawInput: unknown, options: CreateBookingOpt
               customerPhone: input.customerPhone,
               note: input.note ?? null,
               // Online bookings wait for the customer's WhatsApp confirmation; the admin books on the customer's behalf.
+              // In manual mode the admin confirms by hand, so there is no deadline (null keeps the slot held).
               ...(options.source === "ONLINE"
-                ? { status: "PENDING" as const, confirmationExpiresAt: confirmationDeadline(now, startAt) }
+                ? {
+                    status: "PENDING" as const,
+                    confirmationExpiresAt: getWhatsAppMode() === "manual" ? null : confirmationDeadline(now, startAt),
+                  }
                 : { status: "CONFIRMED" as const, confirmedAt: now }),
               source: options.source,
               idempotencyKey: input.idempotencyKey ?? null,

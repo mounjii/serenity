@@ -87,8 +87,14 @@ export default async function ConfirmationPage({ params }: PageProps<"/reservati
               <>
                 <RefreshWhilePending />
                 <p className="mt-4 rounded-sm bg-gold/10 px-4 py-3 text-[0.85rem] text-ink-soft">
-                  Your time is held until <strong className="font-medium text-ink">{booking.confirmUntil ?? "soon"}</strong>. Without
-                  confirmation, the reservation is cancelled automatically.
+                  {booking.confirmUntil ? (
+                    <>
+                      Your time is held until <strong className="font-medium text-ink">{booking.confirmUntil}</strong>. Without confirmation,
+                      the reservation is cancelled automatically.
+                    </>
+                  ) : (
+                    "Your time is reserved. Send us your confirmation on WhatsApp and we will confirm your booking."
+                  )}
                 </p>
               </>
             )}

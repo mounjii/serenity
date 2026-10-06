@@ -81,13 +81,20 @@ export default function BookingActions({ booking, whatsappMode = "mock" }: { boo
 
   return (
     <div className="space-y-4">
-      {waitingUntil && (
+      {waitingUntil ? (
         <p className="rounded-sm bg-gold/10 px-3 py-2 text-[0.82rem] text-ink-soft">
           {manual
             ? "Waiting for the client's WhatsApp message. When they confirm, tap Confirm reservation. Cancelled automatically at "
             : "Waiting for the client to confirm on WhatsApp. Cancelled automatically at "}
           <strong className="font-medium text-ink">{waitingUntil}</strong> without confirmation.
         </p>
+      ) : (
+        booking.status === "PENDING" && (
+          <p className="rounded-sm bg-gold/10 px-3 py-2 text-[0.82rem] text-ink-soft">
+            Waiting for the client&rsquo;s WhatsApp message. When they confirm, tap Confirm reservation. The time stays reserved until you
+            confirm or cancel.
+          </p>
+        )
       )}
 
       {confirmingCancel ? (
