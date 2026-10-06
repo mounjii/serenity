@@ -28,7 +28,7 @@ export default async function Contact() {
 
   return (
     <section id="contact" className="scroll-mt-16 bg-cream-dark/60">
-      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-6 sm:py-24 lg:grid-cols-2 lg:gap-16 lg:px-12 lg:py-28">
+      <div className="mx-auto grid max-w-7xl gap-10 px-5 pt-16 pb-10 sm:px-6 sm:py-24 lg:grid-cols-2 lg:gap-16 lg:px-12 lg:py-28">
         <Reveal>
           <p className="eyebrow">Get in Touch</p>
           <h2 className="mt-4 font-serif text-[2.4rem] leading-[1.08] text-ink sm:text-5xl lg:text-[3.2rem]">Contact Us</h2>
