@@ -7,7 +7,6 @@ import {
   RecentActivity,
   TodaySchedule,
   UpcomingAppointments,
-  type ActivityItem,
 } from "@/components/admin/DashboardWidgets";
 import { resolveRange } from "@/components/admin/UpcomingSection";
 import {
@@ -21,7 +20,8 @@ import {
   XCircleIcon,
 } from "@/components/Icons";
 import { addDays, formatDayHeading, isValidDateString, toLocalMinuteOfDay, weekdayOf } from "@/lib/time";
-import { getDashboardSummary, listBookingsForDates, listRecentlyUpdated, type AdminBooking } from "@/server/admin/bookings";
+import { listActivity } from "@/server/admin/activity";
+import { getDashboardSummary, listBookingsForDates, type AdminBooking } from "@/server/admin/bookings";
 import { requireAdminPage } from "@/server/auth/session";
 import { sweepExpiredBookings } from "@/server/booking/confirmation";
 import { getWhatsAppMode } from "@/server/whatsapp";
@@ -41,24 +41,6 @@ function greeting(now: Date): string {
   if (hour < 12) return "Good morning";
   if (hour < 18) return "Good afternoon";
   return "Good evening";
-}
-
-function timeAgo(iso: string, now: Date): string {
-  const minutes = Math.max(0, Math.round((now.getTime() - new Date(iso).getTime()) / 60_000));
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes} min ago`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-  const days = Math.round(hours / 24);
-  return `${days} day${days === 1 ? "" : "s"} ago`;
-}
-
-function activityOf(b: AdminBooking, now: Date): ActivityItem {
-  const ago = timeAgo(b.updatedAt, now);
-  if (b.status === "CANCELLED") return { booking: b, title: "Booking cancelled", tone: "red", ago };
-  if (b.status === "COMPLETED") return { booking: b, title: "Session completed", tone: "grey", ago };
-  if (b.status === "CONFIRMED") return { booking: b, title: b.source === "ADMIN" ? "Booking added" : "Booking confirmed", tone: "green", ago };
-  return { booking: b, title: "New booking", tone: "amber", ago };
 }
 
 /** "YYYY-MM" from ?month=, falling back to the month of today. */
@@ -86,18 +68,18 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
   const monthStart = `${month}-01`;
   const monthEnd = addDays(`${shiftMonth(month, 1)}-01`, -1);
 
-  const [todayBookings, rangeBookings, monthBookings, recent] = await Promise.all([
+  const [todayBookings, rangeBookings, monthBookings, activity] = await Promise.all([
     listBookingsForDates(today, today),
     listBookingsForDates(range.from, range.to),
     listBookingsForDates(monthStart, monthEnd),
-    listRecentlyUpdated(5),
+    listActivity(6, now),
   ]);
   const next = summary.nextBooking;
   const confirmed = todayBookings.filter((b) => b.status === "CONFIRMED" || b.status === "COMPLETED").length;
   const cancelled = todayBookings.filter((b) => b.status === "CANCELLED").length;
 
   return (
-    <BookingDetailsProvider bookings={uniqueById([todayBookings, rangeBookings, recent, [next]])} whatsappMode={getWhatsAppMode()}>
+    <BookingDetailsProvider bookings={uniqueById([todayBookings, rangeBookings, activity.map((e) => e.booking), [next]])} whatsappMode={getWhatsAppMode()}>
       <div className="space-y-5 sm:space-y-6">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
@@ -159,7 +141,7 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
             <MiniCalendar month={month} today={today} bookings={monthBookings} />
             <div className="space-y-5 sm:space-y-6">
               <QuickActions />
-              <RecentActivity items={recent.map((b) => activityOf(b, now))} />
+              <RecentActivity events={activity} />
             </div>
           </div>
         </div>

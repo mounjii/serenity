@@ -8,6 +8,7 @@ import type { BookingStatusValue } from "@/lib/booking-status";
 import { serviceImage } from "@/lib/images";
 import { whatsappLink } from "@/lib/phone";
 import { formatShortDate } from "@/lib/time";
+import type { ActivityEvent, ActivityTone } from "@/server/admin/activity";
 import type { AdminBooking } from "@/server/admin/bookings";
 import { useOpenBooking } from "./BookingDetails";
 import { useHighlightedBookings } from "./LiveBookings";
@@ -144,41 +145,53 @@ export function TodaySchedule({ bookings, dateLabel }: { bookings: AdminBooking[
   );
 }
 
-export type ActivityItem = { booking: AdminBooking; title: string; tone: "green" | "red" | "amber" | "grey"; ago: string };
+export const activityToneColor: Record<ActivityTone, string> = {
+  green: "bg-olive",
+  red: "bg-red-400",
+  amber: "bg-gold",
+  grey: "bg-muted",
+  blue: "bg-[#5b7fb5]",
+};
 
-const toneColor: Record<ActivityItem["tone"], string> = { green: "bg-olive", red: "bg-red-400", amber: "bg-gold", grey: "bg-muted" };
-
-export function RecentActivity({ items }: { items: ActivityItem[] }) {
+export function ActivityList({ events }: { events: ActivityEvent[] }) {
   const openBooking = useOpenBooking();
+  return (
+    <ul className="space-y-0.5">
+      {events.map((e) => (
+        <li key={e.key}>
+          <button
+            type="button"
+            onClick={() => openBooking(e.booking.id)}
+            className="grid w-full grid-cols-[0.5rem_minmax(0,1fr)_auto] items-start gap-3 rounded-lg px-1.5 py-2 text-left transition hover:bg-cream/70"
+          >
+            <span className={`mt-1.5 h-2 w-2 rounded-full ${activityToneColor[e.tone]}`} aria-hidden />
+            <span className="min-w-0">
+              <span className="block text-[0.82rem] text-ink">{e.title}</span>
+              <span className="block truncate text-[0.74rem] text-muted">{e.detail}</span>
+            </span>
+            <span className="pt-0.5 text-[0.7rem] whitespace-nowrap text-muted">{e.ago}</span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export function RecentActivity({ events }: { events: ActivityEvent[] }) {
   return (
     <Card className="p-4 sm:p-5">
       <div className="flex items-center justify-between">
         <h2 className="text-[1rem] font-medium text-ink">Recent activity</h2>
-        <Link href="/admin/bookings" className="text-[0.74rem] text-ink-soft underline-offset-4 hover:text-ink hover:underline">
+        <Link href="/admin/activity" className="text-[0.74rem] text-ink-soft underline-offset-4 hover:text-ink hover:underline">
           See all
         </Link>
       </div>
-      {items.length === 0 ? (
-        <p className="mt-4 text-[0.82rem] text-muted">Nothing yet.</p>
+      {events.length === 0 ? (
+        <p className="mt-4 text-[0.82rem] text-muted">No activity yet.</p>
       ) : (
-        <ul className="mt-3 space-y-1">
-          {items.map((item) => (
-            <li key={item.booking.id}>
-              <button
-                type="button"
-                onClick={() => openBooking(item.booking.id)}
-                className="grid w-full grid-cols-[0.5rem_minmax(0,1fr)_auto] items-start gap-3 rounded-lg px-1.5 py-2 text-left transition hover:bg-cream/70"
-              >
-                <span className={`mt-1.5 h-2 w-2 rounded-full ${toneColor[item.tone]}`} aria-hidden />
-                <span className="min-w-0">
-                  <span className="block text-[0.82rem] text-ink">{item.title}</span>
-                  <span className="block truncate text-[0.74rem] text-muted">{item.booking.customerName}</span>
-                </span>
-                <span className="pt-0.5 text-[0.7rem] whitespace-nowrap text-muted">{item.ago}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+        <div className="mt-3">
+          <ActivityList events={events} />
+        </div>
       )}
     </Card>
   );

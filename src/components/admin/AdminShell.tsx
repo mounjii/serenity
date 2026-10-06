@@ -5,12 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { logoutAction } from "@/app/admin/actions";
-import { BellIcon, CalendarIcon, CalendarOffIcon, CloseIcon, HomeIcon, LogoutIcon, MenuIcon, PlusIcon } from "@/components/Icons";
+import { BellIcon, CalendarIcon, CalendarOffIcon, ClockIcon, CloseIcon, HomeIcon, LogoutIcon, MenuIcon, PlusIcon } from "@/components/Icons";
 import { blurProps, images } from "@/lib/images";
 
 const links = [
   { href: "/admin", label: "Dashboard", icon: HomeIcon },
   { href: "/admin/bookings", label: "Bookings", icon: CalendarIcon },
+  { href: "/admin/activity", label: "Activity", icon: ClockIcon },
   { href: "/admin/closed-days", label: "Closed days", icon: CalendarOffIcon },
   { href: "/admin/notifications", label: "Notifications", icon: BellIcon },
 ];

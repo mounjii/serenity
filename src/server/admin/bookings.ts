@@ -135,12 +135,6 @@ export async function getDashboardSummary(now = new Date()) {
   return { today, todayCount, nextBooking: next ? toAdminBooking(next) : null };
 }
 
-/** Bookings most recently created or changed, newest first. */
-export async function listRecentlyUpdated(take = 5): Promise<AdminBooking[]> {
-  const rows = await getDb().booking.findMany({ orderBy: { updatedAt: "desc" }, take, select: adminBookingSelect });
-  return rows.map(toAdminBooking);
-}
-
 export async function getAdminBooking(id: string): Promise<AdminBooking | null> {
   if (!/^[a-z0-9]{10,40}$/i.test(id)) return null;
   const row = await getDb().booking.findUnique({ where: { id }, select: adminBookingSelect });
