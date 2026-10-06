@@ -21,12 +21,12 @@ export default function Hero() {
         />
       </Parallax>
       <div className="absolute inset-y-0 left-0 hidden w-3/5 bg-gradient-to-r from-cream/45 to-transparent lg:block" />
-      <div className="absolute inset-0 bg-gradient-to-b from-cream/85 via-cream/55 to-cream/5 lg:hidden" />
+      <div className="absolute inset-0 bg-gradient-to-b from-cream/60 via-cream/25 to-transparent lg:hidden" />
       <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-cream to-transparent" />
 
       <div className="relative mx-auto w-full max-w-7xl px-5 pt-24 pb-24 sm:px-6 sm:pt-28 sm:pb-20 lg:px-12">
         <div className="max-w-2xl">
-          <p className="eyebrow animate-fade-up" style={stagger(150)}>
+          <p className="eyebrow animate-fade-up !text-ink lg:!text-muted" style={stagger(150)}>
             Relax <span className="mx-2">•</span> Recharge <span className="mx-2">•</span> Reconnect
           </p>
           <h1
@@ -37,7 +37,7 @@ export default function Hero() {
             <br />
             It&rsquo;s a Reset
           </h1>
-          <p className="animate-fade-up mt-5 max-w-[19rem] text-[0.95rem] leading-relaxed text-ink-soft sm:mt-6 sm:max-w-sm sm:font-light" style={stagger(480)}>
+          <p className="animate-fade-up mt-5 max-w-[19rem] text-[0.95rem] leading-relaxed text-ink lg:text-ink-soft sm:mt-6 sm:max-w-sm sm:font-light" style={stagger(480)}>
             Escape the everyday and give your body and mind the care they deserve.
           </p>
           <div className="animate-fade-up mt-8 flex flex-wrap items-center gap-x-7 gap-y-4 sm:mt-9" style={stagger(640)}>
