@@ -2,7 +2,16 @@ import Image from "next/image";
 import { blurProps, images } from "@/lib/images";
 import Reveal from "./Reveal";
 
-const alts = ["Treatment room", "Rolled towels and candle", "Stone bath with petals", "Relaxation lounge"];
+const alts = [
+  "Massage room with a Thai silk table cover and candles",
+  "Treatment room with a massage table and a lounge sofa",
+  "Traditional Thai massage mat lit by lanterns",
+  "Candle-lit massage room with lotus flowers",
+  "Waiting area with an elephant painting",
+  "Reception desk in the warm-lit hallway",
+  "Wooden shelf with lanterns and candles",
+  "Reception counter with Thai balms and herbal products",
+];
 
 export default function Gallery() {
   return (
@@ -16,21 +25,20 @@ export default function Gallery() {
           </p>
         </Reveal>
 
-        <div className="mt-10 grid grid-cols-2 gap-3 sm:mt-14 sm:gap-4 lg:grid-cols-4 lg:gap-6">
+        <p className="mt-8 text-right text-[0.7rem] tracking-[0.2em] text-muted uppercase sm:hidden">Swipe →</p>
+        <div className="no-scrollbar -mx-5 mt-3 flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto px-5 pb-2 sm:mx-0 sm:mt-14 sm:grid sm:grid-cols-4 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:gap-6">
           {images.gallery.map((src, i) => (
             <Reveal
               key={src}
               variant="zoom"
-              delay={i * 110}
-              className={`group relative overflow-hidden rounded-sm ${
-                i === 0 || i === images.gallery.length - 1 ? "col-span-2 aspect-[16/9] sm:col-span-1 sm:aspect-[4/3]" : "aspect-square sm:aspect-[4/3]"
-              }`}
+              delay={(i % 4) * 110}
+              className="group relative aspect-[3/4] w-[72%] shrink-0 snap-start overflow-hidden rounded-sm sm:w-auto"
             >
               <Image
                 src={src} {...blurProps(src)}
-                alt={alts[i]}
+                alt={alts[i] ?? "Touch Sense salon"}
                 fill
-                sizes={i === 0 || i === images.gallery.length - 1 ? "(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" : "(min-width: 1024px) 25vw, 50vw"}
+                sizes="(min-width: 640px) 25vw, 72vw"
                 className="object-cover transition-transform duration-[1.2s] group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/15" />

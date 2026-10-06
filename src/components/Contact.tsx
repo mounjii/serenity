@@ -91,8 +91,8 @@ export default function Contact() {
         ) : (
           <Reveal variant="zoom" delay={150} className="relative hidden overflow-hidden rounded-sm lg:block lg:min-h-[480px]">
             <Image
-              src={images.gallery[3]} {...blurProps(images.gallery[3])}
-              alt="Relaxation lounge at Touch Sense"
+              src={images.gallery[4]} {...blurProps(images.gallery[4])}
+              alt="Waiting area at Touch Sense"
               fill
               sizes="(min-width: 1024px) 45vw, 100vw"
               className="object-cover"

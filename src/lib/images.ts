@@ -25,7 +25,8 @@ export const images = {
   testimonial: local("testimonial"),
   avatar: local("avatar"),
   cta: local("cta"),
-  gallery: [local("gallery-1"), local("gallery-2"), local("gallery-3"), local("gallery-4")],
+  /** Real photos of the salon. */
+  gallery: Array.from({ length: 8 }, (_, i) => local(`space/space-${i + 1}`)),
 };
 
 const imageBySlug: Record<string, string> = {
