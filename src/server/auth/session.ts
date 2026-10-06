@@ -26,7 +26,8 @@ export async function startSession(username: string): Promise<void> {
   const store = await cookies();
   store.set(SESSION_COOKIE, await createSessionToken(username), {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    // COOKIE_SECURE=false is only for testing over plain http before the domain has HTTPS.
+    secure: process.env.COOKIE_SECURE ? process.env.COOKIE_SECURE === "true" : process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
     maxAge: SESSION_MAX_AGE_SECONDS,

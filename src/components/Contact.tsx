@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { connection } from "next/server";
 import { blurProps, images } from "@/lib/images";
 import { formatPhone, normalizePhone, whatsappLink } from "@/lib/phone";
 import Reveal from "./Reveal";
@@ -9,7 +10,9 @@ const WHATSAPP_GREETING = "Hello Touch Sense, I would like some information.";
 
 type Item = { icon: (p: React.SVGProps<SVGSVGElement>) => React.JSX.Element; label: string; value: string; href?: string; external?: boolean };
 
-export default function Contact() {
+export default async function Contact() {
+  // Contact details come from the hosting panel at runtime, not from the build environment.
+  await connection();
   const phone = normalizePhone(process.env.CONTACT_PHONE || process.env.OWNER_WHATSAPP_PHONE || "");
   const address = process.env.CONTACT_ADDRESS?.trim() || null;
   const email = process.env.CONTACT_EMAIL?.trim() || null;
