@@ -11,7 +11,13 @@ COPY package.json package-lock.json ./
 COPY prisma ./prisma
 COPY prisma.config.ts ./
 # `npm ci` rejects the Windows-generated lock file on Linux (optional @emnapi packages).
-RUN npm install --no-audit --no-fund
+# The VPS network sometimes drops npm downloads (ECONNRESET): retry before failing the build.
+RUN npm config set fetch-retries 5 \
+  && npm config set fetch-retry-mintimeout 20000 \
+  && npm config set fetch-retry-maxtimeout 120000 \
+  && (npm install --no-audit --no-fund \
+    || (sleep 10 && npm install --no-audit --no-fund) \
+    || (sleep 30 && npm install --no-audit --no-fund))
 
 COPY . .
 RUN npm run build
