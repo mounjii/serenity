@@ -194,7 +194,7 @@ export default function Navbar() {
           >
             Login
           </Link>
-          <p className="pt-2 text-center text-[0.72rem] tracking-wide text-muted">Open Monday to Saturday · 10:00 – 20:00</p>
+          <p className="pt-2 text-center text-[0.72rem] tracking-wide text-muted">Open every day · 10:00 – 22:00</p>
         </div>
       </div>
     </>

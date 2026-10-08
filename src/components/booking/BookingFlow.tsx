@@ -551,7 +551,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                 );
               })}
             </div>
-            <p className="mt-4 text-[0.75rem] text-muted">We are open Monday to Saturday, 10:00 to 20:00.</p>
+            <p className="mt-4 text-[0.75rem] text-muted">We are open every day, Monday to Sunday, 10:00 to 22:00.</p>
           </div>
         )}
 

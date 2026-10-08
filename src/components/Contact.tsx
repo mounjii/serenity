@@ -21,7 +21,7 @@ export default async function Contact() {
   if (phone) items.push({ icon: PhoneIcon, label: "Call us", value: formatPhone(phone), href: `tel:${phone}` });
   items.push({ icon: PinIcon, label: "Visit us", value: address, href: `https://www.google.com/maps/search/?api=1&query=${mapQuery}`, external: true });
   if (email) items.push({ icon: MailIcon, label: "Email", value: email, href: `mailto:${email}` });
-  items.push({ icon: ClockIcon, label: "Opening hours", value: "Monday – Saturday · 10:00 – 20:00" });
+  items.push({ icon: ClockIcon, label: "Opening hours", value: "Monday – Sunday · 10:00 – 22:00" });
 
   return (
     <section id="contact" className="scroll-mt-16 bg-cream-dark/60">

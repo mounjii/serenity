@@ -55,7 +55,7 @@ export default function MobileBookBar() {
       <div className="flex items-center gap-4">
         <div className="min-w-0 flex-1 leading-tight">
           <p className="font-serif text-[1.1rem] text-ink">Touch Sense</p>
-          <p className="truncate text-[0.7rem] text-muted">Mon – Sat · 10:00 – 20:00</p>
+          <p className="truncate text-[0.7rem] text-muted">Every day · 10:00 – 22:00</p>
         </div>
         <Link
           href={RESERVATION_PATH}

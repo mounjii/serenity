@@ -8,12 +8,12 @@ export default async function AdminLoginPage({ searchParams }: PageProps<"/admin
     <main className="flex min-h-screen items-center justify-center px-5 py-16">
       <div className="w-full max-w-sm rounded-sm bg-white p-8 shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)]">
         <Image
-          src="/images/ts-logo.webp"
+          src="/images/ts-logo-black.webp"
           alt="Touch Sense Thai Massage"
-          width={672}
-          height={435}
+          width={745}
+          height={144}
           priority
-          className="mx-auto h-24 w-auto"
+          className="mx-auto h-12 w-auto"
         />
         <h1 className="mt-5 text-center font-serif text-3xl text-ink">Admin sign in</h1>
         <LoginForm next={typeof next === "string" ? next : "/admin"} />

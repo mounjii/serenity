@@ -21,7 +21,7 @@ function Sidebar({ username, onNavigate }: { username: string; onNavigate?: () =
   return (
     <div className="flex h-full flex-col px-4 pt-7 pb-5">
       <Link href="/admin" onClick={onNavigate} className="mx-auto block">
-        <Image src="/images/ts-logo.webp" alt="Touch Sense Thai Massage" width={672} height={435} priority className="h-[68px] w-auto" />
+        <Image src="/images/ts-logo-black.webp" alt="Touch Sense Thai Massage" width={745} height={144} priority className="h-10 w-auto invert" />
       </Link>
 
       <nav aria-label="Admin" className="mt-10 space-y-1">
@@ -124,12 +124,12 @@ export default function AdminShell({ username, children }: { username: string; c
         </button>
         <Link href="/admin" className="absolute left-1/2 -translate-x-1/2">
           <Image
-            src="/images/ts-logo-horizontal.webp"
+            src="/images/ts-logo-black.webp"
             alt="Touch Sense Thai Massage"
-            width={998}
-            height={194}
+            width={745}
+            height={144}
             priority
-            className="h-7 w-auto"
+            className="h-7 w-auto invert"
           />
         </Link>
         <Link

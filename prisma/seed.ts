@@ -63,12 +63,12 @@ const services: SeedService[] = [
   },
 ];
 
-// 0 = Sunday (closed), 1-6 = Monday-Saturday 10:00-20:00.
+// Every day, Monday to Sunday, 10:00-22:00.
 const openingHours = Array.from({ length: 7 }, (_, weekday) => ({
   weekday,
   openMinute: 600,
-  closeMinute: 1200,
-  closed: weekday === 0,
+  closeMinute: 1320,
+  closed: false,
 }));
 
 async function main() {
