@@ -60,10 +60,10 @@ export default function IntroSplash() {
     <div ref={overlayRef} className="intro-overlay fixed inset-0 z-[100] bg-cream" aria-hidden>
       <div ref={flyerRef} className="fixed top-1/2 left-1/2 w-[min(78vw,560px)] -translate-x-1/2 -translate-y-1/2">
         <Image
-          src="/images/touch-sense-logo-horizontal.webp"
+          src="/images/ts-logo-horizontal.webp"
           alt=""
-          width={986}
-          height={197}
+          width={998}
+          height={194}
           priority
           className="intro-logo-in h-auto w-full"
         />

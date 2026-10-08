@@ -8,10 +8,10 @@ export default async function AdminLoginPage({ searchParams }: PageProps<"/admin
     <main className="flex min-h-screen items-center justify-center px-5 py-16">
       <div className="w-full max-w-sm rounded-sm bg-white p-8 shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)]">
         <Image
-          src="/images/touch-sense-logo.webp"
+          src="/images/ts-logo.webp"
           alt="Touch Sense Thai Massage"
-          width={650}
-          height={451}
+          width={672}
+          height={435}
           priority
           className="mx-auto h-24 w-auto"
         />
