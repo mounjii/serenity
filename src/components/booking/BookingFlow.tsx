@@ -2,6 +2,7 @@
 
 import { formatInTimeZone } from "date-fns-tz";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, CheckIcon, ChevronDown, HeartIcon, LeafIcon, LotusIcon } from "@/components/Icons";
@@ -701,6 +702,13 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
               <SummaryRow label="Price" value={formatPrice(option.priceCents)} strong />
             </dl>
             <p className="mt-4 text-[0.75rem] text-muted">Payment is made at the salon.</p>
+            <p className="mt-2 text-[0.75rem] leading-relaxed text-muted">
+              Your name and phone number are only used to manage this booking. See our{" "}
+              <Link href="/privacy" target="_blank" className="text-ink underline underline-offset-2">
+                Privacy Policy
+              </Link>
+              .
+            </p>
             {submitError && (
               <p role="alert" className="mt-6 rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-[0.85rem] text-red-700">
                 {submitError}

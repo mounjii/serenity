@@ -44,9 +44,8 @@ export default function Footer() {
         <div className="flex flex-col items-center gap-3 border-t border-sand pt-4 pb-safe text-center text-[0.72rem] text-muted md:flex-row md:justify-between md:pb-6">
           <p>© {new Date().getFullYear()} Touch Sense Thai Massage. All rights reserved.</p>
           <div className="flex items-center gap-6 sm:gap-8">
-            <Link href="#" className="hover:text-ink">Privacy</Link>
+            <Link href="/privacy" className="hover:text-ink">Privacy Policy</Link>
             <Link href={RESERVATION_PATH} className="hover:text-ink">Bookings</Link>
-            <Link href="#" className="hover:text-ink">Wholesale</Link>
             <Link
               href="#"
               aria-label="Back to top"
