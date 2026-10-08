@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LOCALES } from "@/i18n/config";
 import { CUSTOMER_NAME_MAX, CUSTOMER_NAME_MIN, NOTE_MAX } from "./booking-rules";
 import { normalizePhone } from "./phone";
 
@@ -49,6 +50,8 @@ export const createBookingSchema = customerDetailsSchema.extend({
   startAt: z.iso.datetime({ offset: true, error: "Invalid start time." }),
   idempotencyKey: z.string().min(8).max(100).optional(),
   website: z.string().max(500).optional(),
+  /** Language of the site when booking; the client's WhatsApp messages use it. */
+  locale: z.enum(LOCALES).optional(),
 });
 
 export type CreateBookingInput = z.input<typeof createBookingSchema>;

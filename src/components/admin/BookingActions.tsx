@@ -27,7 +27,14 @@ export default function BookingActions({ booking, whatsappMode = "mock" }: { boo
   const confirmable = canConfirm(booking, now);
   const waitingUntil = booking.labels.confirmUntil;
   const manual = whatsappMode === "manual";
-  const messageInfo = { customerName: booking.customerName, serviceName: booking.serviceName, date: booking.dateLabel, time: booking.time, bookingId: booking.id };
+  const messageInfo = {
+    customerName: booking.customerName,
+    serviceName: booking.client.serviceName,
+    date: booking.client.dateLabel,
+    time: booking.time,
+    bookingId: booking.id,
+    locale: booking.client.locale,
+  };
   const whatsappMessage =
     whatsappMode === "meta"
       ? null
@@ -48,6 +55,7 @@ export default function BookingActions({ booking, whatsappMode = "mock" }: { boo
     >
       <WhatsAppIcon className="h-3.5 w-3.5 text-[#25D366]" aria-hidden />
       {whatsappMessage.label}
+      {booking.client.locale !== "en" && <span className="text-[0.68rem] text-muted">({booking.client.locale.toUpperCase()})</span>}
     </ButtonAnchor>
   );
 

@@ -1,5 +1,4 @@
-import { PRESSURE_LEVEL, serviceDetails, type Goal } from "./service-details";
-import { formatDuration } from "./format";
+import { PRESSURE_LEVEL, serviceDetails, type Goal, type Pressure } from "./service-details";
 
 export type FinderAnswers = {
   goal: Goal;
@@ -16,12 +15,15 @@ export type FinderService = {
   options: { durationMinutes: number }[];
 };
 
+/** Why a treatment was suggested; worded in the visitor's language by the finder. */
+export type FinderReason = { kind: "goal"; goal: Goal } | { kind: "pressure"; pressure: Pressure } | { kind: "duration"; minutes: number };
+
 export type FinderMatch = {
   serviceId: string;
   /** The service duration closest to the time the guest has. */
   durationMinutes: number;
   score: number;
-  reasons: string[];
+  reasons: FinderReason[];
 };
 
 export const GOAL_CHOICES: { value: Goal; label: string; hint: string }[] = [
@@ -47,26 +49,24 @@ export const TIME_CHOICES: { value: number; label: string }[] = [
   { value: 120, label: "2 hours" },
 ];
 
-const goalLabel = (goal: Goal) => GOAL_CHOICES.find((g) => g.value === goal)?.label.toLowerCase() ?? goal;
-
 /** Services ranked best first for the guest's answers. Ties keep the menu order. */
 export function rankTreatments(services: FinderService[], answers: FinderAnswers): FinderMatch[] {
   return services
     .filter((s) => s.options.length > 0)
     .map((service, order) => {
       const info = serviceDetails(service.slug, service.description);
-      const reasons: string[] = [];
+      const reasons: FinderReason[] = [];
       let score = 0;
 
       const goalIndex = info.goals.indexOf(answers.goal);
       if (goalIndex === 0) score += 6;
       else if (goalIndex > 0) score += 4;
-      if (goalIndex >= 0) reasons.push(`Made for ${goalLabel(answers.goal)}`);
+      if (goalIndex >= 0) reasons.push({ kind: "goal", goal: answers.goal });
 
       if (answers.pressure !== null) {
         const gap = Math.abs(PRESSURE_LEVEL[info.pressure] - answers.pressure);
         score -= gap * 1.5;
-        if (gap <= 1) reasons.push(`${info.pressure} pressure, as you like it`);
+        if (gap <= 1) reasons.push({ kind: "pressure", pressure: info.pressure });
       }
 
       const closest = service.options.reduce((best, o) =>
@@ -74,7 +74,7 @@ export function rankTreatments(services: FinderService[], answers: FinderAnswers
       );
       if (closest.durationMinutes === answers.minutes) {
         score += 2;
-        reasons.push(`Available in ${formatDuration(closest.durationMinutes)}`);
+        reasons.push({ kind: "duration", minutes: closest.durationMinutes });
       } else {
         score -= Math.abs(closest.durationMinutes - answers.minutes) / 60;
       }

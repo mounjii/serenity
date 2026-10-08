@@ -2,29 +2,15 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { useI18n } from "@/i18n/client";
+import { fmt } from "@/i18n/format";
 import { blurProps, images } from "@/lib/images";
 import { ArrowLeft, ArrowRight, StarIcon } from "./Icons";
 import Reveal from "./Reveal";
 
-const testimonials = [
-  {
-    quote:
-      "An amazing experience! The atmosphere is so calming and the therapist was incredibly professional. I left feeling lighter, both physically and mentally.",
-    name: "Sarah L.",
-  },
-  {
-    quote:
-      "The deep tissue massage was exactly what my back needed. Every detail, from the scent to the music, made me feel completely at ease.",
-    name: "Emma R.",
-  },
-  {
-    quote:
-      "A true sanctuary in the middle of the city. I have been coming every month and each visit feels like a small holiday.",
-    name: "Claire M.",
-  },
-];
-
 export default function Testimonials() {
+  const { t } = useI18n();
+  const testimonials = t.testimonials.items;
   const [index, setIndex] = useState(0);
   const count = testimonials.length;
 
@@ -45,7 +31,8 @@ export default function Testimonials() {
     const end = e.changedTouches[0]?.clientX;
     touchStartX.current = null;
     if (start === null || end === undefined || Math.abs(end - start) < 40) return;
-    if (end < start) next();
+    const rtl = document.documentElement.dir === "rtl";
+    if (end < start !== rtl) next();
     else prev();
   };
 
@@ -55,7 +42,7 @@ export default function Testimonials() {
         <Reveal variant="curtain" className="relative aspect-[16/9] overflow-hidden rounded-sm shadow-[0_30px_60px_-30px_rgba(60,40,20,0.35)] sm:aspect-[4/3]">
           <Image
             src={images.testimonial} {...blurProps(images.testimonial)}
-            alt="Zen stones, candle and orchid"
+            alt={t.testimonials.imageAlt}
             fill
             sizes="(min-width: 768px) 45vw, 100vw"
             className="object-cover"
@@ -63,22 +50,20 @@ export default function Testimonials() {
         </Reveal>
 
         <Reveal variant="right" delay={200}>
-          <p className="eyebrow">Testimonials</p>
-          <h2 className="mt-4 font-serif text-[2.4rem] leading-[1.08] text-ink sm:text-5xl lg:text-[3.2rem]">
-            What Our Clients Say
-          </h2>
+          <p className="eyebrow">{t.testimonials.eyebrow}</p>
+          <h2 className="mt-4 font-serif text-[2.4rem] leading-[1.08] text-ink sm:text-5xl lg:text-[3.2rem]">{t.testimonials.title}</h2>
 
           <div className="relative mt-6 grid touch-pan-y sm:mt-8" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-            {testimonials.map((t, i) => (
+            {testimonials.map((item, i) => (
               <blockquote
-                key={t.name}
+                key={item.name}
                 aria-hidden={i !== index}
                 className={`col-start-1 row-start-1 transition-all duration-700 ${
                   i === index ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"
                 }`}
               >
                 <p className="max-w-lg font-serif text-[1.15rem] leading-relaxed text-ink-soft italic sm:text-xl">
-                  &ldquo;{t.quote}&rdquo;
+                  &ldquo;{item.quote}&rdquo;
                 </p>
               </blockquote>
             ))}
@@ -102,27 +87,27 @@ export default function Testimonials() {
             <div className="flex gap-3">
               <button
                 onClick={prev}
-                aria-label="Previous testimonial"
+                aria-label={t.testimonials.prev}
                 className="grid h-11 w-11 place-items-center rounded-full border border-sand bg-white text-ink transition hover:border-ink"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" />
               </button>
               <button
                 onClick={next}
-                aria-label="Next testimonial"
+                aria-label={t.testimonials.next}
                 className="grid h-11 w-11 place-items-center rounded-full border border-sand bg-white text-ink transition hover:border-ink"
               >
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
               </button>
             </div>
           </div>
 
           <div className="mt-8 flex gap-2">
-            {testimonials.map((t, i) => (
+            {testimonials.map((item, i) => (
               <button
-                key={t.name}
+                key={item.name}
                 onClick={() => setIndex(i)}
-                aria-label={`Show testimonial ${i + 1}`}
+                aria-label={fmt(t.testimonials.show, { n: i + 1 })}
                 className={`h-[3px] rounded-full transition-all duration-500 ${
                   i === index ? "w-8 bg-ink" : "w-4 bg-sand"
                 }`}

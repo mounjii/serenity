@@ -12,12 +12,17 @@ import { customerDetailsSchema } from "@/lib/booking-schema";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { blurProps, serviceCardImage, serviceImage } from "@/lib/images";
 import { formatPhone } from "@/lib/phone";
-import { PRESSURE_LEVEL, serviceDetails, type ServiceDetails } from "@/lib/service-details";
+import { PRESSURE_LEVEL, type ServiceDetails } from "@/lib/service-details";
 import { pickOption } from "@/lib/service-options";
 import { NAVBAR_OFFSET, smoothScrollTo } from "@/lib/smooth-scroll";
 import type { FinderMatch } from "@/lib/treatment-finder";
 import TreatmentFinder from "./TreatmentFinder";
-import { formatLongDate } from "@/lib/time";
+import { useI18n } from "@/i18n/client";
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/en";
+import { errorMessage, fieldErrorMessage } from "@/i18n/errors";
+import { dayPartsIn, fmt, formatLongDateIn } from "@/i18n/format";
+import { localizedServiceDetails, serviceText } from "@/i18n/services";
 import type { BookableDay } from "@/server/booking/calendar";
 import type { PublicService } from "@/server/booking/services";
 import type { ApiErrorBody } from "@/server/errors";
@@ -26,32 +31,28 @@ type Slot = { time: string; startAt: string };
 type GridStatus = "available" | "booked" | "rest" | "unavailable";
 type GridTime = Slot & { available: boolean; status?: GridStatus };
 
-const UNAVAILABLE_STYLE: Record<Exclude<GridStatus, "available">, { label: string; className: string }> = {
-  booked: { label: "Booked", className: "border-transparent bg-cream-dark/70 text-muted/70" },
-  rest: { label: "Rest", className: "border-dashed border-sand bg-white/60 text-bronze/80" },
-  unavailable: { label: "Too short", className: "border-transparent bg-cream-dark/35 text-muted/60" },
+const UNAVAILABLE_STYLE: Record<Exclude<GridStatus, "available">, { label: "booked" | "rest" | "tooShort"; className: string }> = {
+  booked: { label: "booked", className: "border-transparent bg-cream-dark/70 text-muted/70" },
+  rest: { label: "rest", className: "border-dashed border-sand bg-white/60 text-bronze/80" },
+  unavailable: { label: "tooShort", className: "border-transparent bg-cream-dark/35 text-muted/60" },
 };
 type Step = 1 | 2 | 3 | 4 | 5;
 type Details = { customerName: string; customerPhone: string; note: string; website: string };
 
-const STEPS: { id: Step; label: string }[] = [
-  { id: 1, label: "Service" },
-  { id: 2, label: "Date" },
-  { id: 3, label: "Time" },
-  { id: 4, label: "Details" },
-  { id: 5, label: "Confirm" },
-];
+const STEP_IDS: Step[] = [1, 2, 3, 4, 5];
 
-const SLOT_TAKEN_MESSAGE = "This time was just booked by someone else. Please choose another time.";
 const SLOT_REFRESH_MS = 30_000;
-const NETWORK_MESSAGE = "We couldn't reach the server. Please check your connection and try again.";
 
 function newIdempotencyKey(): string {
   if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
   return Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-function dayParts(date: string) {
+function dayParts(locale: Locale, date: string) {
+  if (locale !== "en") {
+    const parts = dayPartsIn(locale, date);
+    return { weekday: parts.shortWeekday, day: parts.day, month: parts.month };
+  }
   const d = new Date(`${date}T12:00:00.000Z`);
   return {
     weekday: formatInTimeZone(d, "UTC", "EEE"),
@@ -73,6 +74,9 @@ type Props = { services: PublicService[]; days: BookableDay[]; initialServiceSlu
 
 export default function BookingFlow({ services, days, initialServiceSlug, initialDuration }: Props) {
   const router = useRouter();
+  const { t, locale, href } = useI18n();
+  const nameOf = (s: PublicService) => serviceText(t, s).name;
+  const longDate = (instant: Date) => formatLongDateIn(locale, instant);
   const initialService = services.find((s) => s.slug === initialServiceSlug);
   // A link with a duration skips straight to the date; a link with only a service opens its details (and prices).
   const initialOption = initialService && initialDuration ? pickOption(initialService.options, initialDuration) : null;
@@ -187,7 +191,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
       const res = await fetch(`/api/availability?${params}`, { cache: "no-store", signal: controller.signal });
       if (!res.ok) {
         const err = await readError(res);
-        throw new Error(err?.message ?? "Could not load available times.");
+        throw new Error(err ? errorMessage(t, locale, err) : t.errors.loadTimes);
       }
       const data = (await res.json()) as { slots: Slot[]; times?: GridTime[] };
       setSlots(data.slots);
@@ -195,11 +199,11 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
       setSlot((current) => (current && data.slots.some((s) => s.startAt === current.startAt) ? current : null));
     } catch (error) {
       if (controller.signal.aborted) return;
-      setSlotsError(error instanceof Error && error.message ? error.message : "Could not load available times.");
+      setSlotsError(error instanceof Error && error.message ? error.message : t.errors.loadTimes);
     } finally {
       if (slotsRequest.current === controller) setSlotsLoading(false);
     }
-  }, []);
+  }, [t, locale]);
 
   // While the customer is choosing a time, keep the slots fresh: every 30 s and whenever the tab regains focus.
   useEffect(() => {
@@ -268,7 +272,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
       const errors: Record<string, string> = {};
       for (const issue of parsed.error.issues) {
         const key = String(issue.path[0]);
-        if (!errors[key]) errors[key] = issue.message;
+        if (!errors[key]) errors[key] = fieldErrorMessage(t, locale, key, issue.message);
       }
       setFieldErrors(errors);
       return;
@@ -295,34 +299,36 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
           note: details.note,
           website: details.website,
           idempotencyKey: idempotencyKey.current,
+          locale,
         }),
       });
       if (res.ok) {
         const data = (await res.json()) as { id: string };
-        router.push(`/reservation/confirmation/${data.id}`);
+        router.push(href(`/reservation/confirmation/${data.id}`));
         return;
       }
       const err = await readError(res);
       if (res.status === 409) {
-        setNotice(SLOT_TAKEN_MESSAGE);
+        setNotice(t.errors.slotTaken);
         setSlot(null);
         resetAttempt();
         setStep(3);
         if (date) void loadSlots(service.id, option.durationMinutes, date);
       } else if (res.status === 400 && err?.fields) {
-        setFieldErrors(err.fields);
+        const fields = err.fields;
+        setFieldErrors(Object.fromEntries(Object.entries(fields).map(([key, message]) => [key, fieldErrorMessage(t, locale, key, message)])));
         setStep(4);
       } else if (res.status === 422 && err && ["TOO_SOON", "TOO_FAR", "CLOSED", "OUTSIDE_OPENING_HOURS", "INVALID_SLOT"].includes(err.code)) {
-        setNotice(err.message);
+        setNotice(errorMessage(t, locale, err));
         setSlot(null);
         resetAttempt();
         setStep(3);
         if (date) void loadSlots(service.id, option.durationMinutes, date);
       } else {
-        setSubmitError(err?.message ?? "Something went wrong. Please try again.");
+        setSubmitError(errorMessage(t, locale, err));
       }
     } catch {
-      setSubmitError(NETWORK_MESSAGE);
+      setSubmitError(t.errors.network);
     } finally {
       setSubmitting(false);
     }
@@ -356,8 +362,9 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
 
   return (
     <div ref={rootRef} id="book" className="-mt-6 scroll-mt-24 sm:-mt-8">
-      <ol className="animate-fade-up mx-auto flex max-w-3xl items-start [animation-delay:200ms]" aria-label="Reservation steps">
-        {STEPS.map((s, index) => {
+      <ol className="animate-fade-up mx-auto flex max-w-3xl items-start [animation-delay:200ms]" aria-label={t.booking.stepsAria}>
+        {STEP_IDS.map((id, index) => {
+          const s = { id, label: t.booking.steps[index] };
           const current = s.id === step;
           const done = s.id < step;
           return (
@@ -366,7 +373,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                 <span
                   aria-hidden
                   className={`absolute top-[1.15rem] h-px -translate-y-1/2 sm:top-5 ${s.id <= step ? "bg-ink/40" : "bg-sand"}`}
-                  style={{ left: "calc(-50% + 1.6rem)", right: "calc(50% + 1.6rem)" }}
+                  style={{ insetInlineStart: "calc(-50% + 1.6rem)", insetInlineEnd: "calc(50% + 1.6rem)" }}
                 />
               )}
               <button
@@ -374,7 +381,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                 onClick={() => goTo(s.id)}
                 disabled={!canOpen(s.id)}
                 aria-current={current ? "step" : undefined}
-                aria-label={`Step ${s.id}: ${s.label}`}
+                aria-label={fmt(t.booking.stepAria, { n: s.id, label: s.label })}
                 className={`relative grid h-9 w-9 place-items-center rounded-full text-[0.8rem] transition sm:h-10 sm:w-10 ${
                   current
                     ? "bg-ink text-cream shadow-[0_6px_16px_-6px_rgba(20,18,15,0.7)] ring-4 ring-ink/10"
@@ -409,14 +416,17 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
               <div className="flex items-center gap-3 sm:gap-4">
                 <LeafIcon className="h-9 w-9 shrink-0 -rotate-12 text-olive sm:h-11 sm:w-11" aria-hidden />
                 <div>
-                  <h2 className="font-serif text-2xl text-ink sm:text-[2.1rem] sm:leading-tight">Choose your treatment</h2>
-                  <p className="mt-0.5 text-[0.85rem] font-light text-ink-soft">Tap a treatment to see the details and prices.</p>
+                  <h2 className="font-serif text-2xl text-ink sm:text-[2.1rem] sm:leading-tight">{t.booking.chooseTitle}</h2>
+                  <p className="mt-0.5 text-[0.85rem] font-light text-ink-soft">{t.booking.chooseSubtitle}</p>
                 </div>
               </div>
-              <p className="hidden -rotate-6 pt-1 font-script text-2xl leading-none text-bronze/80 md:block" aria-hidden>
-                Your wellness
+              <p
+                className={`hidden pt-1 text-bronze/80 md:block ${locale === "en" ? "-rotate-6 font-script text-2xl leading-none" : "-rotate-3 font-serif text-xl leading-tight italic"}`}
+                aria-hidden
+              >
+                {t.booking.wellness1}
                 <br />
-                <span className="pl-6">matters ♡</span>
+                <span className="ps-6">{t.booking.wellness2}</span>
               </p>
             </div>
             {services.length > 1 && (
@@ -426,8 +436,8 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                     <LotusIcon className="h-5 w-5" aria-hidden />
                   </span>
                   <div>
-                    <p className="text-[0.9rem] text-ink">{recommended ? "Want to try again?" : "Not sure which one to choose?"}</p>
-                    <p className="text-[0.76rem] font-light text-muted">Answer 3 quick questions and we&apos;ll suggest the best treatment for you.</p>
+                    <p className="text-[0.9rem] text-ink">{recommended ? t.booking.finderAgain : t.booking.finderPrompt}</p>
+                    <p className="text-[0.76rem] font-light text-muted">{t.booking.finderText}</p>
                   </div>
                 </div>
                 <button
@@ -435,28 +445,31 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                   onClick={() => setFinderOpen(true)}
                   className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-ink px-6 py-2.5 text-[0.8rem] tracking-wide text-cream transition hover:-translate-y-0.5 hover:bg-black"
                 >
-                  Help me choose
-                  <ArrowRight className="h-4 w-4" />
+                  {t.booking.helpMe}
+                  <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
                 </button>
               </div>
             )}
             {services.length === 0 ? (
-              <p className="mt-6 text-[0.9rem] text-ink-soft">No treatments are available for booking right now.</p>
+              <p className="mt-6 text-[0.9rem] text-ink-soft">{t.booking.noServices}</p>
             ) : (
               <div className="mt-6 grid gap-4 lg:grid-cols-2">
-                {orderedServices.map((s, index) => (
+                {orderedServices.map((s, index) => {
+                  const text = serviceText(t, s);
+                  return (
                   <button
                     key={s.id}
                     type="button"
                     onClick={() => openDetail(s.id)}
-                    aria-label={`${s.name}: details and prices`}
+                    aria-label={fmt(t.treatments.detailsAria, { name: text.name })}
                     style={{ animationDelay: `${(hasMoved ? 40 : 380) + index * 50}ms` }}
-                    className={`animate-fade-up group relative isolate flex min-h-[10rem] overflow-hidden rounded-lg border bg-gradient-to-r from-[#f7f2eb] to-[#efe8de] text-left transition-[box-shadow,border-color,translate] duration-500 outline-none hover:-translate-y-0.5 hover:shadow-[0_22px_40px_-24px_rgba(40,30,15,0.65)] focus-visible:ring-2 focus-visible:ring-olive/60 sm:min-h-[10.5rem] ${
+                    className={`animate-fade-up group relative isolate flex min-h-[10rem] overflow-hidden rounded-lg border bg-gradient-to-r from-[#f7f2eb] to-[#efe8de] text-start rtl:bg-gradient-to-l transition-[box-shadow,border-color,translate] duration-500 outline-none hover:-translate-y-0.5 hover:shadow-[0_22px_40px_-24px_rgba(40,30,15,0.65)] focus-visible:ring-2 focus-visible:ring-olive/60 sm:min-h-[10.5rem] ${
                       s.id === serviceId ? "border-olive/50" : "border-sand/60"
                     }`}
                   >
-                    {/* The photo always spans the whole card; the clip only uncovers its left third until hover/focus. */}
-                    <span className="absolute inset-0 -z-20 overflow-hidden transition-[clip-path] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] [clip-path:inset(0_64%_0_0)] group-hover:[clip-path:inset(0_0_0_0)] group-focus-visible:[clip-path:inset(0_0_0_0)]">
+                    {/* The photo always spans the whole card; the clip only uncovers its first third until hover/focus.
+                        In Arabic the whole layer is mirrored so the photo sits on the right, where the card starts. */}
+                    <span className="absolute inset-0 -z-20 overflow-hidden transition-[clip-path] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] [clip-path:inset(0_64%_0_0)] rtl:-scale-x-100 group-hover:[clip-path:inset(0_0_0_0)] group-focus-visible:[clip-path:inset(0_0_0_0)]">
                       <Image
                         src={serviceCardImage(s.slug)} {...blurProps(serviceCardImage(s.slug))}
                         alt=""
@@ -467,42 +480,43 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                     </span>
                     <span
                       aria-hidden
-                      className="absolute inset-0 -z-10 bg-gradient-to-r from-black/20 via-black/45 to-black/65 opacity-0 transition-opacity duration-700 group-hover:opacity-100 group-focus-visible:opacity-100"
+                      className="absolute inset-0 -z-10 bg-gradient-to-r from-black/20 via-black/45 to-black/65 opacity-0 rtl:bg-gradient-to-l transition-opacity duration-700 group-hover:opacity-100 group-focus-visible:opacity-100"
                     />
 
-                    <span className="ml-[36%] flex min-w-0 flex-1 flex-col py-4 pr-4 pl-4 sm:py-5 sm:pr-5 sm:pl-6">
+                    <span className="ms-[36%] flex min-w-0 flex-1 flex-col py-4 pe-4 ps-4 sm:py-5 sm:pe-5 sm:ps-6">
                       <span className="flex items-center justify-between gap-2">
                         <span className="text-[0.65rem] tracking-[0.2em] text-muted transition-colors duration-500 group-hover:text-white/70 group-focus-visible:text-white/70">
                           {String(index + 1).padStart(2, "0")}
                         </span>
                         {s.id === recommendedId && (
                           <span className="rounded-full bg-ink px-2.5 py-1 text-[0.58rem] tracking-[0.15em] text-cream uppercase transition-colors duration-500 group-hover:bg-white group-hover:text-ink">
-                            Recommended for you
+                            {t.booking.recommended}
                           </span>
                         )}
                       </span>
                       <span className="mt-1.5 font-serif text-xl leading-tight text-ink transition-colors duration-500 group-hover:text-white group-focus-visible:text-white sm:text-[1.4rem]">
-                        {s.name}
+                        {text.name}
                       </span>
                       <span className="mt-1.5 line-clamp-2 text-[0.76rem] leading-relaxed font-light text-muted transition-colors duration-500 group-hover:text-white/85 group-focus-visible:text-white/85">
-                        {s.description}
+                        {text.description}
                       </span>
                       <span className="mt-auto flex items-center justify-between gap-3 pt-3">
                         <span className="flex min-w-0 flex-col leading-tight">
                           <span className="font-serif text-[1.05rem] text-ink transition-colors duration-500 group-hover:text-white group-focus-visible:text-white">
-                            From {formatPrice(Math.min(...s.options.map((o) => o.priceCents)))}
+                            {fmt(t.booking.from, { price: formatPrice(Math.min(...s.options.map((o) => o.priceCents)), locale) })}
                           </span>
                           <span className="mt-0.5 text-[0.62rem] tracking-[0.16em] text-ink-soft uppercase transition-colors duration-500 group-hover:text-white/85 group-focus-visible:text-white/85">
-                            {s.options.map((o) => o.durationMinutes).join(" · ")} min
+                            {s.options.map((o) => o.durationMinutes).join(" · ")} {t.booking.min}
                           </span>
                         </span>
                         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-ink bg-ink text-cream transition-all duration-500 group-hover:border-white/80 group-hover:bg-white/10 group-hover:backdrop-blur-sm group-focus-visible:border-white/80 group-focus-visible:bg-white/10">
-                          <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-0.5" />
+                          <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5" />
                         </span>
                       </span>
                     </span>
                   </button>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -521,12 +535,12 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
         {step === 2 && service && option && (
           <div>
             <StepTitle
-              title="Pick a date"
-              subtitle={`${service.name} · ${formatDuration(option.durationMinutes)} · ${formatPrice(option.priceCents)}`}
+              title={t.booking.pickDate}
+              subtitle={`${nameOf(service)} · ${formatDuration(option.durationMinutes, locale)} · ${formatPrice(option.priceCents, locale)}`}
             />
             <div className="mt-6 grid grid-cols-4 gap-2 sm:grid-cols-7">
               {days.map((d) => {
-                const parts = dayParts(d.date);
+                const parts = dayParts(locale, d.date);
                 const selected = d.date === date;
                 return (
                   <button
@@ -535,7 +549,9 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                     disabled={!d.open}
                     onClick={() => chooseDate(d.date)}
                     aria-pressed={selected}
-                    aria-label={d.open ? formatLongDate(new Date(`${d.date}T12:00:00.000Z`)) : `${parts.weekday} ${parts.day} ${parts.month} (closed)`}
+                    aria-label={
+                      d.open ? longDate(new Date(`${d.date}T12:00:00.000Z`)) : `${parts.weekday} ${parts.day} ${parts.month} (${t.booking.closed})`
+                    }
                     className={`flex min-h-16 flex-col items-center justify-center rounded-md border text-center transition ${
                       selected
                         ? "border-ink bg-ink text-cream"
@@ -551,61 +567,62 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                 );
               })}
             </div>
-            <p className="mt-4 text-[0.75rem] text-muted">We are open every day, Monday to Sunday, 10:00 to 22:00.</p>
+            <p className="mt-4 text-[0.75rem] text-muted">{t.booking.openNote}</p>
           </div>
         )}
 
         {step === 3 && service && option && date && (
           <div>
             <StepTitle
-              title="Choose a time"
-              subtitle={`${service.name} · ${formatDuration(option.durationMinutes)} · ${formatLongDate(new Date(`${date}T12:00:00.000Z`))}`}
+              title={t.booking.chooseTime}
+              subtitle={`${nameOf(service)} · ${formatDuration(option.durationMinutes, locale)} · ${longDate(new Date(`${date}T12:00:00.000Z`))}`}
             />
             {slotsLoading && times.length === 0 ? (
-              <p className="mt-6 text-[0.9rem] text-ink-soft">Loading available times…</p>
+              <p className="mt-6 text-[0.9rem] text-ink-soft">{t.booking.loadingTimes}</p>
             ) : slotsError ? (
               <div className="mt-6 space-y-4">
                 <p role="alert" className="text-[0.9rem] text-red-700">{slotsError}</p>
-                <Button variant="outline" size="sm" onClick={() => void loadSlots(service.id, option.durationMinutes, date)}>Try again</Button>
+                <Button variant="outline" size="sm" onClick={() => void loadSlots(service.id, option.durationMinutes, date)}>{t.booking.tryAgain}</Button>
               </div>
             ) : times.length === 0 ? (
               <div className="mt-6 space-y-4">
-                <p className="text-[0.9rem] text-ink-soft">No available times on this day.</p>
-                <Button variant="outline" size="sm" onClick={() => setStep(2)}>Choose another date</Button>
+                <p className="text-[0.9rem] text-ink-soft">{t.booking.noTimes}</p>
+                <Button variant="outline" size="sm" onClick={() => setStep(2)}>{t.booking.anotherDate}</Button>
               </div>
             ) : (
               <>
                 {slots.length === 0 && (
                   <div className="mt-6 flex flex-wrap items-center gap-4">
-                    <p className="text-[0.9rem] text-ink-soft">This day is fully booked for a {formatDuration(option.durationMinutes)} treatment.</p>
-                    <Button variant="outline" size="sm" onClick={() => setStep(2)}>Choose another date</Button>
+                    <p className="text-[0.9rem] text-ink-soft">{fmt(t.booking.fullyBooked, { duration: formatDuration(option.durationMinutes, locale) })}</p>
+                    <Button variant="outline" size="sm" onClick={() => setStep(2)}>{t.booking.anotherDate}</Button>
                   </div>
                 )}
                 <div className="mt-6 grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6">
-                  {times.map((t) =>
-                    t.available ? (
+                  {times.map((time) =>
+                    time.available ? (
                       <button
-                        key={t.startAt}
+                        key={time.startAt}
                         type="button"
-                        onClick={() => chooseSlot({ time: t.time, startAt: t.startAt })}
-                        aria-pressed={slot?.startAt === t.startAt}
+                        onClick={() => chooseSlot({ time: time.time, startAt: time.startAt })}
+                        aria-pressed={slot?.startAt === time.startAt}
                         className={`min-h-12 rounded-md border text-[0.9rem] transition ${
-                          slot?.startAt === t.startAt ? "border-ink bg-ink text-cream" : "border-sand bg-white text-ink hover:border-ink"
+                          slot?.startAt === time.startAt ? "border-ink bg-ink text-cream" : "border-sand bg-white text-ink hover:border-ink"
                         }`}
                       >
-                        {t.time}
+                        {time.time}
                       </button>
                     ) : (
                       (() => {
-                        const look = UNAVAILABLE_STYLE[t.status && t.status !== "available" ? t.status : "booked"];
+                        const look = UNAVAILABLE_STYLE[time.status && time.status !== "available" ? time.status : "booked"];
+                        const label = t.booking[look.label];
                         return (
                           <span
-                            key={t.startAt}
-                            aria-label={`${t.time}, ${look.label.toLowerCase()}`}
+                            key={time.startAt}
+                            aria-label={`${time.time}, ${label.toLowerCase()}`}
                             className={`flex min-h-12 cursor-not-allowed flex-col items-center justify-center rounded-md border leading-tight ${look.className}`}
                           >
-                            <span className="text-[0.85rem] line-through">{t.time}</span>
-                            <span className="text-[0.56rem] tracking-[0.15em] uppercase">{look.label}</span>
+                            <span className="text-[0.85rem] line-through">{time.time}</span>
+                            <span className="text-[0.56rem] tracking-[0.15em] uppercase">{label}</span>
                           </span>
                         );
                       })()
@@ -613,9 +630,9 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                   )}
                 </div>
                 <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 text-[0.72rem] text-muted">
-                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm bg-cream-dark" aria-hidden /> Booked: a session is in progress</li>
-                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm border border-dashed border-sand" aria-hidden /> Rest: {BUFFER_MINUTES}-minute pause after each session</li>
-                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm bg-cream-dark/40" aria-hidden /> Too short: not enough time before the next guest</li>
+                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm bg-cream-dark" aria-hidden /> {t.booking.legendBooked}</li>
+                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm border border-dashed border-sand" aria-hidden /> {fmt(t.booking.legendRest, { n: BUFFER_MINUTES })}</li>
+                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm bg-cream-dark/40" aria-hidden /> {t.booking.legendShort}</li>
                 </ul>
               </>
             )}
@@ -624,9 +641,9 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
 
         {step === 4 && (
           <form onSubmit={submitDetails} noValidate>
-            <StepTitle title="Your details" subtitle="After booking, you confirm your time on WhatsApp in one tap." />
+            <StepTitle title={t.booking.detailsTitle} subtitle={t.booking.detailsSubtitle} />
             <div className="mt-6 space-y-5">
-              <Field label="Full name" htmlFor="customerName" error={fieldErrors.customerName}>
+              <Field label={t.booking.fullName} htmlFor="customerName" error={fieldErrors.customerName}>
                 <input
                   id="customerName"
                   name="customerName"
@@ -639,14 +656,15 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                 />
               </Field>
               <Field
-                label="Phone number"
+                label={t.booking.phone}
                 htmlFor="customerPhone"
-                hint="Moroccan numbers can start with +212 or 0. International numbers are welcome."
+                hint={t.booking.phoneHint}
                 error={fieldErrors.customerPhone}
               >
                 <input
                   id="customerPhone"
                   name="customerPhone"
+                  dir="ltr"
                   type="tel"
                   inputMode="tel"
                   autoComplete="tel"
@@ -654,10 +672,10 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                   onChange={(e) => updateDetail("customerPhone", e.target.value)}
                   maxLength={32}
                   aria-invalid={!!fieldErrors.customerPhone}
-                  className={inputClass(!!fieldErrors.customerPhone)}
+                  className={`${inputClass(!!fieldErrors.customerPhone)} rtl:text-end`}
                 />
               </Field>
-              <Field label="Note (optional)" htmlFor="note" error={fieldErrors.note}>
+              <Field label={t.booking.note} htmlFor="note" error={fieldErrors.note}>
                 <textarea
                   id="note"
                   name="note"
@@ -668,7 +686,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                   aria-invalid={!!fieldErrors.note}
                   className={`${inputClass(!!fieldErrors.note)} resize-y`}
                 />
-                <span className="mt-1 block text-right text-[0.7rem] text-muted">{details.note.length}/{NOTE_MAX}</span>
+                <span className="mt-1 block text-end text-[0.7rem] text-muted">{details.note.length}/{NOTE_MAX}</span>
               </Field>
               <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
                 <label htmlFor="website">Website</label>
@@ -683,31 +701,35 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
               </div>
             </div>
             <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
-              <Button type="button" variant="ghost" onClick={() => setStep(3)}>Back</Button>
-              <Button type="submit">Continue</Button>
+              <Button type="button" variant="ghost" onClick={() => setStep(3)}>{t.booking.back}</Button>
+              <Button type="submit">{t.booking.continue}</Button>
             </div>
           </form>
         )}
 
         {step === 5 && service && option && slot && (
           <div>
-            <StepTitle title="Review your reservation" />
+            <StepTitle title={t.booking.review} />
             <dl className="mt-6 divide-y divide-sand border-y border-sand text-[0.9rem]">
-              <SummaryRow label="Service" value={service.name} />
-              <SummaryRow label="Date" value={formatLongDate(new Date(slot.startAt))} />
-              <SummaryRow label="Time" value={`${slot.time} (${formatDuration(option.durationMinutes)})`} />
-              <SummaryRow label="Name" value={details.customerName.replace(/\s+/g, " ").trim()} />
-              <SummaryRow label="Phone" value={normalizedPhone.success ? formatPhone(normalizedPhone.data) : details.customerPhone} />
-              {details.note.trim() && <SummaryRow label="Note" value={details.note.trim()} />}
-              <SummaryRow label="Price" value={formatPrice(option.priceCents)} strong />
+              <SummaryRow label={t.booking.service} value={nameOf(service)} />
+              <SummaryRow label={t.booking.date} value={longDate(new Date(slot.startAt))} />
+              <SummaryRow label={t.booking.time} value={`${slot.time} (${formatDuration(option.durationMinutes, locale)})`} />
+              <SummaryRow label={t.booking.name} value={details.customerName.replace(/\s+/g, " ").trim()} />
+              <SummaryRow
+                label={t.booking.phoneLabel}
+                value={normalizedPhone.success ? formatPhone(normalizedPhone.data) : details.customerPhone}
+                ltr
+              />
+              {details.note.trim() && <SummaryRow label={t.booking.noteLabel} value={details.note.trim()} />}
+              <SummaryRow label={t.booking.price} value={formatPrice(option.priceCents, locale)} strong />
             </dl>
-            <p className="mt-4 text-[0.75rem] text-muted">Payment is made at the salon.</p>
+            <p className="mt-4 text-[0.75rem] text-muted">{t.booking.payAtSalon}</p>
             <p className="mt-2 text-[0.75rem] leading-relaxed text-muted">
-              Your name and phone number are only used to manage this booking. See our{" "}
-              <Link href="/privacy" target="_blank" className="text-ink underline underline-offset-2">
-                Privacy Policy
+              {t.booking.privacyBefore}{" "}
+              <Link href={href("/privacy")} target="_blank" className="text-ink underline underline-offset-2">
+                {t.booking.privacyLink}
               </Link>
-              .
+              {t.booking.privacyAfter}
             </p>
             {submitError && (
               <p role="alert" className="mt-6 rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-[0.85rem] text-red-700">
@@ -715,9 +737,9 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
               </p>
             )}
             <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
-              <Button type="button" variant="ghost" onClick={() => setStep(4)} disabled={submitting}>Back</Button>
+              <Button type="button" variant="ghost" onClick={() => setStep(4)} disabled={submitting}>{t.booking.back}</Button>
               <Button type="button" onClick={() => void confirm()} loading={submitting}>
-                {submitting ? "Confirming…" : "Confirm reservation"}
+                {submitting ? t.booking.confirming : t.booking.confirm}
               </Button>
             </div>
           </div>
@@ -788,7 +810,9 @@ function ServiceDetailView({
   onBack: () => void;
   onContinue: () => void;
 }) {
-  const info = serviceDetails(service.slug, service.description);
+  const { t, locale } = useI18n();
+  const info = localizedServiceDetails(t, service);
+  const { name } = serviceText(t, service);
   return (
     <div>
       <button
@@ -796,23 +820,23 @@ function ServiceDetailView({
         onClick={onBack}
         className="inline-flex items-center gap-2 text-[0.72rem] tracking-[0.2em] text-muted uppercase transition hover:text-ink"
       >
-        <ArrowLeft className="h-4 w-4" /> All treatments
+        <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" /> {t.booking.allTreatments}
       </button>
 
       <div className="mt-5 grid gap-6 md:grid-cols-[0.85fr_1.5fr] md:gap-8">
         <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:aspect-auto md:min-h-[21rem]">
-          <Image src={serviceImage(service.slug)} {...blurProps(serviceImage(service.slug))} alt={service.name} fill sizes="(min-width: 768px) 34vw, 100vw" className="object-cover" />
+          <Image src={serviceImage(service.slug)} {...blurProps(serviceImage(service.slug))} alt={name} fill sizes="(min-width: 768px) 34vw, 100vw" className="object-cover" />
         </div>
 
         <div className="flex flex-col">
-          <p className="text-[0.66rem] tracking-[0.3em] text-muted uppercase">Treatment</p>
-          <h2 className="mt-1.5 font-serif text-3xl leading-tight text-ink sm:text-[2.3rem]">{service.name}</h2>
+          <p className="text-[0.66rem] tracking-[0.3em] text-muted uppercase">{t.booking.treatment}</p>
+          <h2 className="mt-1.5 font-serif text-3xl leading-tight text-ink sm:text-[2.3rem]">{name}</h2>
 
           <ul className="mt-5 grid grid-cols-3 border-b border-sand pb-5">
             {info.benefits.map((benefit, index) => {
               const Icon = BENEFIT_ICONS[index % BENEFIT_ICONS.length];
               return (
-                <li key={benefit} className={`flex flex-col gap-2.5 px-3 first:pl-0 sm:px-5 ${index > 0 ? "border-l border-sand" : ""}`}>
+                <li key={benefit} className={`flex flex-col gap-2.5 px-3 first:ps-0 sm:px-5 ${index > 0 ? "border-s border-sand" : ""}`}>
                   <Icon className="h-6 w-6 text-ink-soft" aria-hidden />
                   <span className="text-[0.72rem] leading-snug text-ink-soft sm:text-[0.78rem]">{benefit}</span>
                 </li>
@@ -820,7 +844,7 @@ function ServiceDetailView({
             })}
           </ul>
 
-          <p className="mt-5 text-[0.66rem] tracking-[0.3em] text-muted uppercase">Duration</p>
+          <p className="mt-5 text-[0.66rem] tracking-[0.3em] text-muted uppercase">{t.booking.duration}</p>
           <div className="mt-2.5 grid grid-cols-3 gap-2 sm:gap-3">
             {service.options.map((o, index) => {
               const isSelected = o.durationMinutes === selected.durationMinutes;
@@ -837,62 +861,62 @@ function ServiceDetailView({
                       : "border-sand bg-white text-ink shadow-[0_6px_16px_-14px_rgba(60,40,20,0.5)] hover:border-ink"
                   }`}
                 >
-                  <span className="text-[0.72rem] opacity-80">{formatDuration(o.durationMinutes)}</span>
-                  <span className="mt-0.5 font-serif text-lg">{formatPrice(o.priceCents)}</span>
+                  <span className="text-[0.72rem] opacity-80">{formatDuration(o.durationMinutes, locale)}</span>
+                  <span className="mt-0.5 font-serif text-lg">{formatPrice(o.priceCents, locale)}</span>
                 </button>
               );
             })}
           </div>
 
-          <p className="mt-2.5 text-[0.72rem] text-muted">A {BUFFER_MINUTES}-minute rest is kept after every session.</p>
+          <p className="mt-2.5 text-[0.72rem] text-muted">{fmt(t.booking.restNote, { n: BUFFER_MINUTES })}</p>
 
           <button
             type="button"
             onClick={onContinue}
             className="mt-4 inline-flex w-full items-center justify-center gap-3 rounded-full bg-ink py-3.5 text-[0.85rem] tracking-wide text-cream shadow-[0_12px_24px_-14px_rgba(20,18,15,0.9)] transition hover:-translate-y-0.5 hover:bg-black"
           >
-            Book Now · {formatDuration(selected.durationMinutes)}
-            <ArrowRight className="h-4 w-4" />
+            {fmt(t.booking.bookDuration, { duration: formatDuration(selected.durationMinutes, locale) })}
+            <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
           </button>
         </div>
       </div>
 
-      <TreatmentDetails info={info} />
+      <TreatmentDetails info={info} t={t} />
     </div>
   );
 }
 
-function TreatmentDetails({ info }: { info: ServiceDetails }) {
+function TreatmentDetails({ info, t }: { info: ServiceDetails; t: Dictionary }) {
   return (
     <section className="mt-8 rounded-2xl border border-sand/70 bg-white/60 p-4 sm:p-6">
-      <h3 className="px-1 text-[1.05rem] font-medium text-ink">Treatment details</h3>
+      <h3 className="px-1 text-[1.05rem] font-medium text-ink">{t.booking.treatmentDetails}</h3>
       <div className="mt-4 space-y-3">
-        <DetailItem icon={LotusIcon} title="Overview" summary={info.summary}>
+        <DetailItem icon={LotusIcon} title={t.booking.overview} summary={info.summary}>
           <p className="text-[0.86rem] leading-relaxed font-light text-ink-soft">{info.intro}</p>
           <dl className="mt-4 grid grid-cols-2 gap-3">
             <div className="rounded-lg bg-cream px-4 py-3">
-              <dt className="text-[0.6rem] tracking-[0.25em] text-muted uppercase">Pressure</dt>
+              <dt className="text-[0.6rem] tracking-[0.25em] text-muted uppercase">{t.booking.pressure}</dt>
               <dd className="mt-2">
                 <span className="flex gap-1" aria-hidden>
                   {[1, 2, 3, 4, 5].map((level) => (
                     <span key={level} className={`h-1.5 w-5 rounded-full ${level <= PRESSURE_LEVEL[info.pressure] ? "bg-ink" : "bg-sand"}`} />
                   ))}
                 </span>
-                <span className="mt-1.5 block text-[0.8rem] text-ink">{info.pressure}</span>
+                <span className="mt-1.5 block text-[0.8rem] text-ink first-letter:uppercase">{t.pressure[info.pressure]}</span>
               </dd>
             </div>
             <div className="rounded-lg bg-cream px-4 py-3">
-              <dt className="text-[0.6rem] tracking-[0.25em] text-muted uppercase">Ideal for</dt>
+              <dt className="text-[0.6rem] tracking-[0.25em] text-muted uppercase">{t.booking.idealFor}</dt>
               <dd className="mt-2 text-[0.8rem] leading-snug text-ink">{info.idealFor}</dd>
             </div>
           </dl>
           {info.why && (
-            <p className="mt-4 border-l-2 border-ink/20 pl-3 font-serif text-[1.02rem] leading-snug text-ink italic">{info.why}</p>
+            <p className="mt-4 border-s-2 border-ink/20 ps-3 font-serif text-[1.02rem] leading-snug text-ink italic">{info.why}</p>
           )}
         </DetailItem>
 
         {info.highlights.length > 0 && (
-          <DetailItem icon={LeafIcon} title="What to expect" summary={info.expectSummary}>
+          <DetailItem icon={LeafIcon} title={t.booking.whatToExpect} summary={info.expectSummary}>
             <ul className="space-y-2 text-[0.86rem] text-ink-soft">
               {info.highlights.map((h) => (
                 <li key={h} className="flex items-start gap-2.5">
@@ -905,7 +929,7 @@ function TreatmentDetails({ info }: { info: ServiceDetails }) {
         )}
 
         {info.helpsWith.length > 0 && (
-          <DetailItem icon={HeartIcon} title="Helps with" summary={`${info.helpsWith.slice(0, 3).join(", ")}…`}>
+          <DetailItem icon={HeartIcon} title={t.booking.helpsWith} summary={`${info.helpsWith.slice(0, 3).join(t.booking.listSeparator)}…`}>
             <ul className="flex flex-wrap gap-1.5">
               {info.helpsWith.map((item) => (
                 <li key={item} className="rounded-full bg-cream-dark px-3 py-1 text-[0.76rem] text-ink">
@@ -934,7 +958,7 @@ function DetailItem({
   const [open, setOpen] = useState(false);
   return (
     <div className={`rounded-xl border bg-white transition-shadow duration-300 ${open ? "border-sand shadow-[0_14px_30px_-24px_rgba(60,40,20,0.5)]" : "border-sand/70"}`}>
-      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="flex w-full items-center gap-4 px-4 py-3.5 text-left sm:px-5">
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="flex w-full items-center gap-4 px-4 py-3.5 text-start sm:px-5">
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-cream-dark text-ink-soft">
           <Icon className="h-5 w-5" aria-hidden />
         </span>
@@ -946,18 +970,20 @@ function DetailItem({
       </button>
       <div className={`grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
         <div className="overflow-hidden" inert={!open}>
-          <div className="border-t border-sand/70 px-4 pt-4 pb-5 sm:pl-[4.75rem] sm:pr-6">{children}</div>
+          <div className="border-t border-sand/70 px-4 pt-4 pb-5 sm:ps-[4.75rem] sm:pe-6">{children}</div>
         </div>
       </div>
     </div>
   );
 }
 
-function SummaryRow({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+function SummaryRow({ label, value, strong = false, ltr = false }: { label: string; value: string; strong?: boolean; ltr?: boolean }) {
   return (
     <div className="flex items-baseline justify-between gap-4 py-3 sm:gap-6">
       <dt className="shrink-0 text-muted">{label}</dt>
-      <dd className={`min-w-0 text-right break-words ${strong ? "font-serif text-xl text-ink" : "text-ink"}`}>{value}</dd>
+      <dd className={`min-w-0 text-end break-words ${strong ? "font-serif text-xl text-ink" : "text-ink"}`}>
+        {ltr ? <bdi dir="ltr">{value}</bdi> : value}
+      </dd>
     </div>
   );
 }

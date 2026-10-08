@@ -151,6 +151,7 @@ export async function createBooking(rawInput: unknown, options: CreateBookingOpt
               customerName: input.customerName,
               customerPhone: input.customerPhone,
               note: input.note ?? null,
+              locale: input.locale ?? "en",
               // Online bookings wait for the customer's WhatsApp confirmation; the admin books on the customer's behalf.
               // In manual mode the admin confirms by hand, so there is no deadline (null keeps the slot held).
               ...(options.source === "ONLINE"

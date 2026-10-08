@@ -1,4 +1,8 @@
 import type { Prisma } from "@/generated/prisma/client";
+import { DEFAULT_LOCALE, isLocale, type Locale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
+import { formatLongDateIn } from "@/i18n/format";
+import { serviceText } from "@/i18n/services";
 import { canCancel, canComplete, canConfirm, type BookingStatusValue } from "@/lib/booking-status";
 import { addDays, formatLongDate, isValidDateString, localToUtc, toLocalDateString, toLocalTimeString } from "@/lib/time";
 import { holdsSlot } from "@/server/booking/slot-hold";
@@ -28,7 +32,8 @@ export const adminBookingSelect = {
   cancelledAt: true,
   cancelReason: true,
   completedAt: true,
-  service: { select: { name: true, slug: true } },
+  locale: true,
+  service: { select: { name: true, slug: true, description: true } },
   therapist: { select: { name: true } },
 } satisfies Prisma.BookingSelect;
 
@@ -60,6 +65,8 @@ export type AdminBooking = {
   cancelledAt: string | null;
   cancelReason: CancelReason | null;
   completedAt: string | null;
+  /** Language the client booked in, with the service and date written in it for WhatsApp messages. */
+  client: { locale: Locale; serviceName: string; dateLabel: string };
   /** Salon-time labels formatted on the server; browsers may ship outdated Africa/Casablanca rules. */
   labels: {
     confirmUntil: string | null;
@@ -73,6 +80,7 @@ export type AdminBooking = {
 const stamp = (instant: Date) => `${formatLongDate(instant)}, ${toLocalTimeString(instant)}`;
 
 export function toAdminBooking(row: AdminBookingRow): AdminBooking {
+  const locale = isLocale(row.locale) ? row.locale : DEFAULT_LOCALE;
   return {
     id: row.id,
     serviceName: row.service.name,
@@ -98,6 +106,11 @@ export function toAdminBooking(row: AdminBookingRow): AdminBooking {
     cancelledAt: row.cancelledAt?.toISOString() ?? null,
     cancelReason: toCancelReason(row.cancelReason),
     completedAt: row.completedAt?.toISOString() ?? null,
+    client: {
+      locale,
+      serviceName: serviceText(getDictionary(locale), row.service).name,
+      dateLabel: formatLongDateIn(locale, row.startAt),
+    },
     labels: {
       confirmUntil: row.status === "PENDING" && row.confirmationExpiresAt ? toLocalTimeString(row.confirmationExpiresAt) : null,
       created: stamp(row.createdAt),

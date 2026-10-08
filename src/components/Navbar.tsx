@@ -4,14 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Logo from "./Logo";
+import LanguageSwitcher from "./LanguageSwitcher";
 import { ArrowRight, CloseIcon, MenuIcon } from "./Icons";
+import { splitLocale } from "@/i18n/config";
+import { useI18n } from "@/i18n/client";
 import { navLinks, RESERVATION_PATH } from "@/lib/navigation";
 
 const hashOf = (href: string) => href.slice(href.indexOf("#"));
 
 export default function Navbar() {
+  const { t, href } = useI18n();
   const pathname = usePathname();
-  const isHome = pathname === "/";
+  const isHome = splitLocale(pathname).path === "/";
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [activeHash, setActiveHash] = useState("#home");
@@ -97,7 +101,7 @@ export default function Navbar() {
         <span
           ref={progressRef}
           aria-hidden
-          className={`absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-ink/50 transition-opacity duration-500 ${scrolled && !open ? "opacity-100" : "opacity-0"}`}
+          className={`absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 rtl:origin-right bg-ink/50 transition-opacity duration-500 ${scrolled && !open ? "opacity-100" : "opacity-0"}`}
         />
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-12">
           <Logo />
@@ -106,12 +110,12 @@ export default function Navbar() {
             {navLinks.map((link) => (
               <li key={link.href}>
                 <Link
-                  href={link.href}
+                  href={href(link.href)}
                   className={`relative pb-1.5 text-[0.82rem] tracking-wide transition-colors hover:text-ink ${
                     active === hashOf(link.href) || !scrolled ? "text-ink" : "text-ink-soft"
                   } ${scrolled ? "" : "font-medium"}`}
                 >
-                  {link.label}
+                  {t.nav[link.key]}
                   <span
                     className={`absolute -bottom-0.5 left-1/2 h-px -translate-x-1/2 bg-ink transition-all duration-300 ${
                       active === hashOf(link.href) ? "w-full" : "w-0"
@@ -122,31 +126,32 @@ export default function Navbar() {
             ))}
           </ul>
 
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className="flex items-center gap-1 lg:gap-3">
+            <LanguageSwitcher className="lg:me-1" />
             <Link
               href="/admin/login"
-              className="rounded-full border border-ink/30 px-5 py-2.5 text-[0.78rem] tracking-wide text-ink transition hover:border-ink hover:bg-ink hover:text-cream"
+              className="hidden rounded-full border border-ink/30 px-5 py-2.5 text-[0.78rem] tracking-wide text-ink transition hover:border-ink hover:bg-ink hover:text-cream lg:inline-block"
             >
-              Login
+              {t.nav.login}
             </Link>
             <Link
-              href={RESERVATION_PATH}
-              className="rounded-full bg-ink px-6 py-2.5 text-[0.78rem] tracking-wide text-cream transition hover:bg-black"
+              href={href(RESERVATION_PATH)}
+              className="hidden rounded-full bg-ink px-6 py-2.5 text-[0.78rem] tracking-wide text-cream transition hover:bg-black lg:inline-block"
             >
-              Book Now
+              {t.nav.bookNow}
             </Link>
-          </div>
 
-          <button
-            type="button"
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            aria-controls="mobile-menu"
-            className="-mr-2 grid h-11 w-11 place-items-center rounded-full text-ink transition active:bg-ink/5 lg:hidden"
-            onClick={() => setOpen((v) => !v)}
-          >
-            {open ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
-          </button>
+            <button
+              type="button"
+              aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
+              aria-expanded={open}
+              aria-controls="mobile-menu"
+              className="-me-2 grid h-11 w-11 place-items-center rounded-full text-ink transition active:bg-ink/5 lg:hidden"
+              onClick={() => setOpen((v) => !v)}
+            >
+              {open ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+            </button>
+          </div>
         </nav>
       </header>
 
@@ -165,12 +170,12 @@ export default function Navbar() {
               className={`transition-all duration-500 ${open ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
             >
               <Link
-                href={link.href}
+                href={href(link.href)}
                 onClick={close}
                 className="flex items-center justify-between border-b border-sand/80 py-4 font-serif text-[2rem] leading-none text-ink"
               >
-                {link.label}
-                <ArrowRight className="h-4 w-4 text-muted" aria-hidden />
+                {t.nav[link.key]}
+                <ArrowRight className="h-4 w-4 text-muted rtl:-scale-x-100" aria-hidden />
               </Link>
             </li>
           ))}
@@ -181,20 +186,20 @@ export default function Navbar() {
           className={`space-y-3 pt-6 pb-4 transition-all duration-500 ${open ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
         >
           <Link
-            href={RESERVATION_PATH}
+            href={href(RESERVATION_PATH)}
             onClick={close}
             className="flex min-h-13 items-center justify-center gap-2 rounded-full bg-ink text-[0.9rem] tracking-wide text-cream"
           >
-            Book Now <ArrowRight className="h-4 w-4" aria-hidden />
+            {t.nav.bookNow} <ArrowRight className="h-4 w-4 rtl:-scale-x-100" aria-hidden />
           </Link>
           <Link
             href="/admin/login"
             onClick={close}
             className="flex min-h-12 items-center justify-center rounded-full border border-ink/25 text-[0.85rem] text-ink"
           >
-            Login
+            {t.nav.login}
           </Link>
-          <p className="pt-2 text-center text-[0.72rem] tracking-wide text-muted">Open every day · 10:00 – 22:00</p>
+          <p className="pt-2 text-center text-[0.72rem] tracking-wide text-muted">{t.nav.hours}</p>
         </div>
       </div>
     </>

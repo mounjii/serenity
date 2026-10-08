@@ -1,10 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { DEFAULT_LOCALE, LOCALE_COOKIE, LOCALE_HEADER, isLocale, localeFromAcceptLanguage, localizePath, splitLocale } from "@/i18n/config";
 import { SESSION_COOKIE, verifySessionToken } from "@/server/auth/session-token";
 
 const LOGIN_PATH = "/admin/login";
+const ONE_YEAR = 60 * 60 * 24 * 365;
+
+const isAdminOrApiPath = (path: string) =>
+  path === "/admin" || path.startsWith("/admin/") || path === "/api" || path.startsWith("/api/");
 
 /** First line of defence only: pages, server actions and /api/admin routes re-check the session themselves. */
-export async function proxy(request: NextRequest) {
+async function guardAdmin(request: NextRequest): Promise<NextResponse> {
   const { pathname, search } = request.nextUrl;
   const session = await verifySessionToken(request.cookies.get(SESSION_COOKIE)?.value);
 
@@ -27,6 +32,51 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
+const remember = (response: NextResponse, locale: string) => {
+  response.cookies.set(LOCALE_COOKIE, locale, { path: "/", maxAge: ONE_YEAR, sameSite: "lax" });
+  return response;
+};
+
+/**
+ * Public pages live once in the app; /fr/... and /ar/... are rewritten onto them with the language in a
+ * request header. /en/... is the language switcher's way back to the unprefixed English address.
+ */
+function routeLocale(request: NextRequest): NextResponse {
+  const { pathname, search } = request.nextUrl;
+
+  if (pathname === "/en" || pathname.startsWith("/en/")) {
+    const url = new URL(`${pathname.slice(3) || "/"}${search}`, request.url);
+    return remember(NextResponse.redirect(url), "en");
+  }
+
+  const { locale, path } = splitLocale(pathname);
+  if (locale !== DEFAULT_LOCALE && isAdminOrApiPath(path)) {
+    return NextResponse.redirect(new URL(`${path}${search}`, request.url));
+  }
+  if (locale !== DEFAULT_LOCALE) {
+    const headers = new Headers(request.headers);
+    headers.set(LOCALE_HEADER, locale);
+    const response = NextResponse.rewrite(new URL(`${path}${search}`, request.url), { request: { headers } });
+    return request.cookies.get(LOCALE_COOKIE)?.value === locale ? response : remember(response, locale);
+  }
+
+  const saved = request.cookies.get(LOCALE_COOKIE)?.value;
+  const preferred = isLocale(saved) ? saved : localeFromAcceptLanguage(request.headers.get("accept-language"));
+  if (preferred && preferred !== DEFAULT_LOCALE && request.method === "GET") {
+    return NextResponse.redirect(new URL(`${localizePath(preferred, pathname)}${search}`, request.url));
+  }
+
+  const headers = new Headers(request.headers);
+  headers.set(LOCALE_HEADER, DEFAULT_LOCALE);
+  return NextResponse.next({ request: { headers } });
+}
+
+export async function proxy(request: NextRequest) {
+  if (isAdminOrApiPath(request.nextUrl.pathname)) return guardAdmin(request);
+  return routeLocale(request);
+}
+
 export const config = {
-  matcher: ["/admin", "/admin/:path*", "/api/admin/:path*"],
+  // Pages only: no API routes (except admin), Next internals or files with an extension.
+  matcher: ["/((?!api/|_next/|.*\\..*).*)", "/api/admin/:path*"],
 };

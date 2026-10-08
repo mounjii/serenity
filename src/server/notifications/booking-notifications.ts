@@ -1,4 +1,7 @@
 import { after } from "next/server";
+import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
+import { serviceText } from "@/i18n/services";
 import { normalizePhone } from "@/lib/phone";
 import { getDb } from "@/server/db";
 import { getWhatsAppProvider, type WhatsAppMessage } from "@/server/whatsapp";
@@ -57,12 +60,14 @@ async function loadBooking(bookingId: string) {
       confirmationExpiresAt: true,
       customerName: true,
       customerPhone: true,
-      service: { select: { name: true } },
+      locale: true,
+      service: { select: { name: true, slug: true, description: true } },
     },
   });
   if (!booking) return null;
-  const info = { serviceName: booking.service.name, startAt: booking.startAt };
-  const owner = { ...info, customerName: booking.customerName, customerPhone: booking.customerPhone };
+  const locale = isLocale(booking.locale) ? booking.locale : DEFAULT_LOCALE;
+  const info = { serviceName: serviceText(getDictionary(locale), booking.service).name, startAt: booking.startAt, locale };
+  const owner = { serviceName: booking.service.name, startAt: booking.startAt, customerName: booking.customerName, customerPhone: booking.customerPhone };
   return { booking, info, owner };
 }
 

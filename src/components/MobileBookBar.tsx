@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useI18n } from "@/i18n/client";
 import { RESERVATION_PATH } from "@/lib/navigation";
 import { ArrowRight } from "./Icons";
 
@@ -10,6 +11,7 @@ import { ArrowRight } from "./Icons";
  * once the hero is out of view. It steps aside when the booking banner or the footer is on screen.
  */
 export default function MobileBookBar() {
+  const { t, href } = useI18n();
   const [pastHero, setPastHero] = useState(false);
   const [blocked, setBlocked] = useState(false);
 
@@ -55,13 +57,13 @@ export default function MobileBookBar() {
       <div className="flex items-center gap-4">
         <div className="min-w-0 flex-1 leading-tight">
           <p className="font-serif text-[1.1rem] text-ink">Touch Sense</p>
-          <p className="truncate text-[0.7rem] text-muted">Every day · 10:00 – 22:00</p>
+          <p className="truncate text-[0.7rem] text-muted">{t.bookBar.hours}</p>
         </div>
         <Link
-          href={RESERVATION_PATH}
+          href={href(RESERVATION_PATH)}
           className="inline-flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-ink px-6 text-[0.85rem] tracking-wide text-cream shadow-[0_12px_24px_-14px_rgba(20,18,15,0.9)]"
         >
-          Book Now <ArrowRight className="h-4 w-4" aria-hidden />
+          {t.nav.bookNow} <ArrowRight className="h-4 w-4 rtl:-scale-x-100" aria-hidden />
         </Link>
       </div>
     </div>

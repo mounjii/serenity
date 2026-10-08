@@ -1,14 +1,19 @@
+import type { Locale } from "@/i18n/config";
+import { fmt, formatLongDateIn } from "@/i18n/format";
+import { WHATSAPP_WORDING } from "@/i18n/whatsapp";
 import { formatPhone } from "@/lib/phone";
-import { formatLongDate, toLocalTimeString } from "@/lib/time";
+import { toLocalTimeString } from "@/lib/time";
 import type { WhatsAppButton, WhatsAppTemplate } from "./types";
 
 /** Every WhatsApp text lives here. Dates and times are shown in the salon time zone (Africa/Casablanca). */
 
 type Rendered = { template: WhatsAppTemplate; params: Record<string, string>; text: string; buttons?: WhatsAppButton[] };
+/** serviceName is in the client's language for customer messages, in English for owner messages. */
 type BookingInfo = { serviceName: string; startAt: Date };
+type CustomerInfo = BookingInfo & { locale: Locale };
 type OwnerInfo = BookingInfo & { customerName: string; customerPhone: string };
 
-const when = (startAt: Date) => ({ date: formatLongDate(startAt), time: toLocalTimeString(startAt) });
+const when = (startAt: Date, locale: Locale = "en") => ({ date: formatLongDateIn(locale, startAt), time: toLocalTimeString(startAt) });
 
 /** Button payloads parsed back by the webhook (see parseReplyPayload). */
 export const confirmPayload = (bookingId: string) => `confirm:${bookingId}`;
@@ -20,46 +25,31 @@ export function parseReplyPayload(payload: string): { action: "confirm" | "cance
   return { action: match[1].toLowerCase() === "confirm" ? "confirm" : "cancel", bookingId: match[2] };
 }
 
-export function bookingRequestCustomer({ serviceName, startAt, bookingId, deadline }: BookingInfo & { bookingId: string; deadline: Date }): Rendered {
-  const { date, time } = when(startAt);
+export function bookingRequestCustomer({ serviceName, startAt, locale, bookingId, deadline }: CustomerInfo & { bookingId: string; deadline: Date }): Rendered {
+  const { date, time } = when(startAt, locale);
   const until = toLocalTimeString(deadline);
+  const params = { service: serviceName, date, time, deadline: until };
+  const wording = WHATSAPP_WORDING[locale];
   return {
     template: "booking_request_customer",
-    params: { service: serviceName, date, time, deadline: until },
-    text: `Please confirm your reservation. Service: ${serviceName} / Date: ${date} / Time: ${time}. Tap "Confirm" before ${until}, otherwise the reservation is cancelled automatically.`,
+    params,
+    text: fmt(wording.request, params),
     buttons: [
-      { payload: confirmPayload(bookingId), title: "Confirm" },
-      { payload: cancelPayload(bookingId), title: "Cancel" },
+      { payload: confirmPayload(bookingId), title: wording.confirmButton },
+      { payload: cancelPayload(bookingId), title: wording.cancelButton },
     ],
   };
 }
 
-export function bookingConfirmedCustomer({ serviceName, startAt }: BookingInfo): Rendered {
-  const { date, time } = when(startAt);
-  return {
-    template: "booking_confirmed_customer",
-    params: { service: serviceName, date, time },
-    text: `Your reservation is confirmed. Service: ${serviceName} / Date: ${date} / Time: ${time}. Thank you for your reservation.`,
-  };
+function customerNotice(template: WhatsAppTemplate, key: "confirmed" | "cancelled" | "expired", { serviceName, startAt, locale }: CustomerInfo): Rendered {
+  const { date, time } = when(startAt, locale);
+  const params = { service: serviceName, date, time };
+  return { template, params, text: fmt(WHATSAPP_WORDING[locale][key], params) };
 }
 
-export function bookingCancelledCustomer({ serviceName, startAt }: BookingInfo): Rendered {
-  const { date, time } = when(startAt);
-  return {
-    template: "booking_cancelled_customer",
-    params: { service: serviceName, date, time },
-    text: `Your reservation for ${serviceName} on ${date} at ${time} has been cancelled.`,
-  };
-}
-
-export function bookingExpiredCustomer({ serviceName, startAt }: BookingInfo): Rendered {
-  const { date, time } = when(startAt);
-  return {
-    template: "booking_expired_customer",
-    params: { service: serviceName, date, time },
-    text: `Your reservation for ${serviceName} on ${date} at ${time} was not confirmed in time and has been cancelled. You are welcome to book again.`,
-  };
-}
+export const bookingConfirmedCustomer = (info: CustomerInfo) => customerNotice("booking_confirmed_customer", "confirmed", info);
+export const bookingCancelledCustomer = (info: CustomerInfo) => customerNotice("booking_cancelled_customer", "cancelled", info);
+export const bookingExpiredCustomer = (info: CustomerInfo) => customerNotice("booking_expired_customer", "expired", info);
 
 function ownerParams({ serviceName, startAt, customerName, customerPhone }: OwnerInfo) {
   const { date, time } = when(startAt);

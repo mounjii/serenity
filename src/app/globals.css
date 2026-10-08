@@ -87,7 +87,7 @@ body {
 
 .legal-prose ul {
   list-style: disc;
-  padding-left: 1.25rem;
+  padding-inline-start: 1.25rem;
 }
 
 .legal-prose li + li {
@@ -105,6 +105,34 @@ body {
   letter-spacing: 0.32em;
   text-transform: uppercase;
   color: var(--color-muted);
+}
+
+/* Arabic script: letter-spacing breaks the joined letters, and the glyphs need a little more size and room. */
+html[lang="ar"] {
+  font-size: 106.25%;
+}
+
+/* The Latin fonts' generated fallbacks contain Arabic glyphs, so the Arabic fonts must come first. They are
+   named directly (not through their variables) so their own system fallback does not take over Latin text. */
+html[lang="ar"] body,
+html[lang="ar"] .font-sans {
+  font-family: "Tajawal", var(--font-jost), system-ui, sans-serif;
+}
+
+html[lang="ar"] .font-serif {
+  font-family: "Amiri", var(--font-cormorant), "Times New Roman", serif;
+}
+
+html[lang="ar"] * {
+  letter-spacing: 0 !important;
+}
+
+html[lang="ar"] .font-serif {
+  line-height: 1.4;
+}
+
+html[lang="ar"] .eyebrow {
+  font-size: 0.78rem;
 }
 
 ::selection {
@@ -230,6 +258,14 @@ body {
 
 .animate-step-prev {
   animation: step-from-left 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+[dir="rtl"] .animate-step-next {
+  animation-name: step-from-left;
+}
+
+[dir="rtl"] .animate-step-prev {
+  animation-name: step-from-right;
 }
 
 .animate-scroll-cue {

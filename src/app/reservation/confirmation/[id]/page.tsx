@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import RefreshWhilePending from "@/components/RefreshWhilePending";
 import { WhatsAppIcon } from "@/components/Icons";
 import { ButtonAnchor, ButtonLink } from "@/components/ui/Button";
+import { getI18n } from "@/i18n/server";
+import { fmt } from "@/i18n/format";
 import { formatPrice } from "@/lib/format";
 import { normalizePhone, whatsappLink } from "@/lib/phone";
 import { customerCancelText, customerConfirmText } from "@/lib/whatsapp-text";
@@ -13,31 +15,31 @@ import { sweepExpiredBookings } from "@/server/booking/confirmation";
 import { getPublicBooking } from "@/server/booking/public-booking";
 import { getWhatsAppMode } from "@/server/whatsapp";
 
-export const metadata: Metadata = {
-  title: "Your reservation — Touch Sense",
-  robots: { index: false, follow: false },
-};
-
-const STATUS_TEXT = {
-  PENDING: { title: "Confirm your reservation on WhatsApp", note: "We sent you a WhatsApp message. Tap “Confirm” to secure your time." },
-  CONFIRMED: { title: "Your reservation is confirmed", note: "Your confirmation has been sent to you on WhatsApp." },
-  COMPLETED: { title: "Thank you for your visit", note: "We hope to see you again soon." },
-  CANCELLED: { title: "This reservation was cancelled", note: "Feel free to book another time that suits you." },
-} as const;
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.meta.confirmationTitle, robots: { index: false, follow: false } };
+}
 
 export default async function ConfirmationPage({ params }: PageProps<"/reservation/confirmation/[id]">) {
   await connection();
   await sweepExpiredBookings();
-  const { id } = await params;
-  const booking = await getPublicBooking(id);
+  const [{ id }, { t, locale, href }] = await Promise.all([params, getI18n()]);
+  const booking = await getPublicBooking(id, locale);
+  const c = t.confirmation;
+  const statusText = {
+    PENDING: { title: c.pendingTitle, note: c.pendingNote },
+    CONFIRMED: { title: c.confirmedTitle, note: c.confirmedNote },
+    COMPLETED: { title: c.completedTitle, note: c.completedNote },
+    CANCELLED: { title: c.cancelledTitle, note: c.cancelledNote },
+  };
   if (!booking) notFound();
 
   const ownerPhone = normalizePhone(process.env.OWNER_WHATSAPP_PHONE ?? "");
   const selfConfirm = booking.status === "PENDING" && getWhatsAppMode() !== "meta" && ownerPhone !== null;
-  const messageInfo = { customerName: booking.firstName, serviceName: booking.serviceName, date: booking.date, time: booking.time, bookingId: booking.id };
+  const messageInfo = { customerName: booking.firstName, serviceName: booking.serviceName, date: booking.date, time: booking.time, bookingId: booking.id, locale };
   const text = selfConfirm
-    ? { title: "One last step: confirm on WhatsApp", note: "Tap the button, then press send in WhatsApp. We confirm your time as soon as we see your message." }
-    : STATUS_TEXT[booking.status];
+    ? { title: c.selfTitle, note: c.selfNote }
+    : statusText[booking.status];
 
   return (
     <>
@@ -70,17 +72,17 @@ export default async function ConfirmationPage({ params }: PageProps<"/reservati
                 </svg>
               )}
             </div>
-            <p className="eyebrow mt-6">Reservation</p>
+            <p className="eyebrow mt-6">{c.eyebrow}</p>
             <h1 className="mt-3 font-serif text-3xl text-ink sm:text-4xl">{text.title}</h1>
             {booking.firstName && booking.status === "CONFIRMED" && (
-              <p className="mt-3 text-[0.9rem] font-light text-ink-soft">Thank you, {booking.firstName}. We look forward to welcoming you.</p>
+              <p className="mt-3 text-[0.9rem] font-light text-ink-soft">{fmt(c.thanks, { name: booking.firstName })}</p>
             )}
 
-            <dl className="mt-8 divide-y divide-sand border-y border-sand text-left text-[0.9rem]">
-              <Row label="Service" value={booking.serviceName} />
-              <Row label="Date" value={booking.date} />
-              <Row label="Time" value={booking.time} />
-              <Row label="Price" value={formatPrice(booking.priceCents)} />
+            <dl className="mt-8 divide-y divide-sand border-y border-sand text-start text-[0.9rem]">
+              <Row label={t.booking.service} value={booking.serviceName} />
+              <Row label={t.booking.date} value={booking.date} />
+              <Row label={t.booking.time} value={booking.time} />
+              <Row label={t.booking.price} value={formatPrice(booking.priceCents, locale)} />
             </dl>
 
             {booking.status === "PENDING" && (
@@ -89,11 +91,11 @@ export default async function ConfirmationPage({ params }: PageProps<"/reservati
                 <p className="mt-4 rounded-sm bg-gold/10 px-4 py-3 text-[0.85rem] text-ink-soft">
                   {booking.confirmUntil ? (
                     <>
-                      Your time is held until <strong className="font-medium text-ink">{booking.confirmUntil}</strong>. Without confirmation,
-                      the reservation is cancelled automatically.
+                      {c.heldBefore} <strong className="font-medium text-ink">{booking.confirmUntil}</strong>
+                      {c.heldAfter}
                     </>
                   ) : (
-                    "Your time is reserved. Send us your confirmation on WhatsApp and we will confirm your booking."
+                    c.reserved
                   )}
                 </p>
               </>
@@ -102,19 +104,21 @@ export default async function ConfirmationPage({ params }: PageProps<"/reservati
               <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
                 <ButtonAnchor href={whatsappLink(ownerPhone, customerConfirmText(messageInfo))} target="_blank" rel="noopener noreferrer">
                   <WhatsAppIcon className="h-4 w-4" aria-hidden />
-                  Confirm on WhatsApp
+                  {c.confirmWa}
                 </ButtonAnchor>
                 <ButtonAnchor href={whatsappLink(ownerPhone, customerCancelText(messageInfo))} target="_blank" rel="noopener noreferrer" variant="outline">
-                  Cancel on WhatsApp
+                  {c.cancelWa}
                 </ButtonAnchor>
               </div>
             )}
             <p className="mt-6 text-[0.8rem] text-muted">{text.note}</p>
-            <p className="mt-1 text-[0.8rem] text-muted">Payment is made at the salon.</p>
+            <p className="mt-1 text-[0.8rem] text-muted">{t.booking.payAtSalon}</p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <ButtonLink href="/">Back to home</ButtonLink>
-              <ButtonLink href="/reservation" variant="outline">Book another massage</ButtonLink>
+              <ButtonLink href={href("/")}>{c.backHome}</ButtonLink>
+              <ButtonLink href={href("/reservation")} variant="outline">
+                {c.bookAnother}
+              </ButtonLink>
             </div>
           </section>
         </div>
@@ -128,7 +132,7 @@ function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-6 py-3">
       <dt className="text-muted">{label}</dt>
-      <dd className="text-right text-ink">{value}</dd>
+      <dd className="text-end text-ink">{value}</dd>
     </div>
   );
 }
