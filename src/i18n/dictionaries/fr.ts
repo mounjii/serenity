@@ -47,7 +47,7 @@ const fr: Dictionary = {
     title1: "Votre bien-être",
     title2: "est notre priorité",
     text: "Chez Touch Sense, nous croyons que le vrai bien-être naît de l’équilibre. Notre mission : vous offrir un lieu paisible pour vous détendre, retrouver votre énergie et vous reconnecter à vous-même grâce au pouvoir du toucher.",
-    cta: "En savoir plus",
+    cta: "Réserver",
     imageAlt: "Serviettes roulées et bougies",
   },
   treatments: {

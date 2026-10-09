@@ -40,8 +40,7 @@ export default async function ReservationPage({ searchParams }: PageProps<"/rese
           <div className="absolute inset-0 -z-10 bg-gradient-to-r from-cream via-cream/85 to-cream/10 rtl:bg-gradient-to-l sm:via-cream/60 sm:to-transparent" />
           <div className="absolute inset-x-0 bottom-0 -z-10 h-24 bg-gradient-to-t from-cream to-transparent" />
           <div className="mx-auto max-w-6xl px-5 pt-28 pb-14 sm:px-6 sm:pt-40 sm:pb-24 lg:pb-28">
-            <p className="animate-fade-up flex items-center gap-3 text-[0.7rem] tracking-[0.32em] text-bronze uppercase">
-              <span className="h-px w-8 bg-bronze/60" aria-hidden />
+            <p className="animate-fade-up text-[0.7rem] tracking-[0.32em] text-bronze uppercase">
               {t.reservation.eyebrow}
             </p>
             <h1 className="animate-fade-up mt-4 max-w-md font-serif text-[2.7rem] leading-[1.05] text-ink [animation-delay:80ms] sm:mt-5 sm:text-6xl lg:text-7xl">

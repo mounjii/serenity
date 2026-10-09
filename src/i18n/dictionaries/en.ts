@@ -61,7 +61,7 @@ const en = {
     title1: "Your Wellness",
     title2: "Is Our Priority",
     text: "At Touch Sense, we believe that true well-being comes from balance. Our mission is to provide a peaceful space where you can relax, recharge and reconnect with yourself through the power of touch.",
-    cta: "Learn More",
+    cta: "Book Now",
     imageAlt: "Rolled towels and candles",
   },
   treatments: {

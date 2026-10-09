@@ -58,6 +58,7 @@ export default async function RootLayout({
     <html
       lang={locale}
       dir={dirOf(locale)}
+      data-scroll-behavior="smooth"
       className={`${cormorant.variable} ${jost.variable} ${amiri.variable} ${tajawal.variable}`}
       suppressHydrationWarning
     >

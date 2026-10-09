@@ -127,34 +127,6 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
     setHasMoved(true);
   }
 
-  // Arriving on the page: let the hero settle, then glide down to the steps, unless the visitor
-  // already scrolled on their own. Decided when the timer fires, once the browser has settled the
-  // initial scroll position.
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return undefined;
-    let cancel = () => {};
-    let userScrolled = false;
-    const markUserScroll = () => {
-      userScrolled = true;
-    };
-    const inputs = ["wheel", "touchmove"] as const;
-    for (const e of inputs) window.addEventListener(e, markUserScroll, { passive: true });
-    const removeInputs = () => {
-      for (const e of inputs) window.removeEventListener(e, markUserScroll);
-    };
-    const timer = window.setTimeout(() => {
-      removeInputs();
-      if (userScrolled || root.getBoundingClientRect().top <= NAVBAR_OFFSET + 8) return;
-      cancel = smoothScrollTo(root, 850);
-    }, 400);
-    return () => {
-      window.clearTimeout(timer);
-      removeInputs();
-      cancel();
-    };
-  }, []);
-
   // On each step change, line the steps up under the navbar once the new step has been laid out.
   useEffect(() => {
     const root = rootRef.current;

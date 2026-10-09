@@ -6,7 +6,7 @@ import { ArrowRight } from "./Icons";
 import Reveal from "./Reveal";
 
 export default async function About() {
-  const { t } = await getI18n();
+  const { t, href } = await getI18n();
   return (
     <section id="about" className="bg-cream-dark/60">
       <div className="mx-auto grid max-w-7xl items-center gap-9 px-5 py-16 sm:gap-14 sm:px-6 sm:py-24 md:grid-cols-2 lg:gap-24 lg:px-12 lg:py-28">
@@ -29,7 +29,7 @@ export default async function About() {
           </h2>
           <p className="mt-5 text-[0.92rem] leading-[1.8] font-light text-ink-soft sm:mt-7 sm:leading-[1.85]">{t.about.text}</p>
           <Link
-            href="#services"
+            href={href("/reservation")}
             className="group mt-7 inline-flex min-h-12 items-center gap-3 rounded-full bg-ink px-7 text-[0.8rem] tracking-wide text-cream transition hover:bg-black sm:mt-9"
           >
             {t.about.cta}
