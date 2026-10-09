@@ -11,16 +11,16 @@ export default function Logo({ className = "", variant = "horizontal" }: Props) 
   return (
     <Link href={href("/")} aria-label="Touch Sense Thai Massage — home" className={`inline-flex shrink-0 ${className}`}>
       {variant === "stacked" ? (
-        <Image src="/images/ts-logo-black.webp" alt="Touch Sense Thai Massage" width={745} height={144} className="h-10 w-auto sm:h-12" />
+        <Image src="/images/ts-logo-stacked.webp" alt="Touch Sense Thai Massage" width={638} height={409} className="h-20 w-auto sm:h-24" />
       ) : (
         <Image
-          src="/images/ts-logo-black.webp"
+          src="/images/ts-logo-stacked.webp"
           alt="Touch Sense Thai Massage"
-          width={745}
-          height={144}
+          width={638}
+          height={409}
           priority
           data-nav-logo
-          className="h-9 w-auto sm:h-10"
+          className="h-16 w-auto lg:h-20"
         />
       )}
     </Link>

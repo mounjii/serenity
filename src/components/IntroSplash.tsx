@@ -58,12 +58,12 @@ export default function IntroSplash() {
 
   return (
     <div ref={overlayRef} className="intro-overlay fixed inset-0 z-[100] bg-cream" aria-hidden>
-      <div ref={flyerRef} className="fixed top-1/2 left-1/2 w-[min(78vw,560px)] -translate-x-1/2 -translate-y-1/2">
+      <div ref={flyerRef} className="fixed top-1/2 left-1/2 w-[min(66vw,360px)] -translate-x-1/2 -translate-y-1/2">
         <Image
-          src="/images/ts-logo-black.webp"
+          src="/images/ts-logo-stacked.webp"
           alt=""
-          width={745}
-          height={144}
+          width={638}
+          height={409}
           priority
           className="intro-logo-in h-auto w-full"
         />
