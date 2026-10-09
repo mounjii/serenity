@@ -5,7 +5,7 @@ import { getI18n } from "@/i18n/server";
 import { serviceText } from "@/i18n/services";
 import { NONCE_HEADER } from "@/lib/csp";
 import { normalizePhone } from "@/lib/phone";
-import { BUSINESS_ADDRESS, OG_IMAGE, OPENING_HOURS, SITE_NAME, SITE_URL } from "@/lib/site";
+import { BUSINESS_ADDRESS, OG_IMAGE, OPENING_HOURS, SITE_NAME, SITE_URL, SOCIAL_LINKS } from "@/lib/site";
 import { getActiveServices, type PublicService } from "@/server/booking/services";
 
 const absolute = (path: string) => new URL(path, SITE_URL).toString();
@@ -49,6 +49,7 @@ export default async function BusinessJsonLd() {
     currenciesAccepted: "MAD",
     ...(prices.length > 0 ? { priceRange: `${Math.min(...prices)}–${Math.max(...prices)} MAD` } : {}),
     availableLanguage: ["English", "French", "Arabic"],
+    sameAs: Object.values(SOCIAL_LINKS),
     potentialAction: {
       "@type": "ReserveAction",
       target: absolute(localizePath(locale, "/reservation")),

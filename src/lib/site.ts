@@ -14,3 +14,8 @@ export const BUSINESS_ADDRESS = {
 } as const;
 
 export const OPENING_HOURS = { opens: "10:00", closes: "22:00" } as const;
+
+export const SOCIAL_LINKS = {
+  instagram: "https://www.instagram.com/touchsensespa/",
+  facebook: "https://www.facebook.com/profile.php?id=61566777759531",
+} as const;

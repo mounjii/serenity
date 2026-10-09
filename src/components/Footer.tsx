@@ -4,12 +4,12 @@ import { getI18n } from "@/i18n/server";
 import Logo from "./Logo";
 import Reveal from "./Reveal";
 import { navLinks, RESERVATION_PATH } from "@/lib/navigation";
-import { ArrowUp, FacebookIcon, InstagramIcon, PinterestIcon } from "./Icons";
+import { SOCIAL_LINKS } from "@/lib/site";
+import { ArrowUp, FacebookIcon, InstagramIcon } from "./Icons";
 
 const socials = [
-  { label: "Instagram", icon: InstagramIcon, href: "#" },
-  { label: "Facebook", icon: FacebookIcon, href: "#" },
-  { label: "Pinterest", icon: PinterestIcon, href: "#" },
+  { label: "Instagram", icon: InstagramIcon, href: SOCIAL_LINKS.instagram },
+  { label: "Facebook", icon: FacebookIcon, href: SOCIAL_LINKS.facebook },
 ];
 
 export default async function Footer() {
@@ -32,14 +32,16 @@ export default async function Footer() {
 
           <div className="flex gap-3">
             {socials.map((s) => (
-              <Link
+              <a
                 key={s.label}
                 href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label={s.label}
                 className="grid h-10 w-10 place-items-center rounded-full border border-sand text-ink-soft transition hover:border-ink hover:text-ink sm:h-9 sm:w-9"
               >
                 <s.icon className="h-4 w-4" />
-              </Link>
+              </a>
             ))}
           </div>
         </Reveal>
