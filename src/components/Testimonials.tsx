@@ -71,16 +71,22 @@ export default function Testimonials() {
 
           <div className="mt-6 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="relative h-12 w-12 overflow-hidden rounded-full ring-2 ring-white">
-                <Image src={images.avatar} {...blurProps(images.avatar)} alt="" fill sizes="48px" className="object-cover" />
+              <div
+                aria-hidden
+                className="grid h-12 w-12 place-items-center rounded-full bg-sand font-serif text-xl text-ink ring-2 ring-white"
+              >
+                {testimonials[index].name.charAt(0).toUpperCase()}
               </div>
               <div>
-                <p className="text-[0.88rem] text-ink">{testimonials[index].name}</p>
+                <p className="text-[0.88rem] text-ink">
+                  <bdi>{testimonials[index].name}</bdi>
+                </p>
                 <div className="mt-1 flex gap-0.5 text-gold">
                   {Array.from({ length: 5 }).map((_, s) => (
                     <StarIcon key={s} className="h-3.5 w-3.5" />
                   ))}
                 </div>
+                <p className="mt-1 text-[0.7rem] whitespace-nowrap text-muted">{t.testimonials.source}</p>
               </div>
             </div>
 

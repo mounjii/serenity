@@ -80,18 +80,24 @@ const en = {
     items: [
       {
         quote:
-          "An amazing experience! The atmosphere is so calming and the therapist was incredibly professional. I left feeling lighter, both physically and mentally.",
-        name: "Sarah L.",
+          "Very good massage. Everyone speaks English and is very kind, easy to make appointment through WhatsApp. Very clean and professional.",
+        name: "Deniz Narli",
       },
       {
-        quote: "The deep tissue massage was exactly what my back needed. Every detail, from the scent to the music, made me feel completely at ease.",
-        name: "Emma R.",
+        quote:
+          "I had massage from them before and appreciate the knowledge and proficiency. Did have some back issues but became better after a few visits.",
+        name: "Jonathan GDM",
       },
       {
-        quote: "A true sanctuary in the middle of the city. I have been coming every month and each visit feels like a small holiday.",
-        name: "Claire M.",
+        quote: "Wonderful experience",
+        name: "YassineKz",
+      },
+      {
+        quote: "I love it",
+        name: "Naima Imam",
       },
     ],
+    source: "Google review",
     prev: "Previous testimonial",
     next: "Next testimonial",
     show: "Show testimonial {n}",

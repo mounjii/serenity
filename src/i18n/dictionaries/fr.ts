@@ -66,18 +66,24 @@ const fr: Dictionary = {
     items: [
       {
         quote:
-          "Une expérience incroyable ! L’ambiance est si apaisante et la thérapeute d’un grand professionnalisme. Je suis repartie plus légère, physiquement et mentalement.",
-        name: "Sarah L.",
+          "Très bon massage. Tout le monde parle anglais et est très aimable, et il est facile de prendre rendez-vous par WhatsApp. Très propre et professionnel.",
+        name: "Deniz Narli",
       },
       {
-        quote: "Le massage profond était exactement ce dont mon dos avait besoin. Chaque détail, du parfum à la musique, m’a mise parfaitement à l’aise.",
-        name: "Emma R.",
+        quote:
+          "J’avais déjà reçu un massage chez eux et j’apprécie leur savoir-faire et leur compétence. J’avais quelques problèmes de dos, qui se sont améliorés après quelques séances.",
+        name: "Jonathan GDM",
       },
       {
-        quote: "Un vrai havre de paix en pleine ville. Je viens chaque mois et chaque visite a un air de petites vacances.",
-        name: "Claire M.",
+        quote: "Une expérience merveilleuse",
+        name: "YassineKz",
+      },
+      {
+        quote: "J’adore",
+        name: "Naima Imam",
       },
     ],
+    source: "Avis Google · traduit",
     prev: "Témoignage précédent",
     next: "Témoignage suivant",
     show: "Afficher le témoignage {n}",
