@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { Amiri, Cormorant_Garamond, Jost, Tajawal } from "next/font/google";
 import { I18nProvider } from "@/i18n/client";
 import { dirOf } from "@/i18n/config";
 import { getI18n } from "@/i18n/server";
+import { NONCE_HEADER } from "@/lib/csp";
 import { INTRO_BOOT_SCRIPT } from "@/lib/intro";
 import "./globals.css";
 
@@ -54,6 +56,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const { locale, t } = await getI18n();
+  const nonce = (await headers()).get(NONCE_HEADER) ?? undefined;
   return (
     <html
       lang={locale}
@@ -63,7 +66,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: INTRO_BOOT_SCRIPT }} />
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: INTRO_BOOT_SCRIPT }} />
       </head>
       <body className="antialiased" suppressHydrationWarning>
         <I18nProvider locale={locale} dictionary={t}>
