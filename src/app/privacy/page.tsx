@@ -6,13 +6,14 @@ import Footer from "@/components/Footer";
 import { INTL_LOCALE } from "@/i18n/config";
 import type { PrivacyBlock } from "@/i18n/dictionaries/en";
 import { fmt } from "@/i18n/format";
+import { pageMetadata } from "@/i18n/seo";
 import { getI18n } from "@/i18n/server";
 import { RESERVATION_PATH } from "@/lib/navigation";
 import { formatPhone, normalizePhone } from "@/lib/phone";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getI18n();
-  return { title: t.meta.privacyTitle, description: t.meta.privacyDescription };
+  const { t, locale } = await getI18n();
+  return pageMetadata(locale, "/privacy", t.meta.privacyTitle, t.meta.privacyDescription);
 }
 
 const LAST_UPDATED = new Date("2026-10-08T12:00:00.000Z");

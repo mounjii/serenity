@@ -6,6 +6,7 @@ import { ArrowDown } from "@/components/Icons";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BookingFlow from "@/components/booking/BookingFlow";
+import { pageMetadata } from "@/i18n/seo";
 import { getI18n } from "@/i18n/server";
 import { blurProps, images } from "@/lib/images";
 import { getBookableDays } from "@/server/booking/calendar";
@@ -14,8 +15,8 @@ import { getActiveServices } from "@/server/booking/services";
 const greatVibes = Great_Vibes({ variable: "--font-great-vibes", subsets: ["latin"], weight: "400" });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getI18n();
-  return { title: t.meta.reservationTitle, description: t.meta.reservationDescription };
+  const { t, locale } = await getI18n();
+  return pageMetadata(locale, "/reservation", t.meta.reservationTitle, t.meta.reservationDescription);
 }
 
 export default async function ReservationPage({ searchParams }: PageProps<"/reservation">) {

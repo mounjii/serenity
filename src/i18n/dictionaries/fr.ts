@@ -2,9 +2,10 @@ import type { Dictionary } from "./en";
 
 const fr: Dictionary = {
   meta: {
-    title: "Touch Sense — Massage thaï",
-    description: "Échappez au quotidien et offrez à votre corps et à votre esprit l’attention qu’ils méritent. Massages et soins bien-être professionnels.",
-    reservationTitle: "Réserver un massage — Touch Sense",
+    title: "Touch Sense — Massage thaï et spa à Rabat",
+    description:
+      "Massage thaï, massage à l’huile, réflexologie et plus encore à Rabat (Av. Al Haouz). Thérapeutes professionnels, ouvert tous les jours de 10:00 à 22:00. Réservez en ligne en une minute.",
+    reservationTitle: "Réserver un massage à Rabat — Touch Sense",
     reservationDescription: "Choisissez votre soin, un horaire, et confirmez votre réservation en une minute.",
     confirmationTitle: "Votre réservation — Touch Sense",
     privacyTitle: "Politique de confidentialité — Touch Sense",

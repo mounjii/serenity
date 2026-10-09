@@ -6,6 +6,7 @@ import { dirOf } from "@/i18n/config";
 import { getI18n } from "@/i18n/server";
 import { NONCE_HEADER } from "@/lib/csp";
 import { INTRO_BOOT_SCRIPT } from "@/lib/intro";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -40,7 +41,7 @@ const tajawal = Tajawal({
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
-  return { title: t.meta.title, description: t.meta.description };
+  return { metadataBase: new URL(SITE_URL), title: t.meta.title, description: t.meta.description };
 }
 
 export const viewport: Viewport = {

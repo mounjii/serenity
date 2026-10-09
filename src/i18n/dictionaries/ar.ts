@@ -2,9 +2,10 @@ import type { Dictionary } from "./en";
 
 const ar: Dictionary = {
   meta: {
-    title: "Touch Sense — تدليك تايلاندي",
-    description: "ابتعد عن ضغوط الحياة اليومية وامنح جسدك وعقلك العناية التي يستحقانها. جلسات تدليك وعناية احترافية.",
-    reservationTitle: "احجز جلسة تدليك — Touch Sense",
+    title: "Touch Sense — تدليك تايلاندي وسبا في الرباط",
+    description:
+      "تدليك تايلاندي، تدليك بالزيت، علاج انعكاسي للقدمين وغيرها في الرباط (شارع الحوز). معالجون محترفون، مفتوح يوميًا من 10:00 إلى 22:00. احجز عبر الإنترنت في دقيقة.",
+    reservationTitle: "احجز جلسة تدليك في الرباط — Touch Sense",
     reservationDescription: "اختر علاجك وحدد الوقت المناسب وأكّد حجزك في دقيقة واحدة.",
     confirmationTitle: "حجزك — Touch Sense",
     privacyTitle: "سياسة الخصوصية — Touch Sense",

@@ -16,9 +16,10 @@ export type PrivacyBlock = { p: string; link?: { text: string; href: string } } 
 
 const en = {
   meta: {
-    title: "Touch Sense — Thai Massage",
-    description: "Escape the everyday and give your body and mind the care they deserve. Professional massage and wellness treatments.",
-    reservationTitle: "Book a massage — Touch Sense",
+    title: "Touch Sense — Thai Massage & Spa in Rabat",
+    description:
+      "Thai massage, oil massage, reflexology and more in Rabat (Ave Al Haouz). Professional therapists, open every day 10:00–22:00. Book online in a minute.",
+    reservationTitle: "Book a massage in Rabat — Touch Sense",
     reservationDescription: "Choose your treatment, pick a time and confirm your reservation in a minute.",
     confirmationTitle: "Your reservation — Touch Sense",
     privacyTitle: "Privacy Policy — Touch Sense",
