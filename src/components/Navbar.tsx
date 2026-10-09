@@ -12,6 +12,9 @@ import { navLinks, RESERVATION_PATH } from "@/lib/navigation";
 
 const hashOf = (href: string) => href.slice(href.indexOf("#"));
 
+/** The admin area stays reachable at /admin/login; it is only left out of the public navigation for now. */
+const SHOW_LOGIN = false;
+
 export default function Navbar() {
   const { t, href } = useI18n();
   const pathname = usePathname();
@@ -128,12 +131,14 @@ export default function Navbar() {
 
           <div className="flex items-center gap-1 lg:gap-3">
             <LanguageSwitcher className="lg:me-1" />
-            <Link
-              href="/admin/login"
-              className="hidden rounded-full border border-ink/30 px-5 py-2.5 text-[0.78rem] tracking-wide text-ink transition hover:border-ink hover:bg-ink hover:text-cream lg:inline-block"
-            >
-              {t.nav.login}
-            </Link>
+            {SHOW_LOGIN && (
+              <Link
+                href="/admin/login"
+                className="hidden rounded-full border border-ink/30 px-5 py-2.5 text-[0.78rem] tracking-wide text-ink transition hover:border-ink hover:bg-ink hover:text-cream lg:inline-block"
+              >
+                {t.nav.login}
+              </Link>
+            )}
             <Link
               href={href(RESERVATION_PATH)}
               className="hidden rounded-full bg-ink px-6 py-2.5 text-[0.78rem] tracking-wide text-cream transition hover:bg-black lg:inline-block"
@@ -192,13 +197,15 @@ export default function Navbar() {
           >
             {t.nav.bookNow} <ArrowRight className="h-4 w-4 rtl:-scale-x-100" aria-hidden />
           </Link>
-          <Link
-            href="/admin/login"
-            onClick={close}
-            className="flex min-h-12 items-center justify-center rounded-full border border-ink/25 text-[0.85rem] text-ink"
-          >
-            {t.nav.login}
-          </Link>
+          {SHOW_LOGIN && (
+            <Link
+              href="/admin/login"
+              onClick={close}
+              className="flex min-h-12 items-center justify-center rounded-full border border-ink/25 text-[0.85rem] text-ink"
+            >
+              {t.nav.login}
+            </Link>
+          )}
           <p className="pt-2 text-center text-[0.72rem] tracking-wide text-muted">{t.nav.hours}</p>
         </div>
       </div>
