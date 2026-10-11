@@ -44,16 +44,7 @@ export function serviceImage(slug: string): string {
   return imageBySlug[slug] ?? images.gallery[0];
 }
 
-/** Wide 16:9 photos with the subject in the left third, for the booking cards that reveal the full image on hover. */
-const cardFileBySlug: Record<string, string> = {
-  "head-neck-shoulder-massage": "head-neck",
-  "thai-oil-massage": "thai-oil",
-  "thai-massage": "thai",
-  "sports-massage": "sports",
-  "foot-reflexology": "foot",
-  "hot-herbal-compress": "herbal",
-};
-
+/** 5:2 photos with the subject in the left third, for the booking cards that reveal the full image on hover. */
 export function serviceCardImage(slug: string): string {
-  return slug in imageBySlug ? local(`treatments/wide/${cardFileBySlug[slug] ?? slug}`) : serviceImage(slug);
+  return slug in imageBySlug ? local(`treatments/card/${slug}`) : serviceImage(slug);
 }

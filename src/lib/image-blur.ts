@@ -64,4 +64,12 @@ export const BLUR_DATA: Record<string, string> = {
   "/images/treatments/foot-reflexology-massage.webp": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAADwAQCdASoQAAwAA4BaJaACdAYsstTw9YAA/lPTnLUdQlNxHLQaJ6nExblPq1QuSXH71z+A8XAPmvvuudYDt9ClWTBnay7gEoXtdMvVVOmldJ+fyAA=",
   "/images/treatments/wide/herbal.webp": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAAAQAgCdASoQAAkAA4BaJaACdAYq1N0KVj4AAP66ga6jBp2I/oVU09Y9QS805JuFf2Z09d3uREkq6YR9gdZYDCDT70RWwbDenRi/GxkB+76XVJgYZ55NTKgA",
   "/images/treatments/hot-herbal-compress.webp": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAADwAQCdASoQAAwAA4BaJbACdAC4m1r+1QAA/jOQleY1u0u4lNjc35B7lNgQiDOhbKtEa2hEeTVwj7k80sx9SGs91WuD0O/euU7eA1WQSYa9eNcPMUDHO4JnkEReAAAA",
+  "/images/treatments/card/swedish-massage.webp": "data:image/webp;base64,UklGRlwAAABXRUJQVlA4IFAAAADwAQCdASoQAAYAA4BaJbACdAEWPGosmaAA/qYLYFUkoJqiZQ+hiK32BCzKQPzT6wPcK1zuzo/fgNpIpivxVW+rxeDRGUL+8jnpLCMhN4AAAA==",
+  "/images/treatments/card/thai-oil-massage.webp": "data:image/webp;base64,UklGRkoAAABXRUJQVlA4ID4AAADQAQCdASoQAAYAA4BaJbACdADdhirz4AD+pozTTXZARwMNWmssp3PybPFHc/JvNUYEq3PmbtUMU+9OSWAAAA==",
+  "/images/treatments/card/aroma-massage.webp": "data:image/webp;base64,UklGRk4AAABXRUJQVlA4IEIAAADQAQCdASoQAAYAA4BaJZgCdADbS416gAD+hYcbEm3v53yrR0BHOxPy1IXZilS7J44jvs7bp82j63patpzOleEXOAA=",
+  "/images/treatments/card/head-neck-shoulder-massage.webp": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAAAQAgCdASoQAAYAA4BaJagCdAYs3STdxYNMAP5FbCgvn0e+ind8xaYJAK0v1kdAdY1eVfXn4/DGbv5zy45A3LK/J2sqWwN4TzXDUZsHZAA=",
+  "/images/treatments/card/thai-massage.webp": "data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAADQAQCdASoQAAYAA4BaJYgCdACyqSXVGAD47mPHOMXgUU+Jf5zU7q/PZ5by2PcwhmshaLKGTO1DI/rNrCfSXS5DYMttggAA",
+  "/images/treatments/card/sports-massage.webp": "data:image/webp;base64,UklGRlwAAABXRUJQVlA4IFAAAAAQAgCdASoQAAYAA4BaJagCdAEflamcPXToAP7dnt07fDDH/Nh/3IVUx7aXy+gJEhQ20mHdLRO7U0V7I5JYzxJyKmTcfiFvu/BtR3W13aEgAA==",
+  "/images/treatments/card/foot-reflexology.webp": "data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAACQAQCdASoQAAYAA4BaJZgCdAB06AgA/elzrN4KTolVJMuFrJYe5s2GI3MTfSXt3xALwCaffGVx9EQUjV1UuNSIB1YsQuoO4AA=",
+  "/images/treatments/card/hot-herbal-compress.webp": "data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAADwAQCdASoQAAYAA4BaJbACdADdYsvbHcgA/s7jrexm83uUGtRlCXbEXc1fKf0TgS+3hOqr822qQ6gwQsnOkIiityAAAA==",
 };
