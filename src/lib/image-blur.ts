@@ -58,4 +58,6 @@ export const BLUR_DATA: Record<string, string> = {
   "/images/treatments/thai-oil-massage.webp": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAADwAQCdASoQAAwAA4BaJagCdACv7F/SFMAA4m2KWM67V8wzOS3mD0AjKykRPQs0p+BQ03PLZ0fP3ZN2E6pvkzZCAfTcyJmlVjKeWauJyc96XVc1loqAAA==",
   "/images/treatments/wide/thai.webp": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAADQAQCdASoQAAkAA4BaJYgCdAC4MMS9gAD+ZxrJecz3ixpXcEHAkX0c0ap03lOBjvhb/JIb+0dwiy7qNtaB8WQDOCutlz0pCF/rYYVMyzkcVpNHlQ4AAA==",
   "/images/treatments/thai-massage.webp": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAADwAQCdASoQAAwAA4BaJYgCdADhkHMzlXAA/mcayXoUBVMaL/vKWwdCrA/N570fEzbbmh7EUQseX9K/ClVZtizUCZnlLiBQf2z4BO4FkRs02GFTMs5HFaTSL0FgAA==",
+  "/images/treatments/wide/sports.webp": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAAAwAgCdASoQAAkAA4BaJbACdAdwB9w6Pmm/wAD+0pN5uPW9ePvwwk+pBx4f2uH0Y7PsrBEJhvppkaalaRqHgrywhCozd2PLW3EB/u8jLf2NAV/OHW2wzJSaoZHbY+BAAAA=",
+  "/images/treatments/sports-massage.webp": "data:image/webp;base64,UklGRnwAAABXRUJQVlA4IHAAAADwAQCdASoQAAwAA4BaJbACdAYvg4OlcYAA/ognfTdL98NtpsYMx6FEELp7nPb/riwOUPLbaPXm+Y+CxMSw02Nzgounl8txM13r/s70kw8wvLxU8AeuvhxMH85V35jLK+pyz2A+//W1s3xrtFVDQAAA",
 };
