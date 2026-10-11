@@ -52,4 +52,6 @@ export const BLUR_DATA: Record<string, string> = {
   "/images/treatments/wide/sports-massage.webp": "data:image/webp;base64,UklGRlIAAABXRUJQVlA4IEYAAACwAQCdASoQAAkAA4BaJQBOgBI2vXAAAM43wqQRXSNzkPopjaopcCf4t4c6kh42CwApeNxhqnFkt1MDP3o6ingRuO+yWAAA",
   "/images/treatments/wide/foot-reflexology.webp": "data:image/webp;base64,UklGRlAAAABXRUJQVlA4IEQAAACwAQCdASoQAAkAA4BaJQBOgCELk2qAAP7IFaEw9736M9EZ13Yebw75WL0ppJLEvyUWE0SYWymPpyo8VR+75F55GEcAAA==",
   "/images/treatments/wide/hot-herbal-compress.webp": "data:image/webp;base64,UklGRlYAAABXRUJQVlA4IEoAAACwAQCdASoQAAkAA4BaJQBOgBSXyIMMAP7kXz4lOtTiNn8Ko9MD55ygdNaZZleOH6rjMGtpEBhhhLhWC41kF3/Mz2pGaYbLKeQAAA==",
+  "/images/treatments/wide/head-neck.webp": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAADQAQCdASoQAAkAA4BaJagCdADbZkKk8AD+NDh19RzVEhgZEgyD6Ll5HeqJvSfY7vBnazVFqx7aaoYx09tWJqQzdfO1oc6RKAaTiApoKddLFfq4AUVAAA==",
+  "/images/treatments/head-neck-shoulder.webp": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAABQAgCdASoQAAwAA4BaJbACdAELzExFj57gl8AA4DQtJlVgt2Hw49EHI67ug5/AM8LTYpW5uDYghms30GHyQBNUz1QIKM0eysVqpggZ2mDYztWOUl0nh25EsFbMANHKAAA=",
 };
