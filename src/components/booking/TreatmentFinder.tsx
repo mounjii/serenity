@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, CheckIcon, LotusIcon } from "@/components/Icons";
+import { ArrowLeft, ArrowRight, CheckIcon, FeetIcon, LotusIcon, NeckIcon, RunnerIcon, StretchIcon, WavesIcon } from "@/components/Icons";
 import { formatDuration } from "@/lib/format";
-import { blurProps, serviceImage } from "@/lib/images";
+import { blurProps, images, serviceImage } from "@/lib/images";
+import type { Goal } from "@/lib/service-details";
 import { useI18n } from "@/i18n/client";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
@@ -22,6 +23,15 @@ import {
 import type { PublicService } from "@/server/booking/services";
 
 const STORAGE_KEY = "serenity-finder";
+
+const GOAL_LOOK: Record<Goal, { image: string; icon: (p: React.SVGProps<SVGSVGElement>) => React.JSX.Element }> = {
+  relax: { image: images.about, icon: LotusIcon },
+  pain: { image: images.swedish, icon: WavesIcon },
+  neck: { image: images.headNeck, icon: NeckIcon },
+  sport: { image: images.sports, icon: RunnerIcon },
+  feet: { image: images.footReflexology, icon: FeetIcon },
+  flexibility: { image: images.thai, icon: StretchIcon },
+};
 
 type Draft = Partial<FinderAnswers> & { pressureSet?: boolean };
 
@@ -83,27 +93,45 @@ export default function TreatmentFinder({ services, onPick, onClose }: Props) {
           <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" /> {question === 0 || question === 3 ? t.booking.allTreatments : t.finder.back}
         </button>
         {question < 3 && (
-          <span className="flex items-center gap-1.5" aria-label={fmt(t.finder.questionOf, { n: question + 1 })}>
+          <ol className="flex items-center" aria-label={fmt(t.finder.questionOf, { n: question + 1 })}>
             {[0, 1, 2].map((i) => (
-              <span key={i} className={`h-1 rounded-full transition-all duration-500 ${i <= question ? "w-8 bg-ink" : "w-4 bg-sand"}`} />
+              <li key={i} className="flex items-center">
+                {i > 0 && <span aria-hidden className={`h-px w-5 transition-colors duration-500 sm:w-9 ${i <= question ? "bg-ink" : "bg-sand"}`} />}
+                <span
+                  aria-current={i === question ? "step" : undefined}
+                  className={`grid h-7 w-7 place-items-center rounded-full text-[0.7rem] transition-colors duration-500 ${
+                    i <= question ? "bg-ink text-cream" : "border border-sand bg-white text-muted"
+                  }`}
+                >
+                  {i < question ? <CheckIcon className="h-3.5 w-3.5" /> : i + 1}
+                </span>
+              </li>
             ))}
-          </span>
+          </ol>
         )}
       </div>
 
       <div key={question} className="animate-step-next mt-6">
         {question === 0 && (
-          <Question eyebrow={fmt(t.finder.questionOf, { n: 1 })} title={t.finder.q1}>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <Question eyebrow={fmt(t.finder.questionOf, { n: 1 })} title={t.finder.q1} hint={t.finder.q1Hint}>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
               {GOAL_CHOICES.map((c, i) => (
-                <Choice key={c.value} index={i} selected={draft.goal === c.value} label={t.finder.goals[c.value].label} hint={t.finder.goals[c.value].hint} onClick={() => update({ goal: c.value }, 1)} />
+                <GoalChoice
+                  key={c.value}
+                  index={i}
+                  goal={c.value}
+                  selected={draft.goal === c.value}
+                  label={t.finder.goals[c.value].label}
+                  hint={t.finder.goals[c.value].hint}
+                  onClick={() => update({ goal: c.value }, 1)}
+                />
               ))}
             </div>
           </Question>
         )}
 
         {question === 1 && (
-          <Question eyebrow={fmt(t.finder.questionOf, { n: 2 })} title={t.finder.q2}>
+          <Question eyebrow={fmt(t.finder.questionOf, { n: 2 })} title={t.finder.q2} hint={t.finder.q2Hint}>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {PRESSURE_CHOICES.map((c, i) => (
                 <Choice
@@ -121,7 +149,7 @@ export default function TreatmentFinder({ services, onPick, onClose }: Props) {
         )}
 
         {question === 2 && (
-          <Question eyebrow={fmt(t.finder.questionOf, { n: 3 })} title={t.finder.q3}>
+          <Question eyebrow={fmt(t.finder.questionOf, { n: 3 })} title={t.finder.q3} hint={t.finder.q3Hint}>
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               {TIME_CHOICES.map((c, i) => (
                 <Choice key={c.value} index={i} selected={draft.minutes === c.value} label={t.finder.times[i]} onClick={() => update({ minutes: c.value }, 3)} />
@@ -151,13 +179,67 @@ function reasonText(t: Dictionary, locale: Locale, reason: FinderReason): string
   }
 }
 
-function Question({ eyebrow, title, children }: { eyebrow: string; title: string; children: React.ReactNode }) {
+function Question({ eyebrow, title, hint, children }: { eyebrow: string; title: string; hint: string; children: React.ReactNode }) {
   return (
     <div>
       <p className="text-[0.66rem] tracking-[0.3em] text-muted uppercase">{eyebrow}</p>
-      <h2 className="mt-1.5 font-serif text-2xl text-ink sm:text-[2rem]">{title}</h2>
+      <h2 className="mt-1.5 font-serif text-[1.7rem] leading-tight text-ink sm:text-[2.3rem]">{title}</h2>
+      <p className="mt-2 max-w-2xl text-[0.86rem] leading-relaxed font-light text-ink-soft">{hint}</p>
       <div className="mt-6">{children}</div>
     </div>
+  );
+}
+
+function GoalChoice({
+  index,
+  goal,
+  selected,
+  label,
+  hint,
+  onClick,
+}: {
+  index: number;
+  goal: Goal;
+  selected: boolean;
+  label: string;
+  hint: string;
+  onClick: () => void;
+}) {
+  const { image, icon: Icon } = GOAL_LOOK[goal];
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      style={{ animationDelay: `${60 + index * 50}ms` }}
+      className={`animate-fade-up group flex flex-col overflow-hidden rounded-xl border bg-white text-start transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-24px_rgba(60,40,20,0.6)] ${
+        selected ? "border-bronze shadow-[0_0_0_1px_var(--color-bronze)]" : "border-sand hover:border-ink/40"
+      }`}
+    >
+      <span className="relative block h-20 overflow-hidden sm:h-28">
+        <Image
+          src={image} {...blurProps(image)}
+          alt=""
+          fill
+          sizes="(min-width: 1024px) 300px, 50vw"
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+        />
+      </span>
+      <span className="relative flex flex-1 flex-col px-3.5 pt-7 pb-3.5 sm:px-5 sm:pt-8 sm:pb-4">
+        <span className="absolute -top-6 start-3.5 grid h-12 w-12 place-items-center rounded-full border border-sand bg-cream text-bronze shadow-sm sm:start-5">
+          <Icon className="h-7 w-7" />
+        </span>
+        <span className="flex items-start justify-between gap-2">
+          <span className="font-serif text-[1rem] leading-tight text-ink sm:text-[1.2rem]">{label}</span>
+          {selected ? (
+            <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-bronze" />
+          ) : (
+            <ArrowRight className="mt-0.5 hidden h-4 w-4 shrink-0 text-ink-soft transition group-hover:translate-x-0.5 sm:block rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5" />
+          )}
+        </span>
+        <span className="mt-1 text-[0.72rem] leading-snug font-light text-muted sm:text-[0.78rem]">{hint}</span>
+      </span>
+    </button>
   );
 }
 

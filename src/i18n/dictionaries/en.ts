@@ -223,10 +223,13 @@ const en = {
   },
   finder: {
     back: "Back",
-    questionOf: "Question {n} of 3",
-    q1: "What would you like help with?",
+    questionOf: "Step {n} of 3",
+    q1: "What brings you here today?",
+    q1Hint: "Choose what best describes how you feel. This helps us suggest the most suitable treatment for you.",
     q2: "What pressure do you enjoy?",
+    q2Hint: "Every body is different. Your therapist will also adapt during the session.",
     q3: "How much time do you have?",
+    q3Hint: "We will match the treatment to the time you can give yourself.",
     goals: {
       relax: { label: "Stress & relaxation", hint: "Switch off and unwind" },
       pain: { label: "Muscle pain & knots", hint: "Back, tight or aching muscles" },

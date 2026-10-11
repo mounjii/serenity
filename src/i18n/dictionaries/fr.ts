@@ -209,10 +209,13 @@ const fr: Dictionary = {
   },
   finder: {
     back: "Retour",
-    questionOf: "Question {n} sur 3",
-    q1: "Sur quoi souhaitez-vous agir ?",
+    questionOf: "Étape {n} sur 3",
+    q1: "Qu’est-ce qui vous amène aujourd’hui ?",
+    q1Hint: "Choisissez ce qui décrit le mieux ce que vous ressentez. Cela nous aide à vous suggérer le soin le plus adapté.",
     q2: "Quelle pression aimez-vous ?",
+    q2Hint: "Chaque corps est différent. Votre thérapeute s’adaptera aussi pendant la séance.",
     q3: "De combien de temps disposez-vous ?",
+    q3Hint: "Nous adaptons le soin au temps que vous pouvez vous accorder.",
     goals: {
       relax: { label: "Stress et détente", hint: "Déconnecter et lâcher prise" },
       pain: { label: "Douleurs et nœuds musculaires", hint: "Dos, muscles tendus ou douloureux" },

@@ -277,6 +277,61 @@ export function MailIcon(props: IconProps) {
   );
 }
 
+export function WavesIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 48 48" {...base} {...props}>
+      <path d="M16 12c-3 4 3 8 0 12s3 8 0 12" />
+      <path d="M24 12c-3 4 3 8 0 12s3 8 0 12" />
+      <path d="M32 12c-3 4 3 8 0 12s3 8 0 12" />
+    </svg>
+  );
+}
+
+export function NeckIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 48 48" {...base} {...props}>
+      <circle cx="24" cy="15" r="6" />
+      <path d="M21 21v4M27 21v4" />
+      <path d="M10 39c0-8 6-12 14-12s14 4 14 12" />
+      <path d="M17 29.5c2 1.5 4.3 2.2 7 2.2s5-.7 7-2.2" />
+    </svg>
+  );
+}
+
+export function RunnerIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 48 48" {...base} {...props}>
+      <circle cx="29" cy="9.5" r="3.5" />
+      <path d="m19 19 7-3 5 4 5 1" />
+      <path d="m26 16-3 10 7 5-2 9" />
+      <path d="m23 26-4 6-7 1" />
+      <path d="m19 19-4 5" />
+    </svg>
+  );
+}
+
+export function FeetIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 48 48" {...base} {...props}>
+      <path d="M15 17c-3 0-4.5 4-4.5 9s1.5 8 4.5 8 4.5-3 4.5-8-1.5-9-4.5-9Z" />
+      <path d="M33 14c-3 0-4.5 4-4.5 9s1.5 8 4.5 8 4.5-3 4.5-8-1.5-9-4.5-9Z" />
+      <path d="M12.5 37.5c.5 1.5 1.5 2.5 2.5 2.5s2-1 2.5-2.5" />
+      <path d="M30.5 34.5c.5 1.5 1.5 2.5 2.5 2.5s2-1 2.5-2.5" />
+    </svg>
+  );
+}
+
+export function StretchIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 48 48" {...base} {...props}>
+      <circle cx="24" cy="14" r="3.5" />
+      <path d="M14 6l6 10h8l6-10" />
+      <path d="M20 16l1 12h6l1-12" />
+      <path d="m21 28-4 13M27 28l4 13" />
+    </svg>
+  );
+}
+
 export function WhatsAppIcon(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
