@@ -14,7 +14,7 @@ import { blurProps, serviceCardImage, serviceImage } from "@/lib/images";
 import { formatPhone } from "@/lib/phone";
 import { PRESSURE_LEVEL, type ServiceDetails } from "@/lib/service-details";
 import { pickOption } from "@/lib/service-options";
-import { NAVBAR_OFFSET, smoothScrollTo } from "@/lib/smooth-scroll";
+import { NAVBAR_OFFSET, prefersReducedMotion, smoothScrollTo } from "@/lib/smooth-scroll";
 import type { FinderMatch } from "@/lib/treatment-finder";
 import TreatmentFinder from "./TreatmentFinder";
 import { useI18n } from "@/i18n/client";
@@ -42,6 +42,8 @@ type Details = { customerName: string; customerPhone: string; note: string; webs
 const STEP_IDS: Step[] = [1, 2, 3, 4, 5];
 
 const SLOT_REFRESH_MS = 30_000;
+/** How long a tapped treatment card shows its photo reveal before the details open. */
+const CARD_REVEAL_MS = 650;
 
 function newIdempotencyKey(): string {
   if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
@@ -221,9 +223,23 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
     };
   }, [step, serviceId, durationMinutes, date, loadSlots]);
 
+  const [openingId, setOpeningId] = useState<string | null>(null);
+  const openingTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(openingTimer.current), []);
+
   const openDetail = (id: string) => {
     setNotice(null);
+    setOpeningId(null);
     setDetailId(id);
+  };
+
+  // Touch screens have no hover: play the card's photo reveal first, then open the treatment.
+  const tapCard = (id: string) => {
+    if (openingId) return;
+    const touch = window.matchMedia("(hover: none)").matches;
+    if (!touch || prefersReducedMotion()) return openDetail(id);
+    setOpeningId(id);
+    openingTimer.current = window.setTimeout(() => openDetail(id), CARD_REVEAL_MS);
   };
 
   const closeDetail = () => setDetailId(null);
@@ -460,57 +476,59 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                   <button
                     key={s.id}
                     type="button"
-                    onClick={() => openDetail(s.id)}
+                    onClick={() => tapCard(s.id)}
+                    data-open={openingId === s.id ? "" : undefined}
                     aria-label={fmt(t.treatments.detailsAria, { name: text.name })}
                     style={{ animationDelay: `${(hasMoved ? 40 : 380) + index * 50}ms` }}
                     className={`animate-fade-up group relative isolate flex min-h-[10rem] overflow-hidden rounded-lg border bg-gradient-to-r from-[#f7f2eb] to-[#efe8de] text-start rtl:bg-gradient-to-l transition-[box-shadow,border-color,translate] duration-500 outline-none hover:-translate-y-0.5 hover:shadow-[0_22px_40px_-24px_rgba(40,30,15,0.65)] focus-visible:ring-2 focus-visible:ring-olive/60 sm:min-h-[10.5rem] ${
                       s.id === serviceId ? "border-olive/50" : "border-sand/60"
                     }`}
                   >
-                    {/* The photo always spans the whole card; the clip only uncovers its first third until hover/focus.
-                        In Arabic the whole layer is mirrored so the photo sits on the right, where the card starts. */}
-                    <span className="absolute inset-0 -z-20 overflow-hidden transition-[clip-path] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] [clip-path:inset(0_64%_0_0)] rtl:-scale-x-100 group-hover:[clip-path:inset(0_0_0_0)] group-focus-visible:[clip-path:inset(0_0_0_0)]">
+                    {/* The photo always spans the whole card; the clip only uncovers its first third until hover/focus
+                        (or a tap on touch screens). In Arabic the whole layer is mirrored so the photo sits on the right,
+                        where the card starts. */}
+                    <span className="absolute inset-0 -z-20 overflow-hidden transition-[clip-path] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] [clip-path:inset(0_64%_0_0)] rtl:-scale-x-100 group-hover:[clip-path:inset(0_0_0_0)] group-focus-visible:[clip-path:inset(0_0_0_0)] group-data-[open]:[clip-path:inset(0_0_0_0)]">
                       <Image
                         src={serviceCardImage(s.slug)} {...blurProps(serviceCardImage(s.slug))}
                         alt=""
                         fill
                         sizes="(min-width: 1024px) 560px, 100vw"
-                        className="origin-left object-cover object-left transition-transform duration-[1.2s] ease-out group-hover:scale-[1.03] group-focus-visible:scale-[1.03]"
+                        className="origin-left object-cover object-left transition-transform duration-[1.2s] ease-out group-hover:scale-[1.03] group-focus-visible:scale-[1.03] group-data-[open]:scale-[1.03]"
                       />
                     </span>
                     <span
                       aria-hidden
-                      className="absolute inset-0 -z-10 bg-gradient-to-r from-black/20 via-black/45 to-black/65 opacity-0 rtl:bg-gradient-to-l transition-opacity duration-700 group-hover:opacity-100 group-focus-visible:opacity-100"
+                      className="absolute inset-0 -z-10 bg-gradient-to-r from-black/20 via-black/45 to-black/65 opacity-0 rtl:bg-gradient-to-l transition-opacity duration-700 group-hover:opacity-100 group-focus-visible:opacity-100 group-data-[open]:opacity-100"
                     />
 
                     <span className="ms-[36%] flex min-w-0 flex-1 flex-col py-4 pe-4 ps-4 sm:py-5 sm:pe-5 sm:ps-6">
                       <span className="flex items-center justify-between gap-2">
-                        <span className="text-[0.65rem] tracking-[0.2em] text-muted transition-colors duration-500 group-hover:text-white/70 group-focus-visible:text-white/70">
+                        <span className="text-[0.65rem] tracking-[0.2em] text-muted transition-colors duration-500 group-hover:text-white/70 group-focus-visible:text-white/70 group-data-[open]:text-white/70">
                           {String(index + 1).padStart(2, "0")}
                         </span>
                         {s.id === recommendedId && (
-                          <span className="rounded-full bg-ink px-2.5 py-1 text-[0.58rem] tracking-[0.15em] text-cream uppercase transition-colors duration-500 group-hover:bg-white group-hover:text-ink">
+                          <span className="rounded-full bg-ink px-2.5 py-1 text-[0.58rem] tracking-[0.15em] text-cream uppercase transition-colors duration-500 group-hover:bg-white group-hover:text-ink group-data-[open]:bg-white group-data-[open]:text-ink">
                             {t.booking.recommended}
                           </span>
                         )}
                       </span>
-                      <span className="mt-1.5 font-serif text-xl leading-tight text-ink transition-colors duration-500 group-hover:text-white group-focus-visible:text-white sm:text-[1.4rem]">
+                      <span className="mt-1.5 font-serif text-xl leading-tight text-ink transition-colors duration-500 group-hover:text-white group-focus-visible:text-white group-data-[open]:text-white sm:text-[1.4rem]">
                         {text.name}
                       </span>
-                      <span className="mt-1.5 line-clamp-2 text-[0.76rem] leading-relaxed font-light text-muted transition-colors duration-500 group-hover:text-white/85 group-focus-visible:text-white/85">
+                      <span className="mt-1.5 line-clamp-2 text-[0.76rem] leading-relaxed font-light text-muted transition-colors duration-500 group-hover:text-white/85 group-focus-visible:text-white/85 group-data-[open]:text-white/85">
                         {text.description}
                       </span>
                       <span className="mt-auto flex items-center justify-between gap-3 pt-3">
                         <span className="flex min-w-0 flex-col leading-tight">
-                          <span className="font-serif text-[1.05rem] text-ink transition-colors duration-500 group-hover:text-white group-focus-visible:text-white">
+                          <span className="font-serif text-[1.05rem] text-ink transition-colors duration-500 group-hover:text-white group-focus-visible:text-white group-data-[open]:text-white">
                             {fmt(t.booking.from, { price: formatPrice(Math.min(...s.options.map((o) => o.priceCents)), locale) })}
                           </span>
-                          <span className="mt-0.5 text-[0.62rem] tracking-[0.16em] text-ink-soft uppercase transition-colors duration-500 group-hover:text-white/85 group-focus-visible:text-white/85">
+                          <span className="mt-0.5 text-[0.62rem] tracking-[0.16em] text-ink-soft uppercase transition-colors duration-500 group-hover:text-white/85 group-focus-visible:text-white/85 group-data-[open]:text-white/85">
                             {s.options.map((o) => o.durationMinutes).join(" · ")} {t.booking.min}
                           </span>
                         </span>
-                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-ink bg-ink text-cream transition-all duration-500 group-hover:border-white/80 group-hover:bg-white/10 group-hover:backdrop-blur-sm group-focus-visible:border-white/80 group-focus-visible:bg-white/10">
-                          <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5" />
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-ink bg-ink text-cream transition-all duration-500 group-hover:border-white/80 group-hover:bg-white/10 group-hover:backdrop-blur-sm group-focus-visible:border-white/80 group-focus-visible:bg-white/10 group-data-[open]:border-white/80 group-data-[open]:bg-white/10">
+                          <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-0.5 group-data-[open]:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5 rtl:group-data-[open]:-translate-x-0.5" />
                         </span>
                       </span>
                     </span>
