@@ -60,4 +60,6 @@ export const BLUR_DATA: Record<string, string> = {
   "/images/treatments/thai-massage.webp": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAADwAQCdASoQAAwAA4BaJYgCdADhkHMzlXAA/mcayXoUBVMaL/vKWwdCrA/N570fEzbbmh7EUQseX9K/ClVZtizUCZnlLiBQf2z4BO4FkRs02GFTMs5HFaTSL0FgAA==",
   "/images/treatments/wide/sports.webp": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAAAwAgCdASoQAAkAA4BaJbACdAdwB9w6Pmm/wAD+0pN5uPW9ePvwwk+pBx4f2uH0Y7PsrBEJhvppkaalaRqHgrywhCozd2PLW3EB/u8jLf2NAV/OHW2wzJSaoZHbY+BAAAA=",
   "/images/treatments/sports-massage.webp": "data:image/webp;base64,UklGRnwAAABXRUJQVlA4IHAAAADwAQCdASoQAAwAA4BaJbACdAYvg4OlcYAA/ognfTdL98NtpsYMx6FEELp7nPb/riwOUPLbaPXm+Y+CxMSw02Nzgounl8txM13r/s70kw8wvLxU8AeuvhxMH85V35jLK+pyz2A+//W1s3xrtFVDQAAA",
+  "/images/treatments/wide/foot.webp": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAACwAQCdASoQAAkAA4BaJZgCdACovUfAAP5YdWTIMHpv029HorbA9ll2vuTjFD4p79pWIw9dq9UfgQ+2iT18u0LbnwTTguDqo7gdgAN1GaYgZCe1AAA=",
+  "/images/treatments/foot-reflexology-massage.webp": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAADwAQCdASoQAAwAA4BaJaACdAYsstTw9YAA/lPTnLUdQlNxHLQaJ6nExblPq1QuSXH71z+A8XAPmvvuudYDt9ClWTBnay7gEoXtdMvVVOmldJ+fyAA=",
 };

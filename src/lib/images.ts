@@ -20,7 +20,7 @@ export const images = {
   headNeck: local("treatments/head-neck-shoulder"),
   thai: local("treatments/thai-massage"),
   sports: local("treatments/sports-massage"),
-  footReflexology: local("treatments/foot-reflexology"),
+  footReflexology: local("treatments/foot-reflexology-massage"),
   herbalCompress: local("treatments/herbal-compress"),
   testimonial: local("testimonial"),
   avatar: local("avatar"),
@@ -50,6 +50,7 @@ const cardFileBySlug: Record<string, string> = {
   "thai-oil-massage": "thai-oil",
   "thai-massage": "thai",
   "sports-massage": "sports",
+  "foot-reflexology": "foot",
 };
 
 export function serviceCardImage(slug: string): string {
