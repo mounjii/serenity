@@ -16,7 +16,7 @@ export const images = {
   deepTissue: local("deep-tissue"),
   aromatherapy: local("treatments/aroma"),
   relaxation: local("relaxation"),
-  thaiOil: local("treatments/thai-oil"),
+  thaiOil: local("treatments/thai-oil-massage"),
   headNeck: local("treatments/head-neck-shoulder"),
   thai: local("treatments/thai"),
   sports: local("treatments/sports"),
@@ -47,6 +47,7 @@ export function serviceImage(slug: string): string {
 /** Wide 16:9 photos with the subject in the left third, for the booking cards that reveal the full image on hover. */
 const cardFileBySlug: Record<string, string> = {
   "head-neck-shoulder-massage": "head-neck",
+  "thai-oil-massage": "thai-oil",
 };
 
 export function serviceCardImage(slug: string): string {

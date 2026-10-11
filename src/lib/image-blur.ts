@@ -54,4 +54,6 @@ export const BLUR_DATA: Record<string, string> = {
   "/images/treatments/wide/hot-herbal-compress.webp": "data:image/webp;base64,UklGRlYAAABXRUJQVlA4IEoAAACwAQCdASoQAAkAA4BaJQBOgBSXyIMMAP7kXz4lOtTiNn8Ko9MD55ygdNaZZleOH6rjMGtpEBhhhLhWC41kF3/Mz2pGaYbLKeQAAA==",
   "/images/treatments/wide/head-neck.webp": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAADQAQCdASoQAAkAA4BaJagCdADbZkKk8AD+NDh19RzVEhgZEgyD6Ll5HeqJvSfY7vBnazVFqx7aaoYx09tWJqQzdfO1oc6RKAaTiApoKddLFfq4AUVAAA==",
   "/images/treatments/head-neck-shoulder.webp": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAABQAgCdASoQAAwAA4BaJbACdAELzExFj57gl8AA4DQtJlVgt2Hw49EHI67ug5/AM8LTYpW5uDYghms30GHyQBNUz1QIKM0eysVqpggZ2mDYztWOUl0nh25EsFbMANHKAAA=",
+  "/images/treatments/wide/thai-oil.webp": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAADQAQCdASoQAAkAA4BaJaACdAC8MhVIAADOOzxplE2QuIHBAqJlnJMP7dE1Cv/yswZtv1vn16PlyVifGauM/LNXHWOE/I6BDmwKAAAA",
+  "/images/treatments/thai-oil-massage.webp": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAADwAQCdASoQAAwAA4BaJagCdACv7F/SFMAA4m2KWM67V8wzOS3mD0AjKykRPQs0p+BQ03PLZ0fP3ZN2E6pvkzZCAfTcyJmlVjKeWauJyc96XVc1loqAAA==",
 };
