@@ -16,7 +16,7 @@ type Result = { status: number; body: unknown };
 
 async function main() {
   const { getDb } = await import("../src/server/db");
-  const { addDays, localToUtc, toLocalDateString, weekdayOf } = await import("../src/lib/time");
+  const { addDays, localToUtc, toLocalDateString } = await import("../src/lib/time");
   const db = getDb();
 
   let failures = 0;
@@ -50,20 +50,17 @@ async function main() {
   const { services } = (await servicesRes.json()) as { services: { id: string; name: string }[] };
   const serviceId = services[0].id;
 
-  // A working day (Mon-Sat) between 7 and 20 days ahead with no existing bookings, and the next Sunday.
+  // A day between 7 and 20 days ahead with no existing bookings.
   const today = toLocalDateString(new Date());
   let testDate = "";
   for (let i = 7; i <= 20 && !testDate; i++) {
     const candidate = addDays(today, i);
-    if (weekdayOf(candidate) === 0) continue;
     const taken = await db.booking.count({
       where: { startAt: { gte: localToUtc(candidate, 0), lt: localToUtc(addDays(candidate, 1), 0) }, status: { not: "CANCELLED" } },
     });
     if (taken === 0) testDate = candidate;
   }
   if (!testDate) throw new Error("No free working day found for the test.");
-  let sunday = addDays(today, 1);
-  while (weekdayOf(sunday) !== 0) sunday = addDays(sunday, 1);
 
   const at = (date: string, hhmm: string) => {
     const [h, m] = hhmm.split(":").map(Number);
@@ -79,7 +76,7 @@ async function main() {
 
   console.log(`Server: ${BASE_URL}`);
   console.log(`Service: ${services[0].name} (${serviceId})`);
-  console.log(`Test day: ${testDate} (Africa/Casablanca), Sunday used for case 7: ${sunday}\n`);
+  console.log(`Test day: ${testDate} (Africa/Casablanca)\n`);
 
   await cleanup();
   try {
@@ -118,9 +115,9 @@ async function main() {
     const r6 = await post(booking(at(testDate, "14:00"), { customerPhone: "12345" }));
     check("6. invalid phone number -> 400", r6.status === 400, `${r6.status} ${JSON.stringify(r6.body)}`);
 
-    // 7. Sunday.
-    const r7 = await post(booking(at(sunday, "11:00")));
-    check("7. slot on a Sunday -> 422", r7.status === 422, `${r7.status} ${JSON.stringify(r7.body)}`);
+    // 7. After closing time (open 10:00-22:00).
+    const r7 = await post(booking(at(testDate, "23:00")));
+    check("7. slot after closing time -> 422", r7.status === 422, `${r7.status} ${JSON.stringify(r7.body)}`);
   } finally {
     await cleanup();
     const left = await db.booking.count({ where: { customerName: TEST_NAME } });
