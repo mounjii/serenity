@@ -14,7 +14,7 @@ export const images = {
   reservationHero: local("reservation-hero"),
   swedish: local("treatments/swedish"),
   deepTissue: local("deep-tissue"),
-  aromatherapy: local("treatments/aromatherapy"),
+  aromatherapy: local("treatments/aroma"),
   relaxation: local("relaxation"),
   thaiOil: local("treatments/thai-oil"),
   headNeck: local("treatments/head-neck"),
@@ -46,5 +46,5 @@ export function serviceImage(slug: string): string {
 
 /** Wide 16:9 photos with the subject in the left third, for the booking cards that reveal the full image on hover. */
 export function serviceCardImage(slug: string): string {
-  return slug in imageBySlug ? `/images/treatments/cards/${slug}.webp` : serviceImage(slug);
+  return slug in imageBySlug ? `/images/treatments/wide/${slug}.webp` : serviceImage(slug);
 }
