@@ -56,4 +56,6 @@ export const BLUR_DATA: Record<string, string> = {
   "/images/treatments/head-neck-shoulder.webp": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAABQAgCdASoQAAwAA4BaJbACdAELzExFj57gl8AA4DQtJlVgt2Hw49EHI67ug5/AM8LTYpW5uDYghms30GHyQBNUz1QIKM0eysVqpggZ2mDYztWOUl0nh25EsFbMANHKAAA=",
   "/images/treatments/wide/thai-oil.webp": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAADQAQCdASoQAAkAA4BaJaACdAC8MhVIAADOOzxplE2QuIHBAqJlnJMP7dE1Cv/yswZtv1vn16PlyVifGauM/LNXHWOE/I6BDmwKAAAA",
   "/images/treatments/thai-oil-massage.webp": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAADwAQCdASoQAAwAA4BaJagCdACv7F/SFMAA4m2KWM67V8wzOS3mD0AjKykRPQs0p+BQ03PLZ0fP3ZN2E6pvkzZCAfTcyJmlVjKeWauJyc96XVc1loqAAA==",
+  "/images/treatments/wide/thai.webp": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAADQAQCdASoQAAkAA4BaJYgCdAC4MMS9gAD+ZxrJecz3ixpXcEHAkX0c0ap03lOBjvhb/JIb+0dwiy7qNtaB8WQDOCutlz0pCF/rYYVMyzkcVpNHlQ4AAA==",
+  "/images/treatments/thai-massage.webp": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAADwAQCdASoQAAwAA4BaJYgCdADhkHMzlXAA/mcayXoUBVMaL/vKWwdCrA/N570fEzbbmh7EUQseX9K/ClVZtizUCZnlLiBQf2z4BO4FkRs02GFTMs5HFaTSL0FgAA==",
 };
