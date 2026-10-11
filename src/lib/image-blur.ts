@@ -62,4 +62,6 @@ export const BLUR_DATA: Record<string, string> = {
   "/images/treatments/sports-massage.webp": "data:image/webp;base64,UklGRnwAAABXRUJQVlA4IHAAAADwAQCdASoQAAwAA4BaJbACdAYvg4OlcYAA/ognfTdL98NtpsYMx6FEELp7nPb/riwOUPLbaPXm+Y+CxMSw02Nzgounl8txM13r/s70kw8wvLxU8AeuvhxMH85V35jLK+pyz2A+//W1s3xrtFVDQAAA",
   "/images/treatments/wide/foot.webp": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAACwAQCdASoQAAkAA4BaJZgCdACovUfAAP5YdWTIMHpv029HorbA9ll2vuTjFD4p79pWIw9dq9UfgQ+2iT18u0LbnwTTguDqo7gdgAN1GaYgZCe1AAA=",
   "/images/treatments/foot-reflexology-massage.webp": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAADwAQCdASoQAAwAA4BaJaACdAYsstTw9YAA/lPTnLUdQlNxHLQaJ6nExblPq1QuSXH71z+A8XAPmvvuudYDt9ClWTBnay7gEoXtdMvVVOmldJ+fyAA=",
+  "/images/treatments/wide/herbal.webp": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAAAQAgCdASoQAAkAA4BaJaACdAYq1N0KVj4AAP66ga6jBp2I/oVU09Y9QS805JuFf2Z09d3uREkq6YR9gdZYDCDT70RWwbDenRi/GxkB+76XVJgYZ55NTKgA",
+  "/images/treatments/hot-herbal-compress.webp": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAADwAQCdASoQAAwAA4BaJbACdAC4m1r+1QAA/jOQleY1u0u4lNjc35B7lNgQiDOhbKtEa2hEeTVwj7k80sx9SGs91WuD0O/euU7eA1WQSYa9eNcPMUDHO4JnkEReAAAA",
 };
