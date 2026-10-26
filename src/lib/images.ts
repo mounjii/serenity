@@ -9,7 +9,7 @@ export function blurProps(src: string) {
 }
 
 export const images = {
-  hero: local("hero"),
+  hero: local("hero-classic"),
   about: local("about"),
   reservationHero: local("reservation-hero"),
   swedish: local("treatments/swedish"),

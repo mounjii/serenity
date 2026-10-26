@@ -35,7 +35,7 @@ const fr: Dictionary = {
     treatments: "Nos soins",
     scroll: "Défiler",
     scrollAria: "Défiler pour découvrir",
-    imageAlt: "Salle de soin calme avec table de massage crème, orchidée blanche, bol d’huile et bougies",
+    imageAlt: "Salle de soin avec table de massage, serviettes roulées et bougies",
   },
   features: [
     { title: "Thérapeutes professionnels", text: "Des thérapeutes qualifiés et certifiés pour votre bien-être." },

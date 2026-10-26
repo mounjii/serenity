@@ -49,7 +49,7 @@ const en = {
     treatments: "Our treatments",
     scroll: "Scroll",
     scrollAria: "Scroll to discover",
-    imageAlt: "Quiet spa room with a cream massage bed, white orchid, oil bowl and candles",
+    imageAlt: "Spa treatment room with a massage table, rolled towels and candles",
   },
   features: [
     { title: "Professional Therapists", text: "Skilled and certified therapists for your well-being." },
