@@ -35,7 +35,7 @@ const fr: Dictionary = {
     treatments: "Nos soins",
     scroll: "Défiler",
     scrollAria: "Défiler pour découvrir",
-    imageAlt: "Salle de soin avec table de massage, serviettes roulées et bougies",
+    imageAlt: "Salle de soin calme avec table de massage crème, orchidée blanche, bol d’huile et bougies",
   },
   features: [
     { title: "Thérapeutes professionnels", text: "Des thérapeutes qualifiés et certifiés pour votre bien-être." },
@@ -60,6 +60,12 @@ const fr: Dictionary = {
     details: "Détails et tarifs",
     durations: "Durées",
     detailsAria: "{name} : détails et tarifs",
+    category: {
+      relaxation: "Relaxation",
+      energy: "Énergie",
+      wellness: "Bien-être",
+      targeted: "Ciblé",
+    },
   },
   testimonials: {
     eyebrow: "Témoignages",
@@ -112,6 +118,14 @@ const fr: Dictionary = {
       "Étagère en bois avec lanternes et bougies",
       "Comptoir d’accueil avec baumes thaïs et produits à base de plantes",
     ],
+  },
+  reels: {
+    eyebrow: "Sur Instagram",
+    title: "Nos reels",
+    text: "De courts aperçus du salon, au format vertical d’Instagram.",
+    swipe: "Glisser →",
+    follow: "Nous suivre",
+    clipLabel: "Reel Instagram Touch Sense",
   },
   contact: {
     eyebrow: "Nous contacter",

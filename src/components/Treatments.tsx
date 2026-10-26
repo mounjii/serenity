@@ -7,9 +7,27 @@ import { serviceText } from "@/i18n/services";
 import { blurProps, serviceImage } from "@/lib/images";
 import { RESERVATION_PATH } from "@/lib/navigation";
 import { formatDuration } from "@/lib/format";
-import { ArrowRight } from "./Icons";
+import { ArrowRight, FlowerIcon, LeafIcon, LotusIcon, NeckIcon } from "./Icons";
 import { getActiveServices, type PublicService } from "@/server/booking/services";
 import Reveal from "./Reveal";
+
+const categoryBySlug = {
+  "swedish-massage": "relaxation",
+  "thai-oil-massage": "energy",
+  "aroma-massage": "wellness",
+  "head-neck-shoulder-massage": "targeted",
+  "thai-massage": "energy",
+  "sports-massage": "targeted",
+  "foot-reflexology": "wellness",
+  "hot-herbal-compress": "relaxation",
+} as const;
+
+const categoryIcon = {
+  relaxation: LotusIcon,
+  energy: LeafIcon,
+  wellness: FlowerIcon,
+  targeted: NeckIcon,
+} as const;
 
 const fallback = (slug: string, name: string, description: string, options: [number, number][]): PublicService => ({
   id: slug,
@@ -64,19 +82,21 @@ export default async function Treatments() {
         <div className="no-scrollbar -mx-5 mt-4 flex snap-x snap-mandatory scroll-px-5 gap-4 overflow-x-auto px-5 pb-8 sm:mx-0 sm:mt-16 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4">
           {treatments.map((service, i) => {
             const { name, description } = serviceText(t, service);
+            const category = categoryBySlug[service.slug as keyof typeof categoryBySlug] ?? "wellness";
+            const Icon = categoryIcon[category];
             return (
               <Reveal
                 as="article"
                 key={service.slug}
                 delay={(i % 4) * 120}
-                className="group relative flex w-[80%] shrink-0 snap-start flex-col overflow-hidden rounded-sm bg-white shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)] transition-shadow duration-500 hover:shadow-[0_30px_60px_-25px_rgba(60,40,20,0.4)] sm:w-auto"
+                className="group relative flex w-[80%] shrink-0 snap-start flex-col overflow-hidden rounded-[1.6rem] bg-white shadow-[0_16px_36px_-22px_rgba(60,40,20,0.28)] transition-shadow duration-500 hover:shadow-[0_24px_48px_-22px_rgba(60,40,20,0.36)] sm:w-auto"
               >
                 <Link
                   href={href(`${RESERVATION_PATH}?service=${service.slug}`)}
                   aria-label={fmt(t.treatments.detailsAria, { name })}
                   className="absolute inset-0 z-10"
                 />
-                <div className="relative aspect-[4/3] overflow-hidden">
+                <div className="relative aspect-[16/10] overflow-hidden">
                   <Image
                     src={serviceImage(service.slug)} {...blurProps(serviceImage(service.slug))}
                     alt={name}
@@ -84,20 +104,26 @@ export default async function Treatments() {
                     sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 80vw"
                     className="object-cover transition-transform duration-[1.2s] group-hover:scale-110"
                   />
+                  <span className="absolute end-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-white/92 text-bronze shadow-[0_6px_16px_-10px_rgba(60,40,20,0.45)]">
+                    <Icon className="h-4 w-4" aria-hidden />
+                  </span>
                 </div>
-                <div className="flex flex-1 flex-col p-5 sm:p-6">
-                  <h3 className="text-[0.95rem] font-normal text-ink">{name}</h3>
-                  <p className="mt-3 flex-1 text-[0.8rem] leading-relaxed font-light text-muted">{description}</p>
-                  <ul className="mt-5 flex flex-wrap gap-1.5" aria-label={t.treatments.durations}>
+                <div className="flex flex-1 flex-col px-5 pt-5 pb-5 sm:px-6 sm:pt-6 sm:pb-5">
+                  <p className="text-[0.62rem] tracking-[0.22em] text-bronze uppercase">{t.treatments.category[category]}</p>
+                  <h3 className="mt-2 font-serif text-[1.35rem] leading-tight font-normal text-ink">{name}</h3>
+                  <p className="mt-2.5 flex-1 text-[0.8rem] leading-relaxed font-light text-muted">{description}</p>
+                  <ul className="mt-5 flex flex-wrap gap-2" aria-label={t.treatments.durations}>
                     {service.options.map((o) => (
-                      <li key={o.durationMinutes} className="rounded-full border border-sand px-2.5 py-0.5 text-[0.7rem] text-ink-soft">
+                      <li key={o.durationMinutes} className="rounded-full border border-bronze/45 px-3 py-1 text-[0.68rem] text-bronze">
                         {formatDuration(o.durationMinutes, locale)}
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-5 flex items-center gap-2 border-t border-sand pt-4 text-[0.7rem] tracking-[0.18em] text-ink uppercase transition-colors group-hover:text-olive">
+                  <p className="mt-5 flex items-center justify-between text-[0.68rem] tracking-[0.16em] text-ink uppercase">
                     {t.treatments.details}
-                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1" />
+                    <span className="grid h-8 w-8 place-items-center rounded-full border border-bronze text-bronze transition-colors group-hover:bg-bronze group-hover:text-cream">
+                      <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" />
+                    </span>
                   </p>
                 </div>
               </Reveal>

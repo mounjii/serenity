@@ -19,9 +19,10 @@ export default async function Hero() {
           fill
           priority
           sizes="100vw"
-          className="animate-hero-zoom object-cover object-[65%_center] rtl:-scale-x-100"
+          className="animate-hero-zoom object-cover object-center"
         />
       </Parallax>
+      <div className="absolute inset-0 bg-gradient-to-t from-ink/50 via-ink/20 to-ink/30 lg:hidden" />
       <div className="absolute inset-y-0 start-0 hidden w-3/5 bg-gradient-to-r from-cream/45 to-transparent rtl:bg-gradient-to-l lg:block" />
       <div className="absolute inset-x-0 bottom-0 hidden h-6 bg-gradient-to-t from-cream to-transparent lg:block" />
 

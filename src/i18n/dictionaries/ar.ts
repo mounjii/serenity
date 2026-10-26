@@ -35,7 +35,7 @@ const ar: Dictionary = {
     treatments: "علاجاتنا",
     scroll: "مرّر",
     scrollAria: "مرّر للاكتشاف",
-    imageAlt: "غرفة علاج بها طاولة تدليك ومناشف ملفوفة وشموع",
+    imageAlt: "غرفة سبا هادئة بطاولة تدليك كريمية وأوركيد أبيض ووعاء زيت وشموع",
   },
   features: [
     { title: "معالجات محترفات", text: "معالجات ماهرات وحاصلات على شهادات من أجل راحتك." },
@@ -60,6 +60,12 @@ const ar: Dictionary = {
     details: "التفاصيل والأسعار",
     durations: "المدد",
     detailsAria: "{name}: التفاصيل والأسعار",
+    category: {
+      relaxation: "استرخاء",
+      energy: "طاقة",
+      wellness: "رفاهية",
+      targeted: "موضعي",
+    },
   },
   testimonials: {
     eyebrow: "آراء العملاء",
@@ -110,6 +116,14 @@ const ar: Dictionary = {
       "رف خشبي عليه فوانيس وشموع",
       "منضدة الاستقبال مع مراهم تايلاندية ومنتجات عشبية",
     ],
+  },
+  reels: {
+    eyebrow: "على إنستغرام",
+    title: "ريلزنا",
+    text: "لمحات قصيرة من الصالون بنفس التنسيق العمودي لإنستغرام.",
+    swipe: "← اسحب",
+    follow: "تابعونا",
+    clipLabel: "ريل إنستغرام Touch Sense",
   },
   contact: {
     eyebrow: "تواصل معنا",

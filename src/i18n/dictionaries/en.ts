@@ -49,7 +49,7 @@ const en = {
     treatments: "Our treatments",
     scroll: "Scroll",
     scrollAria: "Scroll to discover",
-    imageAlt: "Spa treatment room with a massage table, rolled towels and candles",
+    imageAlt: "Quiet spa room with a cream massage bed, white orchid, oil bowl and candles",
   },
   features: [
     { title: "Professional Therapists", text: "Skilled and certified therapists for your well-being." },
@@ -74,6 +74,12 @@ const en = {
     details: "Details & prices",
     durations: "Durations",
     detailsAria: "{name}: details and prices",
+    category: {
+      relaxation: "Relaxation",
+      energy: "Energy",
+      wellness: "Wellness",
+      targeted: "Targeted",
+    },
   },
   testimonials: {
     eyebrow: "Testimonials",
@@ -126,6 +132,14 @@ const en = {
       "Wooden shelf with lanterns and candles",
       "Reception counter with Thai balms and herbal products",
     ],
+  },
+  reels: {
+    eyebrow: "On Instagram",
+    title: "Our Reels",
+    text: "Short glimpses of the salon — the same vertical format as Instagram.",
+    swipe: "Swipe →",
+    follow: "Follow us",
+    clipLabel: "Touch Sense Instagram reel",
   },
   contact: {
     eyebrow: "Get in Touch",

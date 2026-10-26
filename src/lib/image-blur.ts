@@ -20,7 +20,7 @@ export const BLUR_DATA: Record<string, string> = {
   "/images/gallery-4.webp": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAABQAgCdASoQAAwAAsBMJYgCdB2gAgk5tW3CsEAA24vA6SlOYtVOyhFknfzDbpEjZU75twSLl0ES8JzU6Ea7jOdxoDyFhbfCZ6Szmrx08XtX/V+DyzyzOCJkteKbUAAA",
   "/images/head-neck.webp": "data:image/webp;base64,UklGRlYAAABXRUJQVlA4IEoAAADQAQCdASoQAAwAA4BaJQBOgBdQfppxsAD9+fkG51RWKx0h+ryoIW/04eMmkFJSqVZdlKVAM4kiRg6lxjltcBvhI9HsFPOgy1QAAA==",
   "/images/herbal-compress.webp": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAADQAQCdASoQAAwAA4BaJQBOgBK5ldBfgAD+73FXTWmcpK2B1uoY27bzuyq8gJpFrK7P0ug91+lBwE/REYXvQJGt6xe3Lqb++T80fgfAAAA=",
-  "/images/hero.webp": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAAAQAgCdASoQAAkAAsBMJZACdAEe/VX+VY+wAP7KopxR1wNvmEr6zf70vPCQFmYAyPkaFxriUzeBt1qxzgHQK1BgNLAHzTIP69aW5s3cCS945eAA",
+  "/images/hero.webp": "data:image/webp;base64,UklGRqIAAABXRUJQVlA4IJYAAABQBACdASoUAAsAPpE4l0eloyIhMAgAsBIJZgCdMoADQeQR+keYjtPn1V6AAP77jVdh6NGrgX7t9lv5g/fXQgAP+k5j9cenrFnzuT4YbwKA+PAJwHk2DfgSHvRs/QigVAnZQ/qv4NRWqAj1vb2cdcx3D6Zx5n9Wnj7G8dOdmiOT/1bYNvzHPh/jmxhCUcxdfixT3LRFAAA=",
   "/images/relaxation.webp": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAAAwAgCdASoQAAwAAsBMJagCdLoAAm3cBMIqOAD33xF+oKLikA1kzUxCB6LHnLuWhd34TEDsK0lGaQ7ingC4UENrJ94TUZ7fKrrp67xdRLj6jW1mGoAAAA==",
   "/images/reservation-hero.webp": "data:image/webp;base64,UklGRlYAAABXRUJQVlA4IEoAAADQAQCdASoQAAkAAsBMJZACdAEKa1uiQAD+8odmyoDQ0M/0MtjXLMKcFp7NLVoMdFTJElpNWQ1AGD9yr3rLLlnP7nwFKv+WT4AAAA==",
   "/images/sports.webp": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAADwAQCdASoQAAwAA4BaJZACdAC4Zm6Aw6AA/olE7d0DUxU3HmIXmZJVS4/ceBATAM8+DTZV8d4j59m5uxM1ynCbCuF6JXRk37NGLeHh38QHlXx90T1a3akTzcFNzs2QAAA=",

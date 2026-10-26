@@ -14,6 +14,7 @@ export function contentSecurityPolicy(nonce: string): string {
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
+    "media-src 'self'",
     "font-src 'self'",
     `connect-src 'self'${isDev ? " ws:" : ""}`,
     "frame-src https://www.google.com https://maps.google.com",

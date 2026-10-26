@@ -51,6 +51,18 @@ export function SparkLotusIcon(props: IconProps) {
   );
 }
 
+export function FlowerIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 48 48" {...base} {...props}>
+      <circle cx="24" cy="24" r="2.4" />
+      <path d="M24 11c-2.6 3.4-2.6 7.2 0 9.4 2.6-2.2 2.6-6 0-9.4Z" />
+      <path d="M24 37c2.6-3.4 2.6-7.2 0-9.4-2.6 2.2-2.6 6 0 9.4Z" />
+      <path d="M11 24c3.4-2.6 7.2-2.6 9.4 0-2.2 2.6-6 2.6-9.4 0Z" />
+      <path d="M37 24c-3.4 2.6-7.2 2.6-9.4 0 2.2-2.6 6-2.6 9.4 0Z" />
+    </svg>
+  );
+}
+
 export function ArrowRight(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" {...base} strokeWidth={1.5} {...props}>
