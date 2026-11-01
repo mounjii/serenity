@@ -1,9 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowRight } from "@/components/Icons";
 import { formatDayHeading } from "@/lib/time";
 import type { AdminBooking } from "@/server/admin/bookings";
-import { useOpenBooking } from "./BookingDetails";
 import { useHighlightedBookings } from "./LiveBookings";
 import StatusBadge from "./StatusBadge";
 
@@ -16,11 +16,10 @@ function groupByDate(bookings: AdminBooking[]) {
 }
 
 export default function UpcomingList({ bookings, today, emptyText }: Props) {
-  const openBooking = useOpenBooking();
   const highlighted = useHighlightedBookings();
 
   if (bookings.length === 0) {
-    return <p className="rounded-md border border-sand/70 bg-white px-6 py-10 text-center text-[0.85rem] text-muted">{emptyText}</p>;
+    return <p className="rounded-lg border border-sand/70 bg-white px-6 py-10 text-center text-[0.85rem] text-muted">{emptyText}</p>;
   }
 
   return (
@@ -38,14 +37,13 @@ export default function UpcomingList({ bookings, today, emptyText }: Props) {
                 {active} appointment{active === 1 ? "" : "s"}
               </span>
             </div>
-            <ul className="divide-y divide-sand/70 overflow-hidden rounded-md border border-sand/70 bg-white">
+            <ul className="divide-y divide-sand/70 overflow-hidden rounded-lg border border-sand/70 bg-white">
               {items.map((b) => {
                 const cancelled = b.status === "CANCELLED";
                 return (
                   <li key={b.id}>
-                    <button
-                      type="button"
-                      onClick={() => openBooking(b.id)}
+                    <Link
+                      href={`/admin/bookings/${b.id}`}
                       className={`group grid w-full grid-cols-[4.25rem_1fr_auto] items-center gap-x-4 px-4 py-3.5 text-left transition-colors duration-300 hover:bg-cream/60 sm:grid-cols-[5rem_minmax(0,1.2fr)_minmax(0,1fr)_auto] sm:px-6 ${
                         highlighted.has(b.id) ? "bg-gold/10" : ""
                       }`}
@@ -62,7 +60,7 @@ export default function UpcomingList({ bookings, today, emptyText }: Props) {
                         {b.status !== "CONFIRMED" && <StatusBadge status={b.status} />}
                         <ArrowRight className="h-3.5 w-3.5 text-muted opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
                       </span>
-                    </button>
+                    </Link>
                   </li>
                 );
               })}

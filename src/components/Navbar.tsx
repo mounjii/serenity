@@ -12,10 +12,9 @@ import { navLinks, RESERVATION_PATH } from "@/lib/navigation";
 
 const hashOf = (href: string) => href.slice(href.indexOf("#"));
 
-/** The admin area stays reachable at /admin/login; it is only left out of the public navigation for now. */
-const SHOW_LOGIN = false;
+const SHOW_LOGIN = true;
 
-export default function Navbar() {
+export default function Navbar({ signedIn = false }: { signedIn?: boolean }) {
   const { t, href } = useI18n();
   const pathname = usePathname();
   const isHome = splitLocale(pathname).path === "/";
@@ -129,14 +128,14 @@ export default function Navbar() {
             ))}
           </ul>
 
-          <div className="flex items-center gap-1 lg:gap-3">
+          <div className="flex shrink-0 items-center gap-2 lg:gap-3">
             <LanguageSwitcher className="lg:me-1" />
             {SHOW_LOGIN && (
               <Link
-                href="/admin/login"
+                href={href(signedIn ? "/account" : "/account/login")}
                 className="hidden rounded-full border border-ink/30 px-5 py-2.5 text-[0.78rem] tracking-wide text-ink transition hover:border-ink hover:bg-ink hover:text-cream lg:inline-block"
               >
-                {t.nav.login}
+                {signedIn ? t.nav.account : t.nav.login}
               </Link>
             )}
             <Link
@@ -199,11 +198,11 @@ export default function Navbar() {
           </Link>
           {SHOW_LOGIN && (
             <Link
-              href="/admin/login"
+              href={href(signedIn ? "/account" : "/account/login")}
               onClick={close}
               className="flex min-h-12 items-center justify-center rounded-full border border-ink/25 text-[0.85rem] text-ink"
             >
-              {t.nav.login}
+              {signedIn ? t.nav.account : t.nav.login}
             </Link>
           )}
           <p className="pt-2 text-center text-[0.72rem] tracking-wide text-muted">{t.nav.hours}</p>

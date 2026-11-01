@@ -10,7 +10,7 @@ export default function NextBookingCard({ booking, isToday }: { booking: AdminBo
 
   if (!booking) {
     return (
-      <div className="rounded-md border border-sand/70 bg-white px-6 py-5 sm:order-first sm:col-span-2 lg:order-none lg:col-span-1">
+      <div className="rounded-lg border border-sand/70 bg-white px-6 py-5 sm:order-first sm:col-span-2 lg:order-none lg:col-span-1">
         {label}
         <p className="mt-4 text-[0.9rem] text-muted">No upcoming reservations.</p>
       </div>
@@ -21,7 +21,7 @@ export default function NextBookingCard({ booking, isToday }: { booking: AdminBo
     <button
       type="button"
       onClick={() => openBooking(booking.id)}
-      className="group rounded-md border border-sand/70 bg-white px-6 py-5 text-left transition-colors duration-300 hover:border-ink/25 sm:order-first sm:col-span-2 lg:order-none lg:col-span-1"
+      className="group rounded-lg border border-sand/70 bg-white px-6 py-5 text-left transition-colors duration-300 hover:border-ink/25 sm:order-first sm:col-span-2 lg:order-none lg:col-span-1"
     >
       <div className="flex items-center justify-between gap-3">
         {label}

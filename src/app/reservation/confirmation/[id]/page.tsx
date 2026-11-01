@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
-import Navbar from "@/components/Navbar";
+import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import RefreshWhilePending from "@/components/RefreshWhilePending";
 import { WhatsAppIcon } from "@/components/Icons";
@@ -43,10 +43,10 @@ export default async function ConfirmationPage({ params }: PageProps<"/reservati
 
   return (
     <>
-      <Navbar />
+      <SiteHeader />
       <main className="min-h-screen bg-cream pt-24 pb-16 sm:pt-32 sm:pb-24">
         <div className="mx-auto max-w-xl px-5 sm:px-6">
-          <section className="rounded-sm bg-white px-5 py-7 text-center shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)] sm:p-10">
+          <section className="rounded-lg bg-white px-5 py-7 text-center shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)] sm:p-10">
             <div
               className={`mx-auto grid h-14 w-14 place-items-center rounded-full ${
                 booking.status === "CANCELLED"
@@ -88,7 +88,7 @@ export default async function ConfirmationPage({ params }: PageProps<"/reservati
             {booking.status === "PENDING" && (
               <>
                 <RefreshWhilePending />
-                <p className="mt-4 rounded-sm bg-gold/10 px-4 py-3 text-[0.85rem] text-ink-soft">
+                <p className="mt-4 rounded-lg bg-gold/10 px-4 py-3 text-[0.85rem] text-ink-soft">
                   {booking.confirmUntil ? (
                     <>
                       {c.heldBefore} <strong className="font-medium text-ink">{booking.confirmUntil}</strong>

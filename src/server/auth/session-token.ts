@@ -13,7 +13,7 @@ async function credentialsVersion(passwordHash: string): Promise<string> {
 }
 
 export async function createSessionToken(username: string): Promise<string> {
-  const { sessionSecret, passwordHash } = getAdminConfig();
+  const { sessionSecret, passwordHash } = await getAdminConfig();
   return new SignJWT({ ver: await credentialsVersion(passwordHash) })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(username)
@@ -25,7 +25,7 @@ export async function createSessionToken(username: string): Promise<string> {
 /** Returns the session for a valid, unexpired token issued for the current admin; null otherwise. */
 export async function verifySessionToken(token: string | undefined): Promise<AdminSession | null> {
   if (!token) return null;
-  const { sessionSecret, passwordHash, username } = getAdminConfig();
+  const { sessionSecret, passwordHash, username } = await getAdminConfig();
   try {
     const { payload } = await jwtVerify(token, sessionSecret, { algorithms: ["HS256"] });
     if (payload.sub !== username || typeof payload.exp !== "number") return null;

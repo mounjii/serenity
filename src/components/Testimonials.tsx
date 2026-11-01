@@ -39,7 +39,7 @@ export default function Testimonials() {
   return (
     <section className="bg-cream-dark/60">
       <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-16 sm:gap-14 sm:px-6 sm:py-24 md:grid-cols-[1fr_1.15fr] lg:gap-24 lg:px-12 lg:py-28">
-        <Reveal variant="curtain" className="relative aspect-[16/9] overflow-hidden rounded-sm shadow-[0_30px_60px_-30px_rgba(60,40,20,0.35)] sm:aspect-[4/3]">
+        <Reveal variant="curtain" className="relative aspect-[16/9] overflow-hidden rounded-lg shadow-[0_30px_60px_-30px_rgba(60,40,20,0.35)] sm:aspect-[4/3]">
           <Image
             src={images.testimonial} {...blurProps(images.testimonial)}
             alt={t.testimonials.imageAlt}

@@ -120,7 +120,7 @@ export default function AdminBookingForm({ services, today, initialDate }: Props
   };
 
   return (
-    <form onSubmit={submit} noValidate className="mt-8 space-y-8 rounded-sm bg-white p-6 shadow-[0_20px_40px_-32px_rgba(60,40,20,0.35)] sm:p-8">
+    <form onSubmit={submit} noValidate className="mt-8 space-y-8 rounded-lg bg-white p-6 shadow-[0_20px_40px_-32px_rgba(60,40,20,0.35)] sm:p-8">
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="service" className="mb-1.5 block text-[0.8rem]">Service</label>
@@ -178,7 +178,7 @@ export default function AdminBookingForm({ services, today, initialDate }: Props
               <span
                 key={s.startAt}
                 aria-label={`${s.time}, ${STATUS_LABEL[s.status && s.status !== "available" ? s.status : "booked"].toLowerCase()}`}
-                className={`flex min-h-11 cursor-not-allowed flex-col items-center justify-center rounded-sm leading-tight ${
+                className={`flex min-h-11 cursor-not-allowed flex-col items-center justify-center rounded-lg leading-tight ${
                   s.status === "rest" ? "border border-dashed border-sand text-bronze/80" : "bg-cream-dark/60 text-muted/70"
                 }`}
               >
@@ -200,7 +200,7 @@ export default function AdminBookingForm({ services, today, initialDate }: Props
                   });
                 }}
                 aria-pressed={slot?.startAt === s.startAt}
-                className={`min-h-11 rounded-sm border text-[0.9rem] transition ${
+                className={`min-h-11 rounded-lg border text-[0.9rem] transition ${
                   slot?.startAt === s.startAt ? "border-ink bg-ink text-cream" : "border-sand text-ink hover:border-ink"
                 }`}
               >
@@ -239,7 +239,7 @@ export default function AdminBookingForm({ services, today, initialDate }: Props
       </div>
 
       {formError && (
-        <p role="alert" className="rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-[0.85rem] text-red-700">
+        <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[0.85rem] text-red-700">
           {formError}
         </p>
       )}

@@ -3,7 +3,7 @@ import { Great_Vibes } from "next/font/google";
 import Image from "next/image";
 import { connection } from "next/server";
 import { ArrowDown } from "@/components/Icons";
-import Navbar from "@/components/Navbar";
+import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import BookingFlow from "@/components/booking/BookingFlow";
 import { pageMetadata } from "@/i18n/seo";
@@ -11,6 +11,8 @@ import { getI18n } from "@/i18n/server";
 import { blurProps, images } from "@/lib/images";
 import { getBookableDays } from "@/server/booking/calendar";
 import { getActiveServices } from "@/server/booking/services";
+import { getCustomerSession } from "@/server/customer/session";
+import { usableVouchersForPhone } from "@/server/loyalty/engine";
 
 const greatVibes = Great_Vibes({ variable: "--font-great-vibes", subsets: ["latin"], weight: "400" });
 
@@ -21,13 +23,20 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ReservationPage({ searchParams }: PageProps<"/reservation">) {
   await connection();
-  const [{ service, duration }, services, days, { t }] = await Promise.all([searchParams, getActiveServices(), getBookableDays(), getI18n()]);
+  const [{ service, duration }, services, days, { t }, session] = await Promise.all([
+    searchParams,
+    getActiveServices(),
+    getBookableDays(),
+    getI18n(),
+    getCustomerSession(),
+  ]);
+  const vouchers = session ? await usableVouchersForPhone(session.phone) : [];
   const initialSlug = typeof service === "string" ? service : undefined;
   const initialDuration = typeof duration === "string" && /^\d{1,3}$/.test(duration) ? Number(duration) : undefined;
 
   return (
     <>
-      <Navbar />
+      <SiteHeader />
       <main className={`${greatVibes.variable} min-h-screen bg-cream pb-16 sm:pb-24`}>
         <section className="relative isolate overflow-hidden">
           <Image
@@ -63,7 +72,14 @@ export default async function ReservationPage({ searchParams }: PageProps<"/rese
         </section>
 
         <div className="mx-auto max-w-6xl px-3 sm:px-6">
-          <BookingFlow services={services} days={days} initialServiceSlug={initialSlug} initialDuration={initialDuration} />
+          <BookingFlow
+            services={services}
+            days={days}
+            initialServiceSlug={initialSlug}
+            initialDuration={initialDuration}
+            guest={session ? { name: session.name, phone: session.phone } : undefined}
+            vouchers={vouchers}
+          />
         </div>
       </main>
       <Footer />

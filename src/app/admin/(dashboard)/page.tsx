@@ -16,9 +16,11 @@ import {
   CheckCircleIcon,
   ChevronLeft,
   ChevronRight,
+  ClockIcon,
   PlusIcon,
-  XCircleIcon,
+  TrendIcon,
 } from "@/components/Icons";
+import { formatPrice } from "@/lib/format";
 import { addDays, formatDayHeading, isValidDateString, toLocalMinuteOfDay, weekdayOf } from "@/lib/time";
 import { listActivity } from "@/server/admin/activity";
 import { getDashboardSummary, listBookingsForDates, type AdminBooking } from "@/server/admin/bookings";
@@ -76,7 +78,6 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
   ]);
   const next = summary.nextBooking;
   const confirmed = todayBookings.filter((b) => b.status === "CONFIRMED" || b.status === "COMPLETED").length;
-  const cancelled = todayBookings.filter((b) => b.status === "CANCELLED").length;
 
   return (
     <BookingDetailsProvider bookings={uniqueById([todayBookings, rangeBookings, activity.map((e) => e.booking), [next]])} whatsappMode={getWhatsAppMode()}>
@@ -84,9 +85,12 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
         <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="font-serif text-[1.85rem] leading-tight text-ink sm:text-[2.2rem]">
-              {greeting(now)}, {session.username} <span aria-hidden>👋</span>
+              {greeting(now)}, {session.username}
             </h1>
-            <p className="mt-1 text-[0.85rem] text-ink-soft">Here’s an overview of your bookings today.</p>
+            <p className="mt-1 text-[0.85rem] text-ink-soft">
+              {summary.weekCount} booking{summary.weekCount === 1 ? "" : "s"} this week
+              {summary.todayRevenueCents > 0 ? ` · ${formatPrice(summary.todayRevenueCents)} today` : ""}.
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:flex-col sm:items-end sm:gap-3">
             <p className="inline-flex items-center gap-2 rounded-lg border border-sand/80 bg-white px-3.5 py-2 text-[0.78rem] text-ink">
@@ -103,8 +107,8 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
           </div>
         </header>
 
-        <section aria-label="Summary" className="grid grid-cols-3 gap-3 sm:gap-4 xl:grid-cols-4">
-          <div className="col-span-3 xl:order-last xl:col-span-1">
+        <section aria-label="Summary" className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-5">
+          <div className="col-span-2 xl:order-last xl:col-span-1">
             <NextAppointmentCard booking={next} isToday={next?.date === today} />
           </div>
           <Stat
@@ -123,11 +127,19 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
             href="/admin/bookings?view=today&status=confirmed"
           />
           <Stat
-            tone="rose"
-            icon={<XCircleIcon className="h-[1.1rem] w-[1.1rem]" />}
-            label="Cancelled"
-            value={cancelled}
-            href="/admin/bookings?view=today&status=cancelled"
+            tone="gold"
+            icon={<ClockIcon className="h-[1.1rem] w-[1.1rem]" />}
+            label="Waiting"
+            value={summary.pendingCount}
+            href="/admin/bookings?status=waiting"
+          />
+          <Stat
+            tone="blue"
+            icon={<TrendIcon className="h-[1.1rem] w-[1.1rem]" />}
+            label="Today’s revenue"
+            short="Revenue"
+            value={formatPrice(summary.todayRevenueCents)}
+            href="/admin/bookings?view=today"
           />
         </section>
 
@@ -153,7 +165,8 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
 const tones = {
   peach: { card: "border-[#f2e2cf] bg-[#fdf6ee] hover:border-[#e5c9a8]", icon: "bg-[#f8e3cb] text-[#b0733a]" },
   green: { card: "border-[#dfe9d8] bg-[#f3f7f0] hover:border-[#bfd3b2]", icon: "bg-[#dfead6] text-olive" },
-  rose: { card: "border-[#f3dcdc] bg-[#fdf3f3] hover:border-[#e6b8b8]", icon: "bg-[#f8dede] text-[#b4505a]" },
+  gold: { card: "border-[#eee4c8] bg-[#fbf7ec] hover:border-[#e0d09a]", icon: "bg-[#f3e6c0] text-[#9a7a2a]" },
+  blue: { card: "border-[#dbe5f2] bg-[#f1f5fb] hover:border-[#b9cbe4]", icon: "bg-[#dfe8f5] text-[#4a6c9c]" },
 };
 
 function Stat({
@@ -168,12 +181,12 @@ function Stat({
   icon: React.ReactNode;
   label: string;
   short?: string;
-  value: number;
+  value: number | string;
   href: string;
 }) {
   const t = tones[tone];
   return (
-    <Link href={href} className={`group relative block rounded-2xl border p-3.5 transition sm:p-5 ${t.card}`}>
+    <Link href={href} className={`group relative block rounded-lg border p-3.5 transition sm:p-5 ${t.card}`}>
       <ChevronRight className="absolute top-4 right-3 h-4 w-4 text-ink-soft transition group-hover:translate-x-0.5 group-hover:text-ink sm:top-5 sm:right-4" />
       <span className={`grid h-8 w-8 place-items-center rounded-lg sm:h-9 sm:w-9 ${t.icon}`}>{icon}</span>
       <p className="mt-3 truncate text-[0.74rem] text-ink-soft sm:text-[0.78rem]">

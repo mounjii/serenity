@@ -80,7 +80,7 @@ export default async function Contact() {
           </ul>
         </Reveal>
 
-        <Reveal variant="fade" delay={150} className="relative aspect-[4/3] overflow-hidden rounded-sm border border-sand bg-sand lg:aspect-auto lg:min-h-[480px]">
+        <Reveal variant="fade" delay={150} className="relative aspect-[4/3] overflow-hidden rounded-lg border border-sand bg-sand lg:aspect-auto lg:min-h-[480px]">
           <iframe
             title={t.contact.mapTitle}
             src={`https://maps.google.com/maps?q=${mapQuery}&z=17&hl=${locale}&output=embed`}

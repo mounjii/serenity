@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { loginAction, type LoginState } from "@/app/admin/actions";
 import { Button } from "@/components/ui/Button";
+import PasswordField from "./PasswordField";
 
 const initialState: LoginState = { error: null };
 const inputClass =
@@ -18,12 +19,15 @@ export default function LoginForm({ next }: { next: string }) {
         <label htmlFor="username" className="mb-1.5 block text-[0.8rem]">Username</label>
         <input id="username" name="username" autoComplete="username" required className={inputClass} />
       </div>
-      <div>
-        <label htmlFor="password" className="mb-1.5 block text-[0.8rem]">Password</label>
-        <input id="password" name="password" type="password" autoComplete="current-password" required className={inputClass} />
-      </div>
+      <PasswordField
+        id="password"
+        name="password"
+        label="Password"
+        autoComplete="current-password"
+        required
+      />
       {state.error && (
-        <p role="alert" className="rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-[0.85rem] text-red-700">
+        <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[0.85rem] text-red-700">
           {state.error}
         </p>
       )}

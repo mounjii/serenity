@@ -7,6 +7,7 @@ import { addMinutes, dateStringToDbDate, localToUtc, toLocalDateString, toLocalM
 import { getDb } from "@/server/db";
 import { AppError, businessRule } from "@/server/errors";
 import { getWhatsAppMode } from "@/server/whatsapp";
+import { claimVoucher, markVoucherUsed } from "@/server/loyalty/engine";
 import { getDaySchedule } from "./schedule";
 import { confirmationDeadline, holdsSlot } from "./slot-hold";
 
@@ -83,7 +84,16 @@ export async function createBooking(rawInput: unknown, options: CreateBookingOpt
   // Duration and price always come from the database, never from the client.
   const option = pickOption(serviceRow.options, input.durationMinutes);
   if (!option) throw businessRule("SERVICE_UNAVAILABLE", "This duration is not available for this service.");
-  const service = { id: serviceRow.id, durationMinutes: option.durationMinutes, priceCents: option.priceCents };
+  let priceCents = option.priceCents;
+  let discountCents = 0;
+  let voucherId: string | undefined;
+  if (input.voucherCode) {
+    const claimed = await claimVoucher(input.voucherCode, input.customerPhone, serviceRow.id, option.priceCents);
+    priceCents = claimed.priceCents;
+    discountCents = claimed.discountCents;
+    voucherId = claimed.voucher.id;
+  }
+  const service = { id: serviceRow.id, durationMinutes: option.durationMinutes, priceCents };
 
   const localDate = toLocalDateString(startAt);
   const schedule = await getDaySchedule(db, localDate);
@@ -148,6 +158,8 @@ export async function createBooking(rawInput: unknown, options: CreateBookingOpt
               blockedUntil,
               durationMinutes: service.durationMinutes,
               priceCents: service.priceCents,
+              discountCents,
+              voucherId: voucherId ?? null,
               customerName: input.customerName,
               customerPhone: input.customerPhone,
               note: input.note ?? null,
@@ -168,6 +180,7 @@ export async function createBooking(rawInput: unknown, options: CreateBookingOpt
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted, maxWait: 5_000, timeout: 15_000 },
       );
+      if (voucherId) await markVoucherUsed(voucherId);
       return { kind: "created", booking: toSummary(row) };
     } catch (error) {
       if (error instanceof AppError) throw error;

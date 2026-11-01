@@ -52,6 +52,14 @@ export const createBookingSchema = customerDetailsSchema.extend({
   website: z.string().max(500).optional(),
   /** Language of the site when booking; the client's WhatsApp messages use it. */
   locale: z.enum(LOCALES).optional(),
+  voucherCode: z
+    .string()
+    .max(16)
+    .optional()
+    .transform((value) => {
+      const code = value?.trim().toUpperCase();
+      return code ? code : undefined;
+    }),
 });
 
 export type CreateBookingInput = z.input<typeof createBookingSchema>;

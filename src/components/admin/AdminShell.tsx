@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { logoutAction } from "@/app/admin/actions";
-import { BellIcon, CalendarIcon, CalendarOffIcon, ClockIcon, CloseIcon, HomeIcon, LogoutIcon, MenuIcon, PlusIcon } from "@/components/Icons";
+import { BellIcon, CalendarIcon, CalendarOffIcon, ClockIcon, CloseIcon, HomeIcon, LogoutIcon, MenuIcon, PlusIcon, StarIcon, UserIcon } from "@/components/Icons";
 import { blurProps, images } from "@/lib/images";
 
 const links = [
@@ -14,6 +14,8 @@ const links = [
   { href: "/admin/activity", label: "Activity", icon: ClockIcon },
   { href: "/admin/closed-days", label: "Closed days", icon: CalendarOffIcon },
   { href: "/admin/notifications", label: "Notifications", icon: BellIcon },
+  { href: "/admin/loyalty", label: "Loyalty", icon: StarIcon },
+  { href: "/admin/profile", label: "Profile", icon: UserIcon },
 ];
 
 function Sidebar({ username, onNavigate }: { username: string; onNavigate?: () => void }) {
@@ -53,7 +55,7 @@ function Sidebar({ username, onNavigate }: { username: string; onNavigate?: () =
       </nav>
 
       <div className="mt-auto space-y-5 pt-8">
-        <div className="relative hidden h-[120px] overflow-hidden rounded-xl ring-1 ring-white/10 [@media(min-height:760px)]:block">
+        <div className="relative hidden h-[120px] overflow-hidden rounded-lg ring-1 ring-white/10 [@media(min-height:760px)]:block">
           <Image src={images.testimonial} {...blurProps(images.testimonial)} alt="" fill sizes="240px" className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
           <p className="absolute inset-x-4 bottom-3.5 text-[0.8rem] leading-snug text-white">
@@ -63,15 +65,15 @@ function Sidebar({ username, onNavigate }: { username: string; onNavigate?: () =
           </p>
         </div>
 
-        <div className="flex items-center gap-3 px-1">
+        <Link href="/admin/profile" onClick={onNavigate} className="flex items-center gap-3 rounded-lg px-1 py-1 transition hover:bg-white/[0.04]">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-bronze/80 font-serif text-[1.05rem] text-white uppercase">
             {username.charAt(0)}
           </span>
           <span className="min-w-0">
             <span className="block truncate text-[0.84rem] text-white">{username}</span>
-            <span className="block text-[0.7rem] text-white/50">Administrator</span>
+            <span className="block text-[0.7rem] text-white/50">Edit profile</span>
           </span>
-        </div>
+        </Link>
 
         <form action={logoutAction}>
           <button

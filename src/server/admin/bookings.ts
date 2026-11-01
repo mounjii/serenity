@@ -4,7 +4,7 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { formatLongDateIn } from "@/i18n/format";
 import { serviceText } from "@/i18n/services";
 import { canCancel, canComplete, canConfirm, type BookingStatusValue } from "@/lib/booking-status";
-import { addDays, formatLongDate, isValidDateString, localToUtc, toLocalDateString, toLocalTimeString } from "@/lib/time";
+import { addDays, formatLongDate, isValidDateString, localToUtc, toLocalDateString, toLocalTimeString, weekdayOf } from "@/lib/time";
 import { holdsSlot } from "@/server/booking/slot-hold";
 import { getDb } from "@/server/db";
 import { businessRule, notFound } from "@/server/errors";
@@ -135,17 +135,40 @@ export async function listBookingsForDates(from: string, to: string): Promise<Ad
 export async function getDashboardSummary(now = new Date()) {
   const db = getDb();
   const today = toLocalDateString(now);
-  const [todayCount, next] = await Promise.all([
+  const todayStart = localToUtc(today, 0);
+  const tomorrow = localToUtc(addDays(today, 1), 0);
+  const weekday = weekdayOf(today);
+  const weekStart = addDays(today, weekday === 0 ? -6 : 1 - weekday);
+  const weekEnd = addDays(weekStart, 7);
+
+  const [todayCount, pendingCount, next, todayRevenue, weekCount] = await Promise.all([
     db.booking.count({
-      where: { status: { not: "CANCELLED" }, startAt: { gte: localToUtc(today, 0), lt: localToUtc(addDays(today, 1), 0) } },
+      where: { status: { not: "CANCELLED" }, startAt: { gte: todayStart, lt: tomorrow } },
+    }),
+    db.booking.count({
+      where: { status: "PENDING", startAt: { gte: todayStart } },
     }),
     db.booking.findFirst({
       where: { ...holdsSlot(now), status: { in: ["CONFIRMED", "PENDING"] }, startAt: { gt: now } },
       orderBy: { startAt: "asc" },
       select: adminBookingSelect,
     }),
+    db.booking.aggregate({
+      where: { status: { not: "CANCELLED" }, startAt: { gte: todayStart, lt: tomorrow } },
+      _sum: { priceCents: true },
+    }),
+    db.booking.count({
+      where: { status: { not: "CANCELLED" }, startAt: { gte: localToUtc(weekStart, 0), lt: localToUtc(weekEnd, 0) } },
+    }),
   ]);
-  return { today, todayCount, nextBooking: next ? toAdminBooking(next) : null };
+  return {
+    today,
+    todayCount,
+    pendingCount,
+    todayRevenueCents: todayRevenue._sum.priceCents ?? 0,
+    weekCount,
+    nextBooking: next ? toAdminBooking(next) : null,
+  };
 }
 
 export async function getAdminBooking(id: string): Promise<AdminBooking | null> {

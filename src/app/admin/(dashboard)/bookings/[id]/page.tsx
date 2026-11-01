@@ -25,7 +25,9 @@ export default async function AdminBookingPage({ params }: PageProps<"/admin/boo
 
   return (
     <div className="mx-auto max-w-3xl">
-      <Link href="/admin" className="text-[0.8rem] text-ink-soft hover:text-ink">← Back to dashboard</Link>
+      <Link href="/admin/bookings" className="text-[0.8rem] text-ink-soft hover:text-ink">
+        ← Back to bookings
+      </Link>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <h1 className="font-serif text-4xl text-ink">{booking.customerName}</h1>
@@ -35,7 +37,7 @@ export default async function AdminBookingPage({ params }: PageProps<"/admin/boo
         {booking.serviceName} · {booking.dateLabel} · {booking.time} – {booking.endTime}
       </p>
 
-      <section className="mt-8 rounded-sm bg-white p-6 shadow-[0_20px_40px_-32px_rgba(60,40,20,0.35)] sm:p-8">
+      <section className="mt-8 rounded-lg bg-white p-6 shadow-[0_20px_40px_-32px_rgba(60,40,20,0.35)] sm:p-8">
         <dl className="grid gap-x-8 gap-y-5 text-[0.9rem] sm:grid-cols-2">
           <Item label="Phone">
             <span className="flex flex-wrap items-center gap-2">
@@ -66,7 +68,7 @@ export default async function AdminBookingPage({ params }: PageProps<"/admin/boo
           {booking.completedAt && <Item label="Completed">{stamp(booking.completedAt)}</Item>}
           <div className="sm:col-span-2">
             <dt className="text-[0.72rem] tracking-[0.2em] text-muted uppercase">Note</dt>
-            <dd className="mt-1.5 rounded-sm bg-cream px-4 py-3 whitespace-pre-wrap text-ink">
+            <dd className="mt-1.5 rounded-lg bg-cream px-4 py-3 whitespace-pre-wrap text-ink">
               {booking.note ?? <span className="text-muted">No note.</span>}
             </dd>
           </div>

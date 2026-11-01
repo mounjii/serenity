@@ -30,6 +30,22 @@ enum NotificationStatus {
   FAILED
 }
 
+enum VoucherKind {
+  REWARD
+  BIRTHDAY
+  PERSONALIZED
+  PROMO
+}
+
+enum LoyaltyAlertKind {
+  POINTS
+  TIER
+  BIRTHDAY
+  PERSONALIZED
+  PROMO
+  VOUCHER
+}
+
 model Service {
   id              String    @id @default(cuid())
   slug            String    @unique @db.VarChar(80)
@@ -119,13 +135,91 @@ model Booking {
   completedAt     DateTime?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+  discountCents   Int               @default(0)
+  voucherId       String?           @unique
+  voucher         Voucher?          @relation(fields: [voucherId], references: [id])
   notifications   NotificationLog[]
+  loyaltyLedgers  LoyaltyLedger[]
 
   @@index([therapistId, startAt])
   @@index([status, startAt])
   @@index([updatedAt])
   @@index([status, confirmationExpiresAt])
   @@map("bookings")
+}
+
+/// Customer account, keyed by the WhatsApp / booking phone number (E.164).
+model Customer {
+  id           String          @id @default(cuid())
+  name         String          @db.VarChar(80)
+  phone        String          @unique @db.VarChar(20)
+  passwordHash String          @db.VarChar(100)
+  birthday     DateTime?       @db.Date
+  points       Int             @default(0)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  ledgers      LoyaltyLedger[]
+  vouchers     Voucher[]
+  alerts       LoyaltyAlert[]
+
+  @@map("customers")
+}
+
+model LoyaltyLedger {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  bookingId  String?
+  booking    Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  points     Int
+  reason     String   @db.VarChar(40)
+  createdAt  DateTime @default(now())
+
+  @@index([customerId, createdAt])
+  @@index([bookingId])
+  @@map("loyalty_ledgers")
+}
+
+model Voucher {
+  id              String      @id @default(cuid())
+  customerId      String
+  customer        Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  kind            VoucherKind
+  code            String      @unique @db.VarChar(16)
+  title           String      @db.VarChar(120)
+  discountCents   Int?
+  discountPercent Int?
+  serviceId       String?
+  expiresAt       DateTime
+  usedAt          DateTime?
+  createdAt       DateTime    @default(now())
+  booking         Booking?
+
+  @@index([customerId, usedAt])
+  @@map("vouchers")
+}
+
+model LoyaltyAlert {
+  id         String           @id @default(cuid())
+  customerId String
+  customer   Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  kind       LoyaltyAlertKind
+  payload    Json
+  readAt     DateTime?
+  createdAt  DateTime         @default(now())
+
+  @@index([customerId, createdAt])
+  @@map("loyalty_alerts")
+}
+
+/// Single salon-owner login. Env ADMIN_* is used until this row is saved from the dashboard.
+model AdminAccount {
+  id           Int      @id @default(1)
+  username     String   @unique @db.VarChar(40)
+  passwordHash String   @db.VarChar(100)
+  updatedAt    DateTime @updatedAt
+
+  @@map("admin_accounts")
 }
 
 model NotificationLog {

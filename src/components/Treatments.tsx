@@ -89,7 +89,7 @@ export default async function Treatments() {
                 as="article"
                 key={service.slug}
                 delay={(i % 4) * 120}
-                className="group relative flex w-[80%] shrink-0 snap-start flex-col overflow-hidden rounded-[1.6rem] bg-white shadow-[0_16px_36px_-22px_rgba(60,40,20,0.28)] transition-shadow duration-500 hover:shadow-[0_24px_48px_-22px_rgba(60,40,20,0.36)] sm:w-auto"
+                className="group relative flex w-[80%] shrink-0 snap-start flex-col overflow-hidden rounded-lg bg-white shadow-[0_16px_36px_-22px_rgba(60,40,20,0.28)] transition-shadow duration-500 hover:shadow-[0_24px_48px_-22px_rgba(60,40,20,0.36)] sm:w-auto"
               >
                 <Link
                   href={href(`${RESERVATION_PATH}?service=${service.slug}`)}

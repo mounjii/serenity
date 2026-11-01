@@ -6,6 +6,10 @@ export const DEFAULT_LOCALE: Locale = "en";
 export const LOCALE_COOKIE = "ts-lang";
 /** Set by the proxy on every public request; read by the root layout and the pages. */
 export const LOCALE_HEADER = "x-ts-locale";
+/** sessionStorage flag: a language switch should keep the current scroll position. */
+export const LOCALE_SWITCH_KEY = "ts-locale-switch";
+/** Scroll Y saved just before a language switch reloads the page. */
+export const LOCALE_SCROLL_KEY = "ts-locale-scroll";
 
 export const LOCALE_NAMES: Record<Locale, string> = { en: "English", fr: "Français", ar: "العربية" };
 /** Locale used for Intl dates and numbers. ar-MA keeps Western digits, as used in Morocco. */

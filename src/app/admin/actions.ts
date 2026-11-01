@@ -1,10 +1,12 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { adminAction, type ActionResult } from "@/server/admin/action-result";
 import { cancelBooking, completeBooking, confirmBooking, type AdminBooking } from "@/server/admin/bookings";
 import { addClosedDay, removeClosedDay, type ClosedDayItem } from "@/server/admin/closed-days";
+import { updateAdminProfile } from "@/server/admin/profile";
 import { clearLoginFailures, isLoginThrottled, recordLoginFailure, verifyCredentials } from "@/server/auth/credentials";
 import { endSession, startSession } from "@/server/auth/session";
 import { applyCustomerReply } from "@/server/booking/confirmation";
@@ -15,6 +17,7 @@ import {
   scheduleBookingConfirmedNotification,
   scheduleBookingCreatedNotifications,
 } from "@/server/notifications/booking-notifications";
+import { awardVisitPoints, sendPromo } from "@/server/loyalty/engine";
 import { isMockWhatsApp } from "@/server/whatsapp";
 
 export type LoginState = { error: string | null };
@@ -57,6 +60,25 @@ export async function logoutAction(): Promise<void> {
   redirect("/");
 }
 
+export type ProfileState = { error: string | null; fieldErrors?: Record<string, string>; saved: boolean };
+
+export async function updateAdminProfileAction(_prev: ProfileState, formData: FormData): Promise<ProfileState> {
+  const result = await adminAction(() =>
+    updateAdminProfile({
+      username: String(formData.get("username") ?? ""),
+      currentPassword: String(formData.get("currentPassword") ?? "").slice(0, 200),
+      newPassword: String(formData.get("newPassword") ?? "").slice(0, 200),
+      confirmPassword: String(formData.get("confirmPassword") ?? "").slice(0, 200),
+    }),
+  );
+  if (!result.ok) {
+    return { error: result.error.message, fieldErrors: result.error.fields, saved: false };
+  }
+  await startSession(result.data.username);
+  revalidatePath("/admin", "layout");
+  return { error: null, saved: true };
+}
+
 export async function cancelBookingAction(id: string): Promise<ActionResult<AdminBooking>> {
   return adminAction(async () => {
     const booking = await cancelBooking(id);
@@ -85,7 +107,24 @@ export async function simulateCustomerReplyAction(id: string, action: "confirm" 
 }
 
 export async function completeBookingAction(id: string): Promise<ActionResult<AdminBooking>> {
-  return adminAction(() => completeBooking(id));
+  return adminAction(async () => {
+    const booking = await completeBooking(id);
+    await awardVisitPoints(booking.id);
+    return booking;
+  });
+}
+
+export async function sendLoyaltyPromoAction(formData: FormData): Promise<ActionResult<{ count: number }>> {
+  const result = await adminAction(async () => {
+    const count = await sendPromo({
+      message: String(formData.get("message") ?? ""),
+      percent: Number(formData.get("percent") || 0) || undefined,
+      days: Number(formData.get("days") || 0) || undefined,
+    });
+    return { count };
+  });
+  if (result.ok) revalidatePath("/admin/loyalty");
+  return result;
 }
 
 export type AdminBookingInput = {

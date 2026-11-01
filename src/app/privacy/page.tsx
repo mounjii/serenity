@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
-import Navbar from "@/components/Navbar";
+import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import { INTL_LOCALE } from "@/i18n/config";
 import type { PrivacyBlock } from "@/i18n/dictionaries/en";
@@ -57,7 +57,7 @@ export default async function PrivacyPage() {
 
   return (
     <>
-      <Navbar />
+      <SiteHeader />
       <main className="min-h-screen bg-cream pt-28 pb-16 sm:pt-36 sm:pb-24">
         <article className="mx-auto max-w-3xl px-5 sm:px-6">
           <p className="eyebrow">{p.eyebrow}</p>

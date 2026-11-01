@@ -21,7 +21,7 @@ export default async function Gallery() {
               key={src}
               variant="zoom"
               delay={(i % 4) * 110}
-              className="group relative aspect-[3/4] w-[72%] shrink-0 snap-start overflow-hidden rounded-sm sm:w-auto"
+              className="group relative aspect-[3/4] w-[72%] shrink-0 snap-start overflow-hidden rounded-lg sm:w-auto"
             >
               <Image
                 src={src} {...blurProps(src)}

@@ -10,10 +10,12 @@ import { Button } from "@/components/ui/Button";
 import { BUFFER_MINUTES, DEFAULT_PHONE_PREFIX, NOTE_MAX } from "@/lib/booking-rules";
 import { customerDetailsSchema } from "@/lib/booking-schema";
 import { formatDuration, formatPrice } from "@/lib/format";
+import { voucherDiscount } from "@/lib/loyalty-rules";
 import { blurProps, serviceCardImage, serviceImage } from "@/lib/images";
 import { formatPhone } from "@/lib/phone";
 import { PRESSURE_LEVEL, type ServiceDetails } from "@/lib/service-details";
 import { pickOption } from "@/lib/service-options";
+import { LOCALE_SWITCH_KEY } from "@/i18n/config";
 import { NAVBAR_OFFSET, prefersReducedMotion, smoothScrollTo } from "@/lib/smooth-scroll";
 import type { FinderMatch } from "@/lib/treatment-finder";
 import TreatmentFinder from "./TreatmentFinder";
@@ -25,6 +27,7 @@ import { dayPartsIn, fmt, formatLongDateIn } from "@/i18n/format";
 import { localizedServiceDetails, serviceText } from "@/i18n/services";
 import type { BookableDay } from "@/server/booking/calendar";
 import type { PublicService } from "@/server/booking/services";
+import type { PublicVoucher } from "@/server/loyalty/engine";
 import type { ApiErrorBody } from "@/server/errors";
 
 type Slot = { time: string; startAt: string };
@@ -72,9 +75,16 @@ async function readError(res: Response): Promise<ApiErrorBody["error"] | null> {
   }
 }
 
-type Props = { services: PublicService[]; days: BookableDay[]; initialServiceSlug?: string; initialDuration?: number };
+type Props = {
+  services: PublicService[];
+  days: BookableDay[];
+  initialServiceSlug?: string;
+  initialDuration?: number;
+  guest?: { name: string; phone: string };
+  vouchers?: PublicVoucher[];
+};
 
-export default function BookingFlow({ services, days, initialServiceSlug, initialDuration }: Props) {
+export default function BookingFlow({ services, days, initialServiceSlug, initialDuration, guest, vouchers = [] }: Props) {
   const router = useRouter();
   const { t, locale, href } = useI18n();
   const nameOf = (s: PublicService) => serviceText(t, s).name;
@@ -93,11 +103,12 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
   const [date, setDate] = useState<string | null>(null);
   const [slot, setSlot] = useState<Slot | null>(null);
   const [details, setDetails] = useState<Details>({
-    customerName: "",
-    customerPhone: `${DEFAULT_PHONE_PREFIX} `,
+    customerName: guest?.name ?? "",
+    customerPhone: guest?.phone ? formatPhone(guest.phone) : `${DEFAULT_PHONE_PREFIX} `,
     note: "",
     website: "",
   });
+  const [voucherCode, setVoucherCode] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [slots, setSlots] = useState<Slot[]>([]);
   const [times, setTimes] = useState<GridTime[]>([]);
@@ -131,10 +142,17 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
 
   // Arriving on the page: let the hero settle, then glide down to the steps, unless the visitor
   // already scrolled on their own. Decided when the timer fires, once the browser has settled the
-  // initial scroll position.
+  // initial scroll position. A language switch must not restart this glide.
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return undefined;
+    try {
+      const switchedAt = Number(sessionStorage.getItem(LOCALE_SWITCH_KEY) || 0);
+      if (switchedAt && Date.now() - switchedAt < 2000) {
+        sessionStorage.removeItem(LOCALE_SWITCH_KEY);
+        return undefined;
+      }
+    } catch {}
     let cancel = () => {};
     let userScrolled = false;
     const markUserScroll = () => {
@@ -176,6 +194,9 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
 
   const service = services.find((s) => s.id === serviceId) ?? null;
   const option = service && durationMinutes ? pickOption(service.options, durationMinutes) : null;
+  const usableVouchers = vouchers.filter((v) => !v.serviceId || v.serviceId === serviceId);
+  const selectedVoucher = usableVouchers.find((v) => v.code === voucherCode.trim().toUpperCase());
+  const previewDiscount = option && selectedVoucher ? voucherDiscount(option.priceCents, selectedVoucher) : 0;
 
   const resetAttempt = () => {
     idempotencyKey.current = newIdempotencyKey();
@@ -316,6 +337,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
           website: details.website,
           idempotencyKey: idempotencyKey.current,
           locale,
+          voucherCode: voucherCode.trim() || undefined,
         }),
       });
       if (res.ok) {
@@ -422,7 +444,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
         </div>
       )}
 
-      <section className="animate-fade-up mt-8 overflow-hidden rounded-xl border border-sand/60 bg-[#fcfaf7] p-4 shadow-[0_30px_60px_-35px_rgba(60,40,20,0.35)] [animation-delay:300ms] sm:p-8 lg:p-10">
+      <section className="animate-fade-up mt-8 overflow-hidden rounded-lg border border-sand/60 bg-[#fcfaf7] p-4 shadow-[0_30px_60px_-35px_rgba(60,40,20,0.35)] [animation-delay:300ms] sm:p-8 lg:p-10">
         <div key={position} className={direction > 0 ? "animate-step-next" : "animate-step-prev"}>
         {showFinder && <TreatmentFinder services={services} onPick={pickFromFinder} onClose={() => setFinderOpen(false)} />}
 
@@ -446,7 +468,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
               </p>
             </div>
             {services.length > 1 && (
-              <div className="mt-6 flex flex-col gap-3 rounded-xl border border-sand bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+              <div className="mt-6 flex flex-col gap-3 rounded-lg border border-sand bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                 <div className="flex items-center gap-3">
                   <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-cream-dark text-ink-soft">
                     <LotusIcon className="h-5 w-5" aria-hidden />
@@ -570,7 +592,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                     aria-label={
                       d.open ? longDate(new Date(`${d.date}T12:00:00.000Z`)) : `${parts.weekday} ${parts.day} ${parts.month} (${t.booking.closed})`
                     }
-                    className={`flex min-h-16 flex-col items-center justify-center rounded-md border text-center transition ${
+                    className={`flex min-h-16 flex-col items-center justify-center rounded-lg border text-center transition ${
                       selected
                         ? "border-ink bg-ink text-cream"
                         : d.open
@@ -623,7 +645,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                         type="button"
                         onClick={() => chooseSlot({ time: time.time, startAt: time.startAt })}
                         aria-pressed={slot?.startAt === time.startAt}
-                        className={`min-h-12 rounded-md border text-[0.9rem] transition ${
+                        className={`min-h-12 rounded-lg border text-[0.9rem] transition ${
                           slot?.startAt === time.startAt ? "border-ink bg-ink text-cream" : "border-sand bg-white text-ink hover:border-ink"
                         }`}
                       >
@@ -637,7 +659,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                           <span
                             key={time.startAt}
                             aria-label={`${time.time}, ${label.toLowerCase()}`}
-                            className={`flex min-h-12 cursor-not-allowed flex-col items-center justify-center rounded-md border leading-tight ${look.className}`}
+                            className={`flex min-h-12 cursor-not-allowed flex-col items-center justify-center rounded-lg border leading-tight ${look.className}`}
                           >
                             <span className="text-[0.85rem] line-through">{time.time}</span>
                             <span className="text-[0.56rem] tracking-[0.15em] uppercase">{label}</span>
@@ -693,6 +715,31 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                   className={`${inputClass(!!fieldErrors.customerPhone)} rtl:text-end`}
                 />
               </Field>
+              <Field label={t.loyalty.voucherLabel} htmlFor="voucherCode" hint={t.loyalty.voucherHint}>
+                {usableVouchers.length > 0 && (
+                  <select
+                    value={voucherCode}
+                    onChange={(e) => setVoucherCode(e.target.value)}
+                    className={inputClass(false)}
+                  >
+                    <option value="">{t.loyalty.voucherNone}</option>
+                    {usableVouchers.map((v) => (
+                      <option key={v.id} value={v.code}>
+                        {v.code} — {v.title}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <input
+                  id="voucherCode"
+                  name="voucherCode"
+                  value={voucherCode}
+                  onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
+                  maxLength={16}
+                  placeholder={t.loyalty.voucherCode}
+                  className={`${inputClass(false)} ${usableVouchers.length > 0 ? "mt-2" : ""}`}
+                />
+              </Field>
               <Field label={t.booking.note} htmlFor="note" error={fieldErrors.note}>
                 <textarea
                   id="note"
@@ -739,7 +786,16 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                 ltr
               />
               {details.note.trim() && <SummaryRow label={t.booking.noteLabel} value={details.note.trim()} />}
-              <SummaryRow label={t.booking.price} value={formatPrice(option.priceCents, locale)} strong />
+              {selectedVoucher && <SummaryRow label={t.loyalty.voucherLabel} value={selectedVoucher.code} />}
+              <SummaryRow
+                label={t.booking.price}
+                value={
+                  previewDiscount > 0
+                    ? `${formatPrice(option.priceCents - previewDiscount, locale)} (${fmt(t.loyalty.priceWas, { price: formatPrice(option.priceCents, locale) })})`
+                    : formatPrice(option.priceCents, locale)
+                }
+                strong
+              />
             </dl>
             <p className="mt-4 text-[0.75rem] text-muted">{t.booking.payAtSalon}</p>
             <p className="mt-2 text-[0.75rem] leading-relaxed text-muted">
@@ -750,7 +806,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
               {t.booking.privacyAfter}
             </p>
             {submitError && (
-              <p role="alert" className="mt-6 rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-[0.85rem] text-red-700">
+              <p role="alert" className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[0.85rem] text-red-700">
                 {submitError}
               </p>
             )}
@@ -842,7 +898,7 @@ function ServiceDetailView({
       </button>
 
       <div className="mt-5 grid gap-6 md:grid-cols-[0.85fr_1.5fr] md:gap-8">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-xl md:aspect-auto md:min-h-[21rem]">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-lg md:aspect-auto md:min-h-[21rem]">
           <Image src={serviceImage(service.slug)} {...blurProps(serviceImage(service.slug))} alt={name} fill sizes="(min-width: 768px) 34vw, 100vw" className="object-cover" />
         </div>
 
@@ -906,7 +962,7 @@ function ServiceDetailView({
 
 function TreatmentDetails({ info, t }: { info: ServiceDetails; t: Dictionary }) {
   return (
-    <section className="mt-8 rounded-2xl border border-sand/70 bg-white/60 p-4 sm:p-6">
+    <section className="mt-8 rounded-lg border border-sand/70 bg-white/60 p-4 sm:p-6">
       <h3 className="px-1 text-[1.05rem] font-medium text-ink">{t.booking.treatmentDetails}</h3>
       <div className="mt-4 space-y-3">
         <DetailItem icon={LotusIcon} title={t.booking.overview} summary={info.summary}>
@@ -975,7 +1031,7 @@ function DetailItem({
 }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className={`rounded-xl border bg-white transition-shadow duration-300 ${open ? "border-sand shadow-[0_14px_30px_-24px_rgba(60,40,20,0.5)]" : "border-sand/70"}`}>
+    <div className={`rounded-lg border bg-white transition-shadow duration-300 ${open ? "border-sand shadow-[0_14px_30px_-24px_rgba(60,40,20,0.5)]" : "border-sand/70"}`}>
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="flex w-full items-center gap-4 px-4 py-3.5 text-start sm:px-5">
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-cream-dark text-ink-soft">
           <Icon className="h-5 w-5" aria-hidden />

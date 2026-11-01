@@ -6,7 +6,16 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/admin", "/api/", "/reservation/confirmation/", "/fr/reservation/confirmation/", "/ar/reservation/confirmation/"],
+      disallow: [
+        "/admin",
+        "/api/",
+        "/account",
+        "/fr/account",
+        "/ar/account",
+        "/reservation/confirmation/",
+        "/fr/reservation/confirmation/",
+        "/ar/reservation/confirmation/",
+      ],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,

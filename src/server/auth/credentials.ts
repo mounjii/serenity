@@ -6,7 +6,7 @@ const sha256 = (value: string) => createHash("sha256").update(value).digest();
 
 /** Always runs bcrypt, so a wrong username takes as long as a wrong password. */
 export async function verifyCredentials(username: string, password: string): Promise<boolean> {
-  const config = getAdminConfig();
+  const config = await getAdminConfig();
   const usernameOk = timingSafeEqual(sha256(username.trim()), sha256(config.username));
   const passwordOk = await bcrypt.compare(password, config.passwordHash);
   return usernameOk && passwordOk;

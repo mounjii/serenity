@@ -22,7 +22,7 @@ const dotColor: Record<BookingStatusValue, string> = {
 };
 
 export function Card({ className = "", children }: { className?: string; children: React.ReactNode }) {
-  return <section className={`rounded-2xl border border-sand/60 bg-white shadow-[0_1px_2px_rgba(42,40,36,0.04)] ${className}`}>{children}</section>;
+  return <section className={`rounded-lg border border-sand/60 bg-white shadow-[0_1px_2px_rgba(42,40,36,0.04)] ${className}`}>{children}</section>;
 }
 
 export function NextAppointmentCard({ booking, isToday }: { booking: AdminBooking | null; isToday: boolean }) {
@@ -47,7 +47,7 @@ export function NextAppointmentCard({ booking, isToday }: { booking: AdminBookin
       )}
     </>
   );
-  const className = "group relative block h-full rounded-2xl border border-[#dbe5f2] bg-[#f1f5fb] p-4 text-left sm:p-5";
+  const className = "group relative block h-full rounded-lg border border-[#dbe5f2] bg-[#f1f5fb] p-4 text-left sm:p-5";
   if (!booking) return <div className={className}>{inner}</div>;
   return (
     <button type="button" onClick={() => openBooking(booking.id)} className={`${className} w-full transition hover:border-[#b9cbe4]`}>
@@ -88,7 +88,7 @@ export function TodaySchedule({ bookings, dateLabel }: { bookings: AdminBooking[
             return (
               <li
                 key={b.id}
-                className={`grid grid-cols-[3rem_0.75rem_minmax(0,1fr)] gap-x-3 rounded-xl px-2 py-3 transition-colors sm:grid-cols-[3.5rem_0.75rem_minmax(0,1fr)_auto] sm:gap-x-4 sm:px-3 ${
+                className={`grid grid-cols-[3rem_0.75rem_minmax(0,1fr)] gap-x-3 rounded-lg px-2 py-3 transition-colors sm:grid-cols-[3.5rem_0.75rem_minmax(0,1fr)_auto] sm:gap-x-4 sm:px-3 ${
                   highlighted.has(b.id) ? "bg-gold/10" : ""
                 } ${last ? "" : "border-b border-sand/50"}`}
               >

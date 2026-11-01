@@ -6,7 +6,7 @@ export default async function AdminLoginPage({ searchParams }: PageProps<"/admin
   const { next } = await searchParams;
   return (
     <main className="flex min-h-screen items-center justify-center px-5 py-16">
-      <div className="w-full max-w-sm rounded-sm bg-white p-8 shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)]">
+      <div className="w-full max-w-sm rounded-lg bg-white p-8 shadow-[0_20px_40px_-28px_rgba(60,40,20,0.35)]">
         <Image
           src="/images/ts-logo-stacked.webp"
           alt="Touch Sense Thai Massage"
@@ -18,8 +18,14 @@ export default async function AdminLoginPage({ searchParams }: PageProps<"/admin
         <h1 className="mt-5 text-center font-serif text-3xl text-ink">Admin sign in</h1>
         <LoginForm next={typeof next === "string" ? next : "/admin"} />
         <Link
-          href="/"
+          href="/account/login"
           className="mt-4 flex min-h-12 w-full items-center justify-center rounded-full border border-sand text-[0.8rem] tracking-wide text-ink transition hover:border-ink"
+        >
+          Customer sign in
+        </Link>
+        <Link
+          href="/"
+          className="mt-2 flex min-h-12 w-full items-center justify-center text-[0.8rem] tracking-wide text-muted transition hover:text-ink"
         >
           ← Back to home
         </Link>

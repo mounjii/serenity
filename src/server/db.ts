@@ -24,6 +24,12 @@ function createPrismaClient(): PrismaClient {
 
 /** Lazily created so that importing this module never needs a database (e.g. during `next build`). */
 export function getDb(): PrismaClient {
+  const cached = globalForPrisma.prisma;
+  // After `prisma generate`, a client created from the previous class is missing new models.
+  if (cached && (!cached.customer || !cached.voucher)) {
+    globalForPrisma.prisma = undefined;
+    void cached.$disconnect().catch(() => undefined);
+  }
   if (!globalForPrisma.prisma) {
     globalForPrisma.prisma = createPrismaClient();
   }

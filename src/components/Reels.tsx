@@ -32,7 +32,7 @@ export default async function Reels() {
               key={reel.src}
               variant="zoom"
               delay={(i % 3) * 110}
-              className="relative aspect-[9/16] w-[58%] shrink-0 snap-start overflow-hidden rounded-[1.6rem] bg-ink/10 shadow-[0_16px_36px_-22px_rgba(60,40,20,0.28)] sm:w-auto"
+              className="relative aspect-[9/16] w-[58%] shrink-0 snap-start overflow-hidden rounded-lg bg-ink/10 shadow-[0_16px_36px_-22px_rgba(60,40,20,0.28)] sm:w-auto"
             >
               <ReelVideo src={reel.src} poster={reel.poster} label={t.reels.clipLabel} />
             </Reveal>

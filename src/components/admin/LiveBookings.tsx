@@ -115,7 +115,7 @@ export default function LiveBookings({ initialSince, children }: { initialSince:
   return (
     <HighlightContext.Provider value={highlighted}>
       {unread.length > 0 && (
-        <div role="status" className="mb-6 flex flex-col gap-3 rounded-sm border border-gold/50 bg-gold/15 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div role="status" className="mb-6 flex flex-col gap-3 rounded-lg border border-gold/50 bg-gold/15 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-[0.9rem] text-ink">
             <p className="font-medium">{unread.length === 1 ? "New booking" : `${unread.length} new bookings`}</p>
             <ul className="mt-1 space-y-0.5 text-[0.82rem] text-ink-soft">

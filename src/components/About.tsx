@@ -10,7 +10,7 @@ export default async function About() {
   return (
     <section id="about" className="bg-cream-dark/60">
       <div className="mx-auto grid max-w-7xl items-center gap-9 px-5 py-16 sm:gap-14 sm:px-6 sm:py-24 md:grid-cols-2 lg:gap-24 lg:px-12 lg:py-28">
-        <Reveal variant="curtain" className="relative aspect-[5/4] overflow-hidden rounded-sm shadow-[0_30px_60px_-30px_rgba(60,40,20,0.35)]">
+        <Reveal variant="curtain" className="relative aspect-[5/4] overflow-hidden rounded-lg shadow-[0_30px_60px_-30px_rgba(60,40,20,0.35)]">
           <Image
             src={images.about} {...blurProps(images.about)}
             alt={t.about.imageAlt}

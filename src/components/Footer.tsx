@@ -51,6 +51,7 @@ export default async function Footer() {
           <div className="flex items-center gap-6 sm:gap-8">
             <Link href={href("/privacy")} className="hover:text-ink">{t.footer.privacy}</Link>
             <Link href={href(RESERVATION_PATH)} className="hover:text-ink">{t.footer.bookings}</Link>
+            <Link href="/admin" className="hover:text-ink">{t.footer.staff}</Link>
             <Link
               href="#"
               aria-label={t.footer.backToTop}

@@ -111,7 +111,7 @@ function DetailsContent({ booking, whatsappMode, onClose }: { booking: AdminBook
           <StatusBadge status={booking.status} />
         </div>
 
-        <section className="mt-6 rounded-md border border-sand/70 bg-white p-4">
+        <section className="mt-6 rounded-lg border border-sand/70 bg-white p-4">
           <p className="text-[0.66rem] tracking-[0.24em] text-muted uppercase">Phone</p>
           <a href={`tel:${booking.customerPhone}`} className="mt-1 block text-[1.05rem] text-ink underline-offset-4 hover:underline">
             {formatPhone(booking.customerPhone)}
@@ -151,7 +151,7 @@ function DetailsContent({ booking, whatsappMode, onClose }: { booking: AdminBook
 
         <div className="mt-6">
           <p className="text-[0.66rem] tracking-[0.24em] text-muted uppercase">Note</p>
-          <p className="mt-2 rounded-md bg-white px-4 py-3 text-[0.88rem] whitespace-pre-wrap text-ink">
+          <p className="mt-2 rounded-lg bg-white px-4 py-3 text-[0.88rem] whitespace-pre-wrap text-ink">
             {booking.note ?? <span className="text-muted">No note.</span>}
           </p>
         </div>

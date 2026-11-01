@@ -212,7 +212,7 @@ function GoalChoice({
       onClick={onClick}
       aria-pressed={selected}
       style={{ animationDelay: `${60 + index * 50}ms` }}
-      className={`animate-fade-up group flex flex-col overflow-hidden rounded-xl border bg-white text-start transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-24px_rgba(60,40,20,0.6)] ${
+      className={`animate-fade-up group flex flex-col overflow-hidden rounded-lg border bg-white text-start transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-24px_rgba(60,40,20,0.6)] ${
         selected ? "border-bronze shadow-[0_0_0_1px_var(--color-bronze)]" : "border-sand hover:border-ink/40"
       }`}
     >
@@ -264,7 +264,7 @@ function Choice({
       onClick={onClick}
       aria-pressed={selected}
       style={{ animationDelay: `${60 + index * 50}ms` }}
-      className={`animate-fade-up group flex min-h-[5.5rem] flex-col justify-center rounded-xl border px-5 py-4 text-start transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-22px_rgba(60,40,20,0.6)] ${
+      className={`animate-fade-up group flex min-h-[5.5rem] flex-col justify-center rounded-lg border px-5 py-4 text-start transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-22px_rgba(60,40,20,0.6)] ${
         selected ? "border-ink bg-ink text-cream" : "border-sand bg-white text-ink hover:border-ink"
       }`}
     >
@@ -308,7 +308,7 @@ function Results({
       <p className="text-[0.66rem] tracking-[0.3em] text-muted uppercase">{t.finder.yourMatch}</p>
       <h2 className="mt-1.5 font-serif text-2xl text-ink sm:text-[2rem]">{t.finder.weRecommend}</h2>
 
-      <article className="animate-fade-up mt-6 grid overflow-hidden rounded-2xl border border-sand bg-white md:grid-cols-[0.9fr_1.4fr]">
+      <article className="animate-fade-up mt-6 grid overflow-hidden rounded-lg border border-sand bg-white md:grid-cols-[0.9fr_1.4fr]">
         <div className="relative aspect-[16/10] md:aspect-auto md:min-h-[17rem]">
           <Image src={serviceImage(bestService.slug)} {...blurProps(serviceImage(bestService.slug))} alt={bestName} fill sizes="(min-width: 768px) 35vw, 100vw" className="object-cover" />
           <span className="absolute top-4 start-4 inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-[0.65rem] tracking-[0.18em] text-cream uppercase">
@@ -352,7 +352,7 @@ function Results({
                   type="button"
                   onClick={() => onPick(m)}
                   style={{ animationDelay: `${150 + i * 80}ms` }}
-                  className="animate-fade-up group flex items-center gap-4 rounded-xl border border-sand bg-white p-3 text-start transition hover:-translate-y-0.5 hover:border-ink"
+                  className="animate-fade-up group flex items-center gap-4 rounded-lg border border-sand bg-white p-3 text-start transition hover:-translate-y-0.5 hover:border-ink"
                 >
                   <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
                     <Image src={serviceImage(s.slug)} {...blurProps(serviceImage(s.slug))} alt="" fill sizes="64px" className="object-cover" />
