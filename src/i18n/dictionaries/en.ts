@@ -64,13 +64,14 @@ const en = {
     eyebrow: "About Us",
     title1: "Your Wellness",
     title2: "Is Our Priority",
-    text: "At Touch Sense, we believe that true well-being comes from balance. Our mission is to provide a peaceful space where you can relax, recharge and reconnect with yourself through the power of touch.",
-    cta: "Book Now",
+    text: "At Touch Sense, we combine the wisdom of Thai massage with a modern wellness experience, in a calm and elegant environment designed for your total relaxation.",
+    cta: "Discover More",
     imageAlt: "Rolled towels and candles",
   },
   treatments: {
-    eyebrow: "Our Services",
+    eyebrow: "Our Treatments",
     title: "Massage & Wellness Treatments",
+    viewAll: "View All Treatments",
     text: "Choose from our range of professional treatments designed to relax your body, calm your mind and restore your energy.",
     count: "{n} treatments",
     swipe: "Swipe",
@@ -87,6 +88,7 @@ const en = {
   testimonials: {
     eyebrow: "Testimonials",
     title: "What Our Clients Say",
+    intro: "Real experiences from people who trusted Touch Sense.",
     items: [
       {
         quote:

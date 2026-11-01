@@ -1,10 +1,8 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useI18n } from "@/i18n/client";
 import { fmt } from "@/i18n/format";
-import { blurProps, images } from "@/lib/images";
 import { ArrowLeft, ArrowRight, StarIcon } from "./Icons";
 import Reveal from "./Reveal";
 
@@ -13,6 +11,7 @@ export default function Testimonials() {
   const testimonials = t.testimonials.items;
   const [index, setIndex] = useState(0);
   const count = testimonials.length;
+  const pair = [testimonials[index], testimonials[(index + 1) % count]];
 
   useEffect(() => {
     const id = setInterval(() => setIndex((i) => (i + 1) % count), 7000);
@@ -22,105 +21,72 @@ export default function Testimonials() {
   const prev = () => setIndex((i) => (i - 1 + count) % count);
   const next = () => setIndex((i) => (i + 1) % count);
 
-  const touchStartX = useRef<number | null>(null);
-  const onTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0]?.clientX ?? null;
-  };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    const start = touchStartX.current;
-    const end = e.changedTouches[0]?.clientX;
-    touchStartX.current = null;
-    if (start === null || end === undefined || Math.abs(end - start) < 40) return;
-    const rtl = document.documentElement.dir === "rtl";
-    if (end < start !== rtl) next();
-    else prev();
-  };
-
   return (
-    <section className="bg-cream-dark/60">
-      <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-16 sm:gap-14 sm:px-6 sm:py-24 md:grid-cols-[1fr_1.15fr] lg:gap-24 lg:px-12 lg:py-28">
-        <Reveal variant="curtain" className="relative aspect-[16/9] overflow-hidden rounded-lg shadow-[0_30px_60px_-30px_rgba(60,40,20,0.35)] sm:aspect-[4/3]">
-          <Image
-            src={images.testimonial} {...blurProps(images.testimonial)}
-            alt={t.testimonials.imageAlt}
-            fill
-            sizes="(min-width: 768px) 45vw, 100vw"
-            className="object-cover"
-          />
-        </Reveal>
-
-        <Reveal variant="right" delay={200}>
+    <section className="bg-cream">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 sm:px-6 sm:py-20 lg:grid-cols-[0.85fr_1.4fr] lg:gap-16 lg:px-12 lg:py-24">
+        <Reveal>
           <p className="eyebrow">{t.testimonials.eyebrow}</p>
-          <h2 className="mt-4 font-serif text-[2.4rem] leading-[1.08] text-ink sm:text-5xl lg:text-[3.2rem]">{t.testimonials.title}</h2>
-
-          <div className="relative mt-6 grid touch-pan-y sm:mt-8" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-            {testimonials.map((item, i) => (
-              <blockquote
-                key={item.name}
-                aria-hidden={i !== index}
-                className={`col-start-1 row-start-1 transition-all duration-700 ${
-                  i === index ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"
-                }`}
-              >
-                <p className="max-w-lg font-serif text-[1.15rem] leading-relaxed text-ink-soft italic sm:text-xl">
-                  &ldquo;{item.quote}&rdquo;
-                </p>
-              </blockquote>
-            ))}
-          </div>
-
-          <div className="mt-6 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div
-                aria-hidden
-                className="grid h-12 w-12 place-items-center rounded-full bg-sand font-serif text-xl text-ink ring-2 ring-white"
-              >
-                {testimonials[index].name.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <p className="text-[0.88rem] text-ink">
-                  <bdi>{testimonials[index].name}</bdi>
-                </p>
-                <div className="mt-1 flex gap-0.5 text-gold">
-                  {Array.from({ length: 5 }).map((_, s) => (
-                    <StarIcon key={s} className="h-3.5 w-3.5" />
-                  ))}
-                </div>
-                <p className="mt-1 text-[0.7rem] whitespace-nowrap text-muted">{t.testimonials.source}</p>
-              </div>
+          <h2 className="mt-4 max-w-xs font-serif text-[2.5rem] leading-[1.05] text-ink sm:text-5xl">{t.testimonials.title}</h2>
+          <p className="mt-4 max-w-xs text-[0.95rem] leading-relaxed font-light text-ink-soft">{t.testimonials.intro}</p>
+          <div className="mt-8 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={prev}
+              aria-label={t.testimonials.prev}
+              className="grid h-11 w-11 place-items-center rounded-full border border-sand bg-white text-ink transition hover:border-ink"
+            >
+              <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" />
+            </button>
+            <button
+              type="button"
+              onClick={next}
+              aria-label={t.testimonials.next}
+              className="grid h-11 w-11 place-items-center rounded-full border border-sand bg-white text-ink transition hover:border-ink"
+            >
+              <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
+            </button>
+            <div className="ms-2 flex gap-2">
+              {testimonials.map((item, i) => (
+                <button
+                  key={item.name}
+                  type="button"
+                  onClick={() => setIndex(i)}
+                  aria-label={fmt(t.testimonials.show, { n: i + 1 })}
+                  className={`h-2 w-2 rounded-full transition ${i === index ? "bg-ink" : "bg-sand"}`}
+                />
+              ))}
             </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={prev}
-                aria-label={t.testimonials.prev}
-                className="grid h-11 w-11 place-items-center rounded-full border border-sand bg-white text-ink transition hover:border-ink"
-              >
-                <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" />
-              </button>
-              <button
-                onClick={next}
-                aria-label={t.testimonials.next}
-                className="grid h-11 w-11 place-items-center rounded-full border border-sand bg-white text-ink transition hover:border-ink"
-              >
-                <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-8 flex gap-2">
-            {testimonials.map((item, i) => (
-              <button
-                key={item.name}
-                onClick={() => setIndex(i)}
-                aria-label={fmt(t.testimonials.show, { n: i + 1 })}
-                className={`h-[3px] rounded-full transition-all duration-500 ${
-                  i === index ? "w-8 bg-ink" : "w-4 bg-sand"
-                }`}
-              />
-            ))}
           </div>
         </Reveal>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {pair.map((item, slot) => (
+            <article
+              key={`${item.name}-${slot}`}
+              className={`relative rounded-2xl bg-white px-6 py-6 shadow-[0_18px_40px_-28px_rgba(60,40,20,0.4)] ${slot === 1 ? "hidden sm:block" : ""}`}
+            >
+              <span aria-hidden className="absolute top-4 right-6 font-serif text-5xl leading-none text-sand">
+                &rdquo;
+              </span>
+              <div className="flex items-center gap-3">
+                <div className="grid h-11 w-11 place-items-center rounded-full bg-sand font-serif text-lg text-ink">
+                  {item.name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-[0.92rem] font-medium text-ink">
+                    <bdi>{item.name}</bdi>
+                  </p>
+                  <div className="mt-1 flex gap-0.5 text-gold">
+                    {Array.from({ length: 5 }).map((_, star) => (
+                      <StarIcon key={star} className="h-3.5 w-3.5" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <p className="mt-5 text-[0.92rem] leading-relaxed font-light text-ink-soft">&ldquo;{item.quote}&rdquo;</p>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );

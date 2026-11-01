@@ -1,33 +1,13 @@
-import Image from "next/image";
 import Link from "next/link";
 import { connection } from "next/server";
-import { fmt } from "@/i18n/format";
 import { getI18n } from "@/i18n/server";
 import { serviceText } from "@/i18n/services";
-import { blurProps, serviceImage } from "@/lib/images";
+import { serviceImage } from "@/lib/images";
 import { RESERVATION_PATH } from "@/lib/navigation";
-import { formatDuration } from "@/lib/format";
-import { ArrowRight, FlowerIcon, LeafIcon, LotusIcon, NeckIcon } from "./Icons";
+import { ArrowRight } from "./Icons";
 import { getActiveServices, type PublicService } from "@/server/booking/services";
 import Reveal from "./Reveal";
-
-const categoryBySlug = {
-  "swedish-massage": "relaxation",
-  "thai-oil-massage": "energy",
-  "aroma-massage": "wellness",
-  "head-neck-shoulder-massage": "targeted",
-  "thai-massage": "energy",
-  "sports-massage": "targeted",
-  "foot-reflexology": "wellness",
-  "hot-herbal-compress": "relaxation",
-} as const;
-
-const categoryIcon = {
-  relaxation: LotusIcon,
-  energy: LeafIcon,
-  wellness: FlowerIcon,
-  targeted: NeckIcon,
-} as const;
+import TreatmentCarousel from "./TreatmentCarousel";
 
 const fallback = (slug: string, name: string, description: string, options: [number, number][]): PublicService => ({
   id: slug,
@@ -39,11 +19,11 @@ const fallback = (slug: string, name: string, description: string, options: [num
 
 /** Shown only if the database is unreachable; mirrors prisma/seed.ts. */
 const fallbackServices: PublicService[] = [
-  fallback("swedish-massage", "Swedish Massage", "Gentle, flowing strokes to relieve tension and promote deep relaxation.", [[60, 400], [90, 500], [120, 600]]),
-  fallback("thai-oil-massage", "Thai Oil Massage", "Traditional Thai techniques with warm oil to loosen muscles and restore energy.", [[60, 350], [90, 450], [120, 550]]),
-  fallback("aroma-massage", "Aroma Massage", "Soothing essential oils to calm your mind and balance your body.", [[60, 350], [90, 450], [120, 550]]),
+  fallback("swedish-massage", "Swedish Massage", "A gentle, full-body massage that relieves stress and improves circulation.", [[60, 400], [90, 500], [120, 600]]),
+  fallback("thai-oil-massage", "Thai Oil Massage", "A relaxing massage with natural oil to release tension and calm the mind.", [[60, 350], [90, 450], [120, 550]]),
+  fallback("aroma-massage", "Aroma Massage", "A soothing massage with essential oils for deep relaxation.", [[60, 350], [90, 450], [120, 550]]),
   fallback("head-neck-shoulder-massage", "Head, Neck & Shoulder", "Focused work on the upper body to release stress, stiffness and headaches.", [[60, 300], [90, 450], [120, 550]]),
-  fallback("thai-massage", "Thai Massage", "Assisted stretching and acupressure for flexibility, circulation and balance.", [[60, 300], [90, 450], [120, 550]]),
+  fallback("thai-massage", "Thai Massage", "Traditional Thai technique that restores energy and flexibility.", [[60, 300], [90, 450], [120, 550]]),
   fallback("sports-massage", "Sports Massage", "Deep, targeted pressure to ease muscle tension and speed up recovery.", [[60, 450], [90, 550], [120, 700]]),
   fallback("foot-reflexology", "Foot Reflexology", "Pressure on reflex points of the feet to relax the whole body.", [[30, 180], [60, 300], [90, 400]]),
   fallback("hot-herbal-compress", "Hot Herbal Compress", "Warm Thai herbal compresses to soothe sore muscles and deeply relax.", [[90, 600], [120, 700]]),
@@ -61,75 +41,33 @@ async function loadServices(): Promise<PublicService[]> {
 }
 
 export default async function Treatments() {
-  const [treatments, { t, locale, href }] = await Promise.all([loadServices(), getI18n()]);
+  const [treatments, { t, href }] = await Promise.all([loadServices(), getI18n()]);
+  const items = treatments.map((service) => {
+    const { name, description } = serviceText(t, service);
+    return {
+      slug: service.slug,
+      name,
+      description,
+      image: serviceImage(service.slug),
+      href: href(`${RESERVATION_PATH}?service=${service.slug}`),
+    };
+  });
 
   return (
     <section id="services" className="bg-cream">
-      <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-24 lg:px-12 lg:py-28">
-        <Reveal className="mx-auto max-w-2xl text-center">
-          <p className="eyebrow">{t.treatments.eyebrow}</p>
-          <h2 className="mt-4 font-serif text-[2.4rem] leading-[1.08] text-ink sm:text-5xl lg:text-[3.2rem]">{t.treatments.title}</h2>
-          <p className="mx-auto mt-4 max-w-md text-[0.9rem] leading-relaxed font-light text-ink-soft sm:mt-5">{t.treatments.text}</p>
+      <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-20 lg:px-12 lg:py-24">
+        <Reveal className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="eyebrow">{t.treatments.eyebrow}</p>
+            <h2 className="mt-3 font-serif text-[2.4rem] leading-[1.08] text-ink sm:text-5xl">{t.treatments.title}</h2>
+          </div>
+          <Link href={href(RESERVATION_PATH)} className="inline-flex items-center gap-2 text-[0.9rem] text-ink-soft transition hover:text-ink">
+            {t.treatments.viewAll}
+            <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
+          </Link>
         </Reveal>
 
-        <p className="mt-9 flex items-center justify-between text-[0.68rem] tracking-[0.22em] text-muted uppercase sm:hidden" aria-hidden>
-          <span>{fmt(t.treatments.count, { n: treatments.length })}</span>
-          <span className="flex items-center gap-2">
-            {t.treatments.swipe} <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" />
-          </span>
-        </p>
-
-        <div className="no-scrollbar -mx-5 mt-4 flex snap-x snap-mandatory scroll-px-5 gap-4 overflow-x-auto px-5 pb-8 sm:mx-0 sm:mt-16 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4">
-          {treatments.map((service, i) => {
-            const { name, description } = serviceText(t, service);
-            const category = categoryBySlug[service.slug as keyof typeof categoryBySlug] ?? "wellness";
-            const Icon = categoryIcon[category];
-            return (
-              <Reveal
-                as="article"
-                key={service.slug}
-                delay={(i % 4) * 120}
-                className="group relative flex w-[80%] shrink-0 snap-start flex-col overflow-hidden rounded-lg bg-white shadow-[0_16px_36px_-22px_rgba(60,40,20,0.28)] transition-shadow duration-500 hover:shadow-[0_24px_48px_-22px_rgba(60,40,20,0.36)] sm:w-auto"
-              >
-                <Link
-                  href={href(`${RESERVATION_PATH}?service=${service.slug}`)}
-                  aria-label={fmt(t.treatments.detailsAria, { name })}
-                  className="absolute inset-0 z-10"
-                />
-                <div className="relative aspect-[16/10] overflow-hidden">
-                  <Image
-                    src={serviceImage(service.slug)} {...blurProps(serviceImage(service.slug))}
-                    alt={name}
-                    fill
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 80vw"
-                    className="object-cover transition-transform duration-[1.2s] group-hover:scale-110"
-                  />
-                  <span className="absolute end-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-white/92 text-bronze shadow-[0_6px_16px_-10px_rgba(60,40,20,0.45)]">
-                    <Icon className="h-4 w-4" aria-hidden />
-                  </span>
-                </div>
-                <div className="flex flex-1 flex-col px-5 pt-5 pb-5 sm:px-6 sm:pt-6 sm:pb-5">
-                  <p className="text-[0.62rem] tracking-[0.22em] text-bronze uppercase">{t.treatments.category[category]}</p>
-                  <h3 className="mt-2 font-serif text-[1.35rem] leading-tight font-normal text-ink">{name}</h3>
-                  <p className="mt-2.5 flex-1 text-[0.8rem] leading-relaxed font-light text-muted">{description}</p>
-                  <ul className="mt-5 flex flex-wrap gap-2" aria-label={t.treatments.durations}>
-                    {service.options.map((o) => (
-                      <li key={o.durationMinutes} className="rounded-full border border-bronze/45 px-3 py-1 text-[0.68rem] text-bronze">
-                        {formatDuration(o.durationMinutes, locale)}
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="mt-5 flex items-center justify-between text-[0.68rem] tracking-[0.16em] text-ink uppercase">
-                    {t.treatments.details}
-                    <span className="grid h-8 w-8 place-items-center rounded-full border border-bronze text-bronze transition-colors group-hover:bg-bronze group-hover:text-cream">
-                      <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" />
-                    </span>
-                  </p>
-                </div>
-              </Reveal>
-            );
-          })}
-        </div>
+        <TreatmentCarousel items={items} prevLabel={t.testimonials.prev} nextLabel={t.testimonials.next} detailsAria={t.treatments.detailsAria} />
       </div>
     </section>
   );

@@ -50,13 +50,14 @@ const fr: Dictionary = {
     eyebrow: "À propos",
     title1: "Votre bien-être",
     title2: "est notre priorité",
-    text: "Chez Touch Sense, nous croyons que le vrai bien-être naît de l’équilibre. Notre mission : vous offrir un lieu paisible pour vous détendre, retrouver votre énergie et vous reconnecter à vous-même grâce au pouvoir du toucher.",
-    cta: "Réserver",
+    text: "Chez Touch Sense, nous allions la sagesse du massage thaï à une expérience bien-être moderne, dans un cadre calme et élégant pensé pour votre détente.",
+    cta: "Découvrir",
     imageAlt: "Serviettes roulées et bougies",
   },
   treatments: {
     eyebrow: "Nos soins",
     title: "Massages et soins bien-être",
+    viewAll: "Voir tous les soins",
     text: "Découvrez nos soins professionnels conçus pour détendre votre corps, apaiser votre esprit et restaurer votre énergie.",
     count: "{n} soins",
     swipe: "Glisser",
@@ -73,6 +74,7 @@ const fr: Dictionary = {
   testimonials: {
     eyebrow: "Témoignages",
     title: "Ce que disent nos clients",
+    intro: "Des expériences réelles de personnes qui ont fait confiance à Touch Sense.",
     items: [
       {
         quote:
