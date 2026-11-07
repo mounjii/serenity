@@ -61,7 +61,7 @@ export default function MobileBookBar() {
         </div>
         <Link
           href={href(RESERVATION_PATH)}
-          className="inline-flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-ink px-6 text-[0.85rem] tracking-wide text-cream shadow-[0_12px_24px_-14px_rgba(20,18,15,0.9)]"
+          className="inline-flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-forest px-6 text-[0.85rem] tracking-wide text-cream shadow-[0_12px_24px_-14px_rgba(20,18,15,0.9)]"
         >
           {t.nav.bookNow} <ArrowRight className="h-4 w-4 rtl:-scale-x-100" aria-hidden />
         </Link>

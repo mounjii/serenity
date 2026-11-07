@@ -28,7 +28,7 @@ export default function AdminNav({ className = "" }: { className?: string }) {
             {link.label}
             <span
               aria-hidden
-              className={`absolute inset-x-0 bottom-0 mx-auto h-px bg-ink transition-all duration-300 ${active ? "w-full" : "w-0"}`}
+              className={`absolute inset-x-0 bottom-0 mx-auto h-px bg-forest transition-all duration-300 ${active ? "w-full" : "w-0"}`}
             />
           </Link>
         );

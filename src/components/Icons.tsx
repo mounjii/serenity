@@ -63,6 +63,14 @@ export function FlowerIcon(props: IconProps) {
   );
 }
 
+export function ArrowUpRight(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} strokeWidth={1.75} {...props}>
+      <path d="M7 17 17 7M9 7h8v8" />
+    </svg>
+  );
+}
+
 export function ArrowRight(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" {...base} strokeWidth={1.5} {...props}>
@@ -75,6 +83,14 @@ export function ArrowLeft(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" {...base} strokeWidth={1.5} {...props}>
       <path d="M19 12H5M11 6l-6 6 6 6" />
+    </svg>
+  );
+}
+
+export function PlayIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden {...props}>
+      <path d="M8 6.5v11l9-5.5-9-5.5Z" />
     </svg>
   );
 }
@@ -115,6 +131,17 @@ export function StarIcon(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
       <path d="m12 2.8 2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9L12 2.8Z" />
+    </svg>
+  );
+}
+
+export function GoogleIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden {...props}>
+      <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.51h6.47a5.53 5.53 0 0 1-2.4 3.58v2.98h3.88c2.27-2.09 3.54-5.17 3.54-8.8Z" />
+      <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-2.98c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.76-2.11-6.7-4.94H1.29v3.09C3.26 21.3 7.31 24 12 24Z" />
+      <path fill="#FBBC05" d="M5.3 14.33A7.2 7.2 0 0 1 4.9 12c0-.81.14-1.59.4-2.33V6.58H1.29A12 12 0 0 0 0 12c0 1.94.46 3.77 1.29 5.42l4.01-3.09Z" />
+      <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.58l4.01 3.09C6.24 6.86 8.88 4.75 12 4.75Z" />
     </svg>
   );
 }

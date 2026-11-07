@@ -9,6 +9,8 @@ import { getDb } from "@/server/db";
 export type CustomerBooking = {
   id: string;
   serviceName: string;
+  serviceSlug: string;
+  durationMinutes: number;
   date: string;
   time: string;
   priceCents: number;
@@ -22,10 +24,10 @@ export async function getCustomerBookings(phone: string, locale: Locale): Promis
   const rows = await getDb().booking.findMany({
     where: { customerPhone: phone },
     orderBy: { startAt: "desc" },
-    take: 30,
     select: {
       id: true,
       startAt: true,
+      durationMinutes: true,
       priceCents: true,
       status: true,
       service: { select: { name: true, slug: true, description: true } },
@@ -36,6 +38,8 @@ export async function getCustomerBookings(phone: string, locale: Locale): Promis
   return rows.map((row) => ({
     id: row.id,
     serviceName: serviceText(t, row.service).name,
+    serviceSlug: row.service.slug,
+    durationMinutes: row.durationMinutes,
     date: formatLongDateIn(locale, row.startAt),
     time: toLocalTimeString(row.startAt),
     priceCents: row.priceCents,

@@ -1,15 +1,32 @@
-import { createHash, timingSafeEqual } from "node:crypto";
 import bcrypt from "bcryptjs";
+import { getDb } from "@/server/db";
 import { getAdminConfig } from "./config";
 
-const sha256 = (value: string) => createHash("sha256").update(value).digest();
+const DUMMY_HASH = "$2a$12$R9h/cIPz0gi.URNNXXkh.OG8i2fYcYxK8n5u0cG0k1m2n3o4p5q6r";
 
 /** Always runs bcrypt, so a wrong username takes as long as a wrong password. */
 export async function verifyCredentials(username: string, password: string): Promise<boolean> {
-  const config = await getAdminConfig();
-  const usernameOk = timingSafeEqual(sha256(username.trim()), sha256(config.username));
-  const passwordOk = await bcrypt.compare(password, config.passwordHash);
-  return usernameOk && passwordOk;
+  const name = username.trim();
+  let hash = DUMMY_HASH;
+  let known = false;
+  try {
+    const row = name ? await getDb().adminAccount.findFirst({ where: { username: name }, select: { passwordHash: true } }) : null;
+    if (row) {
+      hash = row.passwordHash;
+      known = true;
+    }
+  } catch {
+    // Table missing before migrate: fall back to the env owner.
+  }
+  if (!known && name) {
+    const config = await getAdminConfig();
+    if (config.username.toLowerCase() === name.toLowerCase()) {
+      hash = config.passwordHash;
+      known = true;
+    }
+  }
+  const passwordOk = await bcrypt.compare(password, hash);
+  return known && passwordOk;
 }
 
 const WINDOW_MS = 15 * 60 * 1000;

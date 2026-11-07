@@ -9,7 +9,7 @@ import type { AdminBooking } from "@/server/admin/bookings";
 import type { ClosedDayItem } from "@/server/admin/closed-days";
 
 const inputClass =
-  "block w-full rounded-sm border border-sand bg-white px-4 py-3 text-[0.95rem] text-ink outline-none transition focus:border-ink";
+  "block w-full rounded-sm border border-sand bg-white px-4 py-3 text-[0.95rem] text-ink outline-none transition focus:border-forest";
 
 export default function ClosedDaysManager({ days, today }: { days: ClosedDayItem[]; today: string }) {
   const router = useRouter();
@@ -63,9 +63,9 @@ export default function ClosedDaysManager({ days, today }: { days: ClosedDayItem
   };
 
   return (
-    <div className="mt-8 space-y-8">
-      <form onSubmit={add} className="rounded-lg bg-white p-6 shadow-[0_20px_40px_-32px_rgba(60,40,20,0.35)] sm:p-8">
-        <h2 className="font-serif text-2xl text-ink">Close a day</h2>
+    <div className="space-y-5">
+      <form onSubmit={add} className="rounded-2xl border border-sand bg-white p-5 sm:p-6">
+        <h2 className="text-[1.05rem] font-semibold tracking-[-0.02em] text-ink">Close a day</h2>
         <div className="mt-5 grid gap-5 sm:grid-cols-[12rem_1fr]">
           <div>
             <label htmlFor="closed-date" className="mb-1.5 block text-[0.8rem]">Date</label>
@@ -105,11 +105,11 @@ export default function ClosedDaysManager({ days, today }: { days: ClosedDayItem
       </form>
 
       <section>
-        <h2 className="mb-4 font-serif text-2xl text-ink">Upcoming closed days</h2>
+        <h2 className="mb-4 text-[1.05rem] font-semibold tracking-[-0.02em] text-ink">Upcoming closed days</h2>
         {days.length === 0 ? (
           <p className="rounded-lg bg-white px-5 py-8 text-center text-[0.85rem] text-muted">No closed days planned.</p>
         ) : (
-          <ul className="divide-y divide-sand/70 overflow-hidden rounded-lg bg-white shadow-[0_20px_40px_-32px_rgba(60,40,20,0.35)]">
+          <ul className="divide-y divide-sand overflow-hidden rounded-2xl border border-sand bg-white">
             {days.map((d) => (
               <li key={d.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
                 <div>

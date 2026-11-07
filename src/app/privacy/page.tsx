@@ -61,14 +61,14 @@ export default async function PrivacyPage() {
       <main className="min-h-screen bg-cream pt-28 pb-16 sm:pt-36 sm:pb-24">
         <article className="mx-auto max-w-3xl px-5 sm:px-6">
           <p className="eyebrow">{p.eyebrow}</p>
-          <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.08] text-ink sm:text-5xl">{p.title}</h1>
+          <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.08] text-forest sm:text-5xl">{p.title}</h1>
           <p className="mt-3 text-[0.8rem] text-muted">{fmt(p.updated, { date: updated })}</p>
           <p className="mt-6 text-[0.95rem] leading-relaxed font-light text-ink-soft">{p.intro}</p>
 
           <div className="mt-10 divide-y divide-sand border-y border-sand">
             {p.sections.map((s, i) => (
               <section key={s.title} className="py-7 sm:py-8">
-                <h2 className="flex items-baseline gap-3 font-serif text-[1.45rem] text-ink sm:text-[1.6rem]">
+                <h2 className="flex items-baseline gap-3 font-serif text-[1.45rem] text-forest sm:text-[1.6rem]">
                   <span className="text-[0.8rem] font-sans tracking-[0.2em] text-bronze">{String(i + 1).padStart(2, "0")}</span>
                   {s.title}
                 </h2>
@@ -81,7 +81,7 @@ export default async function PrivacyPage() {
             ))}
 
             <section className="py-7 sm:py-8">
-              <h2 className="flex items-baseline gap-3 font-serif text-[1.45rem] text-ink sm:text-[1.6rem]">
+              <h2 className="flex items-baseline gap-3 font-serif text-[1.45rem] text-forest sm:text-[1.6rem]">
                 <span className="text-[0.8rem] font-sans tracking-[0.2em] text-bronze">{String(p.sections.length + 1).padStart(2, "0")}</span>
                 {p.contactTitle}
               </h2>
@@ -112,13 +112,13 @@ export default async function PrivacyPage() {
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
               href={href(RESERVATION_PATH)}
-              className="inline-flex min-h-12 items-center rounded-full bg-ink px-8 text-[0.85rem] tracking-wide text-cream transition hover:bg-black"
+              className="inline-flex min-h-12 items-center rounded-full bg-forest px-8 text-[0.85rem] tracking-wide text-cream transition hover:bg-forest-dark"
             >
               {p.book}
             </Link>
             <Link
               href={href("/")}
-              className="inline-flex min-h-12 items-center rounded-full border border-sand px-8 text-[0.85rem] text-ink transition hover:border-ink"
+              className="inline-flex min-h-12 items-center rounded-full border border-sand px-8 text-[0.85rem] text-ink transition hover:border-forest"
             >
               {p.backHome}
             </Link>

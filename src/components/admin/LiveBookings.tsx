@@ -21,7 +21,17 @@ function titleFor(count: number): string {
  * serverTime returned by the server. Any change refreshes the server-rendered page; new bookings are
  * highlighted and announced in the tab title.
  */
-export default function LiveBookings({ initialSince, children }: { initialSince: string; children: React.ReactNode }) {
+export default function LiveBookings({
+  initialSince,
+  live = true,
+  canOpenBookings = true,
+  children,
+}: {
+  initialSince: string;
+  live?: boolean;
+  canOpenBookings?: boolean;
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const since = useRef(initialSince);
   const seen = useRef(new Map<string, string>());
@@ -87,13 +97,14 @@ export default function LiveBookings({ initialSince, children }: { initialSince:
         start();
       }
     };
-    if (!document.hidden) start();
+    if (live && !document.hidden) start();
+    if (!live) return;
     document.addEventListener("visibilitychange", onVisibilityChange);
     return () => {
       stop();
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [poll]);
+  }, [live, poll]);
 
   // Next.js rewrites <title> on navigation and refresh, so the unread count is re-applied whenever it changes.
   useEffect(() => {
@@ -121,9 +132,15 @@ export default function LiveBookings({ initialSince, children }: { initialSince:
             <ul className="mt-1 space-y-0.5 text-[0.82rem] text-ink-soft">
               {unread.slice(-3).map((b) => (
                 <li key={b.id}>
-                  <Link href={`/admin/bookings/${b.id}`} onClick={() => setUnread([])} className="underline-offset-4 hover:underline">
-                    {b.dateLabel} · {b.time} · {b.customerName} · {b.serviceName}
-                  </Link>
+                  {canOpenBookings ? (
+                    <Link href={`/admin/bookings/${b.id}`} onClick={() => setUnread([])} className="underline-offset-4 hover:underline">
+                      {b.dateLabel} · {b.time} · {b.customerName} · {b.serviceName}
+                    </Link>
+                  ) : (
+                    <span>
+                      {b.dateLabel} · {b.time} · {b.customerName} · {b.serviceName}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -131,18 +148,18 @@ export default function LiveBookings({ initialSince, children }: { initialSince:
           <button
             type="button"
             onClick={() => setUnread([])}
-            className="self-start rounded-full border border-ink/20 bg-white px-4 py-2 text-[0.75rem] text-ink transition hover:border-ink sm:self-center"
+            className="self-start rounded-full border border-forest/20 bg-white px-4 py-2 text-[0.75rem] text-ink transition hover:border-forest sm:self-center"
           >
             Mark as seen
           </button>
         </div>
       )}
       {children}
-      <p className="mt-10 flex items-center gap-2 text-[0.72rem] text-muted" aria-live="polite">
+      {live ? <p className="mt-10 flex items-center gap-2 text-[0.72rem] text-muted" aria-live="polite">
         <span className={`h-2 w-2 rounded-full ${online ? "bg-olive" : "bg-red-500"}`} aria-hidden />
         {online ? "Live updates on" : "Connection lost, retrying…"}
         {lastSync && ` · last checked ${lastSync.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`}
-      </p>
+      </p> : null}
     </HighlightContext.Provider>
   );
 }

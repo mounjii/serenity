@@ -19,7 +19,7 @@ type Availability = {
 const STATUS_LABEL = { booked: "Booked", rest: "Rest", unavailable: "Too short" } as const;
 
 const inputClass = (invalid = false) =>
-  `block w-full rounded-sm border bg-white px-4 py-3 text-[0.95rem] text-ink outline-none transition focus:border-ink ${
+  `block w-full rounded-sm border bg-white px-4 py-3 text-[0.95rem] text-ink outline-none transition focus:border-forest ${
     invalid ? "border-red-400" : "border-sand"
   }`;
 
@@ -120,7 +120,7 @@ export default function AdminBookingForm({ services, today, initialDate }: Props
   };
 
   return (
-    <form onSubmit={submit} noValidate className="mt-8 space-y-8 rounded-lg bg-white p-6 shadow-[0_20px_40px_-32px_rgba(60,40,20,0.35)] sm:p-8">
+    <form onSubmit={submit} noValidate className="space-y-8 rounded-2xl border border-sand bg-white p-5 sm:p-6">
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="service" className="mb-1.5 block text-[0.8rem]">Service</label>
@@ -201,7 +201,7 @@ export default function AdminBookingForm({ services, today, initialDate }: Props
                 }}
                 aria-pressed={slot?.startAt === s.startAt}
                 className={`min-h-11 rounded-lg border text-[0.9rem] transition ${
-                  slot?.startAt === s.startAt ? "border-ink bg-ink text-cream" : "border-sand text-ink hover:border-ink"
+                  slot?.startAt === s.startAt ? "border-forest bg-forest text-white" : "border-sand text-ink hover:border-forest"
                 }`}
               >
                 {s.time}

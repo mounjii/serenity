@@ -3,7 +3,7 @@ import BookingDetailsProvider from "@/components/admin/BookingDetails";
 import { ActivityList, Card } from "@/components/admin/DashboardWidgets";
 import { formatDayHeading, toLocalDateString } from "@/lib/time";
 import { listActivity, type ActivityEvent } from "@/server/admin/activity";
-import { requireAdminPage } from "@/server/auth/session";
+import { requireArea } from "@/server/auth/session";
 import { sweepExpiredBookings } from "@/server/booking/confirmation";
 import { getWhatsAppMode } from "@/server/whatsapp";
 
@@ -13,7 +13,7 @@ const LIMIT = 100;
 
 export default async function AdminActivityPage() {
   await connection();
-  await requireAdminPage();
+  await requireArea("activity");
   await sweepExpiredBookings();
   const now = new Date();
   const events = await listActivity(LIMIT, now);
@@ -28,11 +28,10 @@ export default async function AdminActivityPage() {
 
   return (
     <BookingDetailsProvider bookings={bookings} whatsappMode={getWhatsAppMode()}>
-      <div className="space-y-8">
+      <div className="space-y-5 sm:space-y-6">
         <header>
-          <p className="text-[0.68rem] tracking-[0.3em] text-muted uppercase">{formatDayHeading(today, true)}</p>
-          <h1 className="mt-3 font-serif text-[2.75rem] leading-none text-ink sm:text-5xl">Activity</h1>
-          <p className="mt-3 text-[0.9rem] text-ink-soft">Everything that happened to your bookings, newest first.</p>
+          <h1 className="text-[1.7rem] leading-tight font-semibold tracking-[-0.03em] text-forest sm:text-[2rem]">Activity</h1>
+          <p className="mt-1 text-[0.85rem] text-sage">{formatDayHeading(today, true)}. Everything that happened to your bookings, newest first.</p>
         </header>
 
         {events.length === 0 ? (

@@ -4,6 +4,7 @@ import {
   createCustomerSessionToken,
   CUSTOMER_SESSION_COOKIE,
   CUSTOMER_SESSION_MAX_AGE_SECONDS,
+  CUSTOMER_SESSION_SHORT_SECONDS,
   verifyCustomerSessionToken,
   type CustomerSession,
 } from "./session-token";
@@ -21,14 +22,15 @@ export async function requireCustomerPage(): Promise<CustomerSession> {
   return session;
 }
 
-export async function startCustomerSession(id: string, passwordHash: string): Promise<void> {
+export async function startCustomerSession(id: string, passwordHash: string, remember = true): Promise<void> {
+  const maxAge = remember ? CUSTOMER_SESSION_MAX_AGE_SECONDS : CUSTOMER_SESSION_SHORT_SECONDS;
   const store = await cookies();
-  store.set(CUSTOMER_SESSION_COOKIE, await createCustomerSessionToken(id, passwordHash), {
+  store.set(CUSTOMER_SESSION_COOKIE, await createCustomerSessionToken(id, passwordHash, maxAge), {
     httpOnly: true,
     secure: process.env.COOKIE_SECURE ? process.env.COOKIE_SECURE === "true" : process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: CUSTOMER_SESSION_MAX_AGE_SECONDS,
+    ...(remember ? { maxAge } : {}),
   });
 }
 

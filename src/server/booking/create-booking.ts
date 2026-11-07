@@ -7,7 +7,7 @@ import { addMinutes, dateStringToDbDate, localToUtc, toLocalDateString, toLocalM
 import { getDb } from "@/server/db";
 import { AppError, businessRule } from "@/server/errors";
 import { getWhatsAppMode } from "@/server/whatsapp";
-import { claimVoucher, markVoucherUsed } from "@/server/loyalty/engine";
+import { claimVoucher, consumeVoucher } from "@/server/loyalty/engine";
 import { getDaySchedule } from "./schedule";
 import { confirmationDeadline, holdsSlot } from "./slot-hold";
 
@@ -149,6 +149,8 @@ export async function createBooking(rawInput: unknown, options: CreateBookingOpt
           const therapistId = locked.find((t) => !busy.has(t.id))?.id;
           if (!therapistId) throw new AppError(409, "SLOT_TAKEN", SLOT_TAKEN_MESSAGE);
 
+          if (voucherId) await consumeVoucher(tx, voucherId, now);
+
           return tx.booking.create({
             data: {
               serviceId: service.id,
@@ -180,7 +182,6 @@ export async function createBooking(rawInput: unknown, options: CreateBookingOpt
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted, maxWait: 5_000, timeout: 15_000 },
       );
-      if (voucherId) await markVoucherUsed(voucherId);
       return { kind: "created", booking: toSummary(row) };
     } catch (error) {
       if (error instanceof AppError) throw error;

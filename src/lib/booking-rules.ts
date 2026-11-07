@@ -1,5 +1,6 @@
 import type { CountryCode } from "libphonenumber-js";
 
+/** IANA name for the salon. Wall-clock conversion lives in time.ts, because Morocco has been GMT since 20 September 2026 and some runtimes still have the old UTC+1 rule. */
 export const TIMEZONE = "Africa/Casablanca";
 export const CURRENCY = "MAD";
 export const DEFAULT_PHONE_COUNTRY: CountryCode = "MA";

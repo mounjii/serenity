@@ -1,17 +1,23 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cream: #f7f3ed;
-  --color-cream-dark: #efe9e0;
-  --color-sand: #e6ddd0;
-  --color-ink: #2a2824;
-  --color-ink-soft: #5c574f;
-  --color-muted: #8b847a;
-  --color-bronze: #9a8366;
-  --color-gold: #c8a250;
-  --color-forest: #1f241c;
-  --color-olive: #4b5537;
-  --color-olive-dark: #3c442b;
+  --color-ivory: #f7f3ec;
+  --color-forest: #243824;
+  --color-forest-dark: #1c2e1c;
+  --color-gold: #d6b878;
+  --color-espresso: #35291f;
+  --color-sage: #6d7063;
+  --color-sand: #e9e1d5;
+  --color-ink: #211f1b;
+
+  /* Older utility names follow the same palette. */
+  --color-cream: #f7f3ec;
+  --color-cream-dark: #e9e1d5;
+  --color-ink-soft: #6d7063;
+  --color-muted: #6d7063;
+  --color-bronze: #d6b878;
+  --color-olive: #243824;
+  --color-olive-dark: #1c2e1c;
 
   --default-transition-duration: 300ms;
   --default-transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
@@ -20,6 +26,7 @@
 @theme inline {
   --font-serif: var(--font-cormorant), "Times New Roman", serif;
   --font-sans: var(--font-jost), system-ui, sans-serif;
+  --font-display: var(--font-inter), var(--font-jost), system-ui, sans-serif;
   --font-script: var(--font-great-vibes), cursive;
 }
 
@@ -115,7 +122,8 @@ html[lang="ar"] {
 /* The Latin fonts' generated fallbacks contain Arabic glyphs, so the Arabic fonts must come first. They are
    named directly (not through their variables) so their own system fallback does not take over Latin text. */
 html[lang="ar"] body,
-html[lang="ar"] .font-sans {
+html[lang="ar"] .font-sans,
+html[lang="ar"] .font-display {
   font-family: "Tajawal", var(--font-jost), system-ui, sans-serif;
 }
 
@@ -299,7 +307,28 @@ html[lang="ar"] .eyebrow {
   animation: hero-zoom 2.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* First-visit intro (see IntroSplash): "play" while the logo sits centred, "leaving" while it flies. */
+/* Shared controls. Colors come from the theme tokens above. */
+@utility btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-full bg-forest text-white transition hover:bg-forest-dark disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-full border border-forest bg-ivory text-forest transition hover:bg-sand disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility field {
+  @apply block w-full rounded-full border border-sand bg-white text-ink outline-none transition placeholder:text-sage focus:border-forest focus:ring-2 focus:ring-forest/15;
+}
+
+@utility card {
+  @apply rounded-2xl border border-sand bg-white;
+}
+
+@utility badge-gold {
+  @apply inline-flex items-center rounded-full border border-gold/50 bg-gold/15 px-2.5 py-0.5 text-[0.68rem] font-medium tracking-[0.14em] text-espresso uppercase;
+}
+
+/* First-visit intro (see IntroSplash): "play" while the vertical logo is centred, "leaving" while it fades. */
 .intro-overlay {
   display: none;
 }
@@ -309,10 +338,12 @@ html[data-intro] {
 }
 
 html[data-intro] .intro-overlay {
-  display: block;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
 }
 
-html[data-intro] [data-nav-logo] {
+html[data-intro="play"] [data-nav-logo] {
   opacity: 0;
 }
 

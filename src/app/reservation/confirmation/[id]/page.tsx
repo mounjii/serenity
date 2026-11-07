@@ -52,7 +52,7 @@ export default async function ConfirmationPage({ params }: PageProps<"/reservati
                 booking.status === "CANCELLED"
                   ? "bg-cream-dark text-muted"
                   : booking.status === "PENDING"
-                    ? "bg-gold/15 text-[#8a6a22]"
+                    ? "bg-gold/15 text-espresso"
                     : "bg-forest text-cream"
               }`}
               aria-hidden
@@ -73,7 +73,7 @@ export default async function ConfirmationPage({ params }: PageProps<"/reservati
               )}
             </div>
             <p className="eyebrow mt-6">{c.eyebrow}</p>
-            <h1 className="mt-3 font-serif text-3xl text-ink sm:text-4xl">{text.title}</h1>
+            <h1 className="mt-3 font-serif text-3xl text-forest sm:text-4xl">{text.title}</h1>
             {booking.firstName && booking.status === "CONFIRMED" && (
               <p className="mt-3 text-[0.9rem] font-light text-ink-soft">{fmt(c.thanks, { name: booking.firstName })}</p>
             )}

@@ -22,20 +22,20 @@ const dotColor: Record<BookingStatusValue, string> = {
 };
 
 export function Card({ className = "", children }: { className?: string; children: React.ReactNode }) {
-  return <section className={`rounded-lg border border-sand/60 bg-white shadow-[0_1px_2px_rgba(42,40,36,0.04)] ${className}`}>{children}</section>;
+  return <section className={`rounded-2xl border border-sand bg-white ${className}`}>{children}</section>;
 }
 
 export function NextAppointmentCard({ booking, isToday }: { booking: AdminBooking | null; isToday: boolean }) {
   const openBooking = useOpenBooking();
   const inner = (
     <>
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-[#dfe8f5] text-[#4a6c9c]">
+      <span className="grid h-9 w-9 place-items-center rounded-full bg-ivory text-ink">
         <ClockIcon className="h-[1.1rem] w-[1.1rem]" />
       </span>
-      <span className="mt-3 block text-[0.78rem] text-ink-soft">Next appointment</span>
+      <span className="mt-3 block text-[0.78rem] text-sage">Next appointment</span>
       {booking ? (
         <>
-          <span className="mt-1 block font-serif text-[2.3rem] leading-none text-ink lining-nums tabular-nums">
+          <span className="mt-1 block text-[2rem] leading-none font-semibold tracking-[-0.03em] text-ink lining-nums tabular-nums">
             {booking.time}
             {!isToday && <span className="ml-2 align-middle font-sans text-[0.72rem] text-muted">{formatShortDate(booking.date)}</span>}
           </span>
@@ -47,10 +47,10 @@ export function NextAppointmentCard({ booking, isToday }: { booking: AdminBookin
       )}
     </>
   );
-  const className = "group relative block h-full rounded-lg border border-[#dbe5f2] bg-[#f1f5fb] p-4 text-left sm:p-5";
+  const className = "group relative block h-full rounded-2xl border border-sand bg-white p-4 text-left sm:p-5";
   if (!booking) return <div className={className}>{inner}</div>;
   return (
-    <button type="button" onClick={() => openBooking(booking.id)} className={`${className} w-full transition hover:border-[#b9cbe4]`}>
+    <button type="button" onClick={() => openBooking(booking.id)} className={`${className} w-full transition hover:border-black/25`}>
       {inner}
       <ChevronRight className="absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 text-ink transition group-hover:translate-x-0.5" />
     </button>
@@ -65,12 +65,12 @@ export function TodaySchedule({ bookings, dateLabel }: { bookings: AdminBooking[
     <Card>
       <div className="flex items-start justify-between gap-4 px-4 pt-5 pb-3 sm:px-6">
         <div>
-          <h2 className="text-[1.1rem] font-medium text-ink">Today’s schedule</h2>
+          <h2 className="text-[1.05rem] font-semibold tracking-[-0.02em] text-ink">Today’s schedule</h2>
           <p className="mt-0.5 text-[0.78rem] text-muted">{dateLabel}</p>
         </div>
         <Link
           href="/admin/bookings?view=week"
-          className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-sand/80 bg-cream/60 px-3 py-2 text-[0.74rem] text-ink transition hover:border-ink/40"
+          className="inline-flex shrink-0 items-center gap-2 rounded-full border border-sand bg-white px-3 py-2 text-[0.74rem] font-medium text-ink transition hover:border-forest/30"
         >
           <CalendarIcon className="h-4 w-4" />
           <span className="hidden sm:inline">View calendar</span>
@@ -131,7 +131,7 @@ export function TodaySchedule({ bookings, dateLabel }: { bookings: AdminBooking[
                   <button
                     type="button"
                     onClick={() => openBooking(b.id)}
-                    className="flex-1 rounded-lg border border-sand/80 px-4 py-2 text-[0.76rem] text-ink transition hover:border-ink/50 sm:flex-none"
+                    className="flex-1 rounded-lg border border-sand/80 px-4 py-2 text-[0.76rem] text-ink transition hover:border-forest/50 sm:flex-none"
                   >
                     Details
                   </button>
@@ -181,7 +181,7 @@ export function RecentActivity({ events }: { events: ActivityEvent[] }) {
   return (
     <Card className="p-4 sm:p-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-[1rem] font-medium text-ink">Recent activity</h2>
+        <h2 className="text-[1rem] font-semibold tracking-[-0.02em] text-ink">Recent activity</h2>
         <Link href="/admin/activity" className="text-[0.74rem] text-ink-soft underline-offset-4 hover:text-ink hover:underline">
           See all
         </Link>
@@ -214,19 +214,19 @@ export function UpcomingAppointments({ range, bookings }: { range: Range; bookin
     <Card>
       <div id="upcoming" className="flex scroll-mt-24 flex-col gap-3 px-4 pt-5 pb-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div>
-          <h2 className="text-[1.1rem] font-medium text-ink">Upcoming appointments</h2>
+          <h2 className="text-[1.05rem] font-semibold tracking-[-0.02em] text-ink">Upcoming appointments</h2>
           <p className="mt-0.5 text-[0.78rem] text-muted">{range.title}</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex flex-1 rounded-lg border border-sand/80 p-0.5 sm:flex-none" role="group" aria-label="Period">
+          <div className="flex flex-1 rounded-full border border-sand bg-white p-0.5 sm:flex-none" role="group" aria-label="Period">
             {TABS.map((t) => (
               <Link
                 key={t.view}
                 href={`/admin?view=${t.view}#upcoming`}
                 scroll={false}
                 aria-current={range.view === t.view ? "true" : undefined}
-                className={`flex-1 rounded-md px-3 py-1.5 text-center text-[0.74rem] whitespace-nowrap transition sm:flex-none ${
-                  range.view === t.view ? "bg-ink text-cream" : "text-ink-soft hover:text-ink"
+                className={`flex-1 rounded-full px-3 py-1.5 text-center text-[0.74rem] font-medium whitespace-nowrap transition sm:flex-none ${
+                  range.view === t.view ? "bg-forest text-white" : "text-sage hover:text-ink"
                 }`}
               >
                 {t.label}
@@ -234,8 +234,8 @@ export function UpcomingAppointments({ range, bookings }: { range: Range; bookin
             ))}
           </div>
           <label
-            className={`relative grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-lg border transition ${
-              range.view === "date" ? "border-ink bg-ink text-cream" : "border-sand/80 text-ink hover:border-ink/40"
+            className={`relative grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-full border transition ${
+              range.view === "date" ? "border-forest bg-forest text-white" : "border-sand text-ink hover:border-forest/30"
             }`}
           >
             <span className="sr-only">Pick a date</span>

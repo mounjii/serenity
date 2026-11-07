@@ -1,7 +1,5 @@
-export const INTRO_SEEN_KEY = "touch-sense-intro";
-
 /**
- * Runs before the first paint (inline in <head>) so the intro covers the page from the very first
- * frame, and returning visitors never see it flash.
+ * Runs before the first paint (inline in <head>) so the stacked logo covers the homepage
+ * from the very first frame, then the page is revealed.
  */
-export const INTRO_BOOT_SCRIPT = `try{if(/^\\/(fr|ar)?\\/?$/.test(location.pathname)&&!sessionStorage.getItem("${INTRO_SEEN_KEY}")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.dataset.intro="play"}}catch(e){}`;
+export const INTRO_BOOT_SCRIPT = `try{if(/^\\/(fr|ar)?\\/?$/.test(location.pathname)){document.documentElement.dataset.intro="play"}}catch(e){}`;

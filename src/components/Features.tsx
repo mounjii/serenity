@@ -1,32 +1,32 @@
 import { getI18n } from "@/i18n/server";
 import { HeartIcon, LeafIcon, LotusIcon, SparkLotusIcon } from "./Icons";
-import Reveal from "./Reveal";
 
-const icons = [LeafIcon, LotusIcon, HeartIcon, SparkLotusIcon];
+const icons = [LotusIcon, LeafIcon, HeartIcon, SparkLotusIcon];
 
 export default async function Features() {
   const { t } = await getI18n();
   return (
-    <section className="bg-cream">
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-y-2 px-4 pt-4 pb-12 sm:px-6 sm:pt-6 sm:pb-20 lg:grid-cols-4 lg:px-12">
-        {t.features.map((f, i) => {
-          const Icon = icons[i % icons.length];
-          return (
-            <Reveal
-              key={f.title}
-              delay={(i % 2) * 120}
-              className={`flex flex-col items-center px-2 py-6 text-center sm:px-8 sm:py-8 lg:py-2 ${
-                i > 0 ? "lg:border-s lg:border-sand" : ""
-              }`}
-            >
-              <Icon className="h-9 w-9 text-ink sm:h-11 sm:w-11" />
-              <h3 className="mt-4 text-[0.88rem] leading-snug font-normal text-ink sm:mt-6 sm:text-[0.95rem]">{f.title}</h3>
-              <p className="mt-2 max-w-[13rem] text-[0.76rem] leading-relaxed font-light text-muted sm:mt-2.5 sm:text-[0.8rem]">
-                {f.text}
-              </p>
-            </Reveal>
-          );
-        })}
+    <section className="relative z-10 mt-8 bg-transparent pb-6 sm:mt-0 sm:pb-10 lg:-mt-36">
+      <div className="w-full px-5 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-black/[0.04] bg-white shadow-[0_24px_50px_-32px_rgba(23,23,23,0.35)] lg:grid-cols-4">
+          {t.features.map((feature, i) => {
+            const Icon = icons[i % icons.length];
+            return (
+              <div
+                key={feature.title}
+                className={`flex items-start gap-2.5 px-3 py-4 sm:items-center sm:gap-3 sm:px-6 sm:py-5 ${i % 2 === 1 ? "border-s border-sand" : ""} ${
+                  i >= 2 ? "border-t border-sand lg:border-t-0" : ""
+                } ${i > 0 ? "lg:border-s lg:border-sand" : ""}`}
+              >
+                <Icon className="h-6 w-6 shrink-0 text-ink sm:h-7 sm:w-7" />
+                <div className="min-w-0">
+                  <h3 className="font-display text-[0.82rem] leading-tight font-semibold text-ink sm:text-[0.92rem]">{feature.title}</h3>
+                  <p className="mt-1 text-[0.72rem] leading-snug text-balance text-sage sm:text-[0.78rem]">{feature.text}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

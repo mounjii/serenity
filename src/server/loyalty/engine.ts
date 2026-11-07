@@ -55,6 +55,21 @@ async function addAlert(customerId: string, kind: "POINTS" | "TIER" | "BIRTHDAY"
   await getDb().loyaltyAlert.create({ data: { customerId, kind, payload } });
 }
 
+/** In-app notice when the salon confirms a reservation for someone with an account. */
+export async function addBookingConfirmedAlert(phone: string, payload: { bookingId: string; service: string; slug: string; startAt: string }): Promise<void> {
+  const customer = await getDb().customer.findUnique({ where: { phone }, select: { id: true } });
+  if (!customer) return;
+  const recent = await getDb().loyaltyAlert.findMany({
+    where: { customerId: customer.id, kind: "CONFIRMED" },
+    orderBy: { createdAt: "desc" },
+    take: 30,
+    select: { payload: true },
+  });
+  const already = recent.some((row) => (row.payload as { bookingId?: string } | null)?.bookingId === payload.bookingId);
+  if (already) return;
+  await getDb().loyaltyAlert.create({ data: { customerId: customer.id, kind: "CONFIRMED", payload } });
+}
+
 export async function getLoyaltyCard(customerId: string, locale: Locale): Promise<LoyaltyCard> {
   const db = getDb();
   const customer = await db.customer.findUnique({ where: { id: customerId } });
@@ -274,6 +289,10 @@ export async function saveBirthday(customerId: string, birthday: string | null):
   await refreshCustomerOffers(customerId);
 }
 
+export async function countUnreadAlerts(customerId: string): Promise<number> {
+  return getDb().loyaltyAlert.count({ where: { customerId, readAt: null } });
+}
+
 export async function markLoyaltyAlertsRead(customerId: string): Promise<void> {
   await getDb().loyaltyAlert.updateMany({ where: { customerId, readAt: null }, data: { readAt: new Date() } });
 }
@@ -321,8 +340,17 @@ export async function claimVoucher(code: string, phone: string, serviceId: strin
   return { voucher, discountCents, priceCents: priceCents - discountCents };
 }
 
-export async function markVoucherUsed(voucherId: string): Promise<void> {
-  await getDb().voucher.update({ where: { id: voucherId }, data: { usedAt: new Date() } });
+/** Expire the voucher as it is used, so the same code cannot be applied again. */
+export async function consumeVoucher(
+  tx: Pick<ReturnType<typeof getDb>, "voucher">,
+  voucherId: string,
+  now: Date,
+): Promise<void> {
+  const { count } = await tx.voucher.updateMany({
+    where: { id: voucherId, usedAt: null, expiresAt: { gt: now } },
+    data: { usedAt: now, expiresAt: now },
+  });
+  if (count !== 1) throw businessRule("INVALID_INPUT", "This voucher is not valid.");
 }
 
 export async function sendPromo(input: { message: string; percent?: number; days?: number }): Promise<number> {
@@ -352,10 +380,33 @@ export async function sendPromo(input: { message: string; percent?: number; days
   return customers.length;
 }
 
+export type PublicOffer = { percent: number | null; message: string; expiresAt: string };
+
+/** The live salon-wide promo, without a personal voucher code. */
+export async function getPublicOffer(): Promise<PublicOffer | null> {
+  const voucher = await getDb().voucher.findFirst({
+    where: { kind: "PROMO", usedAt: null, expiresAt: { gt: new Date() } },
+    orderBy: { createdAt: "desc" },
+    select: { customerId: true, title: true, discountPercent: true, expiresAt: true },
+  });
+  if (!voucher) return null;
+  const alert = await getDb().loyaltyAlert.findFirst({
+    where: { customerId: voucher.customerId, kind: "PROMO" },
+    orderBy: { createdAt: "desc" },
+    select: { payload: true },
+  });
+  const payload = (alert?.payload ?? {}) as Record<string, string>;
+  return {
+    percent: voucher.discountPercent,
+    message: payload.message || voucher.title,
+    expiresAt: voucher.expiresAt.toISOString(),
+  };
+}
+
 export async function listLoyaltyMembers() {
   const customers = await getDb().customer.findMany({
     orderBy: { points: "desc" },
-    select: { id: true, name: true, phone: true, points: true, birthday: true, createdAt: true },
+    select: { id: true, name: true, phone: true, points: true, birthday: true, createdAt: true, avatarType: true, updatedAt: true },
   });
   const visits =
     customers.length === 0
@@ -374,5 +425,6 @@ export async function listLoyaltyMembers() {
     visits: visitMap.get(c.phone) ?? 0,
     tier: tierFromVisits(visitMap.get(c.phone) ?? 0),
     birthday: c.birthday ? toLocalDateString(c.birthday) : null,
+    avatarUpdatedAt: c.avatarType ? c.updatedAt.toISOString() : null,
   }));
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import BookingActions from "@/components/admin/BookingActions";
+import CustomerAvatar from "@/components/admin/CustomerAvatar";
 import StatusBadge from "@/components/admin/StatusBadge";
 import { CANCEL_REASON_LABEL } from "@/lib/booking-status";
 import { formatDuration, formatPrice } from "@/lib/format";
@@ -9,7 +10,8 @@ import { formatPhone, whatsappLink } from "@/lib/phone";
 import { bookingRef } from "@/lib/whatsapp-text";
 import { formatLongDate, toLocalTimeString } from "@/lib/time";
 import { getAdminBooking } from "@/server/admin/bookings";
-import { requireAdminPage } from "@/server/auth/session";
+import { requireArea } from "@/server/auth/session";
+import { getDb } from "@/server/db";
 import { sweepExpiredBookings } from "@/server/booking/confirmation";
 import { getWhatsAppMode } from "@/server/whatsapp";
 
@@ -17,27 +19,39 @@ const stamp = (iso: string) => `${formatLongDate(new Date(iso))}, ${toLocalTimeS
 
 export default async function AdminBookingPage({ params }: PageProps<"/admin/bookings/[id]">) {
   await connection();
-  await requireAdminPage();
+  await requireArea("bookings");
   await sweepExpiredBookings();
   const { id } = await params;
   const booking = await getAdminBooking(id);
   if (!booking) notFound();
+  const account = await getDb().customer.findUnique({
+    where: { phone: booking.customerPhone },
+    select: { id: true, avatarType: true, updatedAt: true },
+  });
 
   return (
     <div className="mx-auto max-w-3xl">
-      <Link href="/admin/bookings" className="text-[0.8rem] text-ink-soft hover:text-ink">
+      <Link href="/admin/bookings" className="text-[0.8rem] text-sage hover:text-forest">
         ← Back to bookings
       </Link>
 
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <h1 className="font-serif text-4xl text-ink">{booking.customerName}</h1>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        {account ? (
+          <CustomerAvatar
+            id={account.id}
+            name={booking.customerName}
+            updatedAt={account.avatarType ? account.updatedAt.toISOString() : null}
+            size="lg"
+          />
+        ) : null}
+        <h1 className="text-[1.7rem] leading-tight font-semibold tracking-[-0.03em] text-forest sm:text-[2rem]">{booking.customerName}</h1>
         <StatusBadge status={booking.status} />
       </div>
-      <p className="mt-1 text-[0.9rem] text-ink-soft">
+      <p className="mt-1 text-[0.85rem] text-sage">
         {booking.serviceName} · {booking.dateLabel} · {booking.time} – {booking.endTime}
       </p>
 
-      <section className="mt-8 rounded-lg bg-white p-6 shadow-[0_20px_40px_-32px_rgba(60,40,20,0.35)] sm:p-8">
+      <section className="mt-5 rounded-2xl border border-sand bg-white p-5 sm:p-6">
         <dl className="grid gap-x-8 gap-y-5 text-[0.9rem] sm:grid-cols-2">
           <Item label="Phone">
             <span className="flex flex-wrap items-center gap-2">

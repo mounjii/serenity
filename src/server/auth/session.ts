@@ -1,6 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { unauthorized } from "@/server/errors";
+import type { AdminArea } from "@/lib/admin-areas";
+import { businessRule, unauthorized } from "@/server/errors";
+import { canAccess, getAdminAccess, homeFor } from "./access";
 import { createSessionToken, SESSION_COOKIE, SESSION_MAX_AGE_SECONDS, verifySessionToken, type AdminSession } from "./session-token";
 
 export async function getSession(): Promise<AdminSession | null> {
@@ -20,6 +22,33 @@ export async function requireAdminPage(): Promise<AdminSession> {
   const session = await getSession();
   if (!session) redirect("/admin/login");
   return session;
+}
+
+/** The salon owner. Staff accounts are not the main admin. */
+export async function isMainAdmin(username: string): Promise<boolean> {
+  return (await getAdminAccess(username)).owner;
+}
+
+/** Sends a staff admin away from a page they were not given. */
+export async function requireArea(area: AdminArea): Promise<AdminSession> {
+  const session = await requireAdminPage();
+  const access = await getAdminAccess(session.username);
+  if (!canAccess(access, area)) redirect(homeFor(access));
+  return session;
+}
+
+/** Admins and Members & offers are only for the main admin. */
+export async function requireOwnerPage(): Promise<AdminSession> {
+  const session = await requireAdminPage();
+  const access = await getAdminAccess(session.username);
+  if (!access.owner) redirect(homeFor(access));
+  return session;
+}
+
+export async function assertArea(area: AdminArea): Promise<void> {
+  const session = await requireAdmin();
+  const access = await getAdminAccess(session.username);
+  if (!canAccess(access, area)) throw businessRule("INVALID_INPUT", "You do not have access to this.");
 }
 
 export async function startSession(username: string): Promise<void> {

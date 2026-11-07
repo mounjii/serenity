@@ -1,5 +1,5 @@
 import { formatInTimeZone } from "date-fns-tz";
-import { TIMEZONE } from "@/lib/booking-rules";
+import { salonZone } from "@/lib/time";
 import { INTL_LOCALE, type Locale } from "./config";
 
 /** Fills "{name}" placeholders. */
@@ -13,8 +13,9 @@ function intlDate(locale: Locale, instant: Date, timeZone: string, options: Intl
 
 /** e.g. "Monday 12 October 2026" / "lundi 12 octobre 2026" / "الاثنين 12 أكتوبر 2026", in the salon time zone. */
 export function formatLongDateIn(locale: Locale, instant: Date): string {
-  if (locale === "en") return formatInTimeZone(instant, TIMEZONE, "EEEE d MMMM yyyy");
-  return intlDate(locale, instant, TIMEZONE, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const zone = salonZone(instant);
+  if (locale === "en") return formatInTimeZone(instant, zone, "EEEE d MMMM yyyy");
+  return intlDate(locale, instant, zone, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 }
 
 /** Weekday, day and month names of a YYYY-MM-DD calendar date. */

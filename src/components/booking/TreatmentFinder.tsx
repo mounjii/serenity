@@ -96,11 +96,11 @@ export default function TreatmentFinder({ services, onPick, onClose }: Props) {
           <ol className="flex items-center" aria-label={fmt(t.finder.questionOf, { n: question + 1 })}>
             {[0, 1, 2].map((i) => (
               <li key={i} className="flex items-center">
-                {i > 0 && <span aria-hidden className={`h-px w-5 transition-colors duration-500 sm:w-9 ${i <= question ? "bg-ink" : "bg-sand"}`} />}
+                {i > 0 && <span aria-hidden className={`h-px w-5 transition-colors duration-500 sm:w-9 ${i <= question ? "bg-forest" : "bg-sand"}`} />}
                 <span
                   aria-current={i === question ? "step" : undefined}
                   className={`grid h-7 w-7 place-items-center rounded-full text-[0.7rem] transition-colors duration-500 ${
-                    i <= question ? "bg-ink text-cream" : "border border-sand bg-white text-muted"
+                    i <= question ? "bg-forest text-white" : "border border-sand bg-white text-muted"
                   }`}
                 >
                   {i < question ? <CheckIcon className="h-3.5 w-3.5" /> : i + 1}
@@ -183,7 +183,7 @@ function Question({ eyebrow, title, hint, children }: { eyebrow: string; title: 
   return (
     <div>
       <p className="text-[0.66rem] tracking-[0.3em] text-muted uppercase">{eyebrow}</p>
-      <h2 className="mt-1.5 font-serif text-[1.7rem] leading-tight text-ink sm:text-[2.3rem]">{title}</h2>
+      <h2 className="mt-1.5 font-semibold tracking-[-0.02em] text-[1.7rem] leading-tight text-forest sm:text-[2.3rem]">{title}</h2>
       <p className="mt-2 max-w-2xl text-[0.86rem] leading-relaxed font-light text-ink-soft">{hint}</p>
       <div className="mt-6">{children}</div>
     </div>
@@ -213,7 +213,7 @@ function GoalChoice({
       aria-pressed={selected}
       style={{ animationDelay: `${60 + index * 50}ms` }}
       className={`animate-fade-up group flex flex-col overflow-hidden rounded-lg border bg-white text-start transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_-24px_rgba(60,40,20,0.6)] ${
-        selected ? "border-bronze shadow-[0_0_0_1px_var(--color-bronze)]" : "border-sand hover:border-ink/40"
+        selected ? "border-bronze shadow-[0_0_0_1px_var(--color-bronze)]" : "border-sand hover:border-forest/40"
       }`}
     >
       <span className="relative block h-20 overflow-hidden sm:h-28">
@@ -230,7 +230,7 @@ function GoalChoice({
           <Icon className="h-7 w-7" />
         </span>
         <span className="flex items-start justify-between gap-2">
-          <span className="font-serif text-[1rem] leading-tight text-ink sm:text-[1.2rem]">{label}</span>
+          <span className="font-semibold tracking-[-0.02em] text-[1rem] leading-tight text-ink sm:text-[1.2rem]">{label}</span>
           {selected ? (
             <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-bronze" />
           ) : (
@@ -265,17 +265,17 @@ function Choice({
       aria-pressed={selected}
       style={{ animationDelay: `${60 + index * 50}ms` }}
       className={`animate-fade-up group flex min-h-[5.5rem] flex-col justify-center rounded-lg border px-5 py-4 text-start transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-22px_rgba(60,40,20,0.6)] ${
-        selected ? "border-ink bg-ink text-cream" : "border-sand bg-white text-ink hover:border-ink"
+        selected ? "border-forest bg-forest text-white" : "border-sand bg-white text-ink hover:border-forest"
       }`}
     >
       <span className="flex items-center justify-between gap-3">
-        <span className="font-serif text-[1.2rem] leading-tight">{label}</span>
+        <span className="font-semibold tracking-[-0.02em] text-[1.2rem] leading-tight">{label}</span>
         {selected ? <CheckIcon className="h-4 w-4 shrink-0" /> : <ArrowRight className="h-4 w-4 shrink-0 opacity-0 transition group-hover:opacity-60 rtl:-scale-x-100" />}
       </span>
       {meter !== undefined && (
         <span className="mt-2 flex gap-1" aria-hidden>
           {[1, 2, 3, 4, 5].map((level) => (
-            <span key={level} className={`h-1.5 w-4 rounded-full ${level <= meter ? (selected ? "bg-cream" : "bg-ink") : selected ? "bg-cream/25" : "bg-sand"}`} />
+            <span key={level} className={`h-1.5 w-4 rounded-full ${level <= meter ? (selected ? "bg-cream" : "bg-forest") : selected ? "bg-cream/25" : "bg-sand"}`} />
           ))}
         </span>
       )}
@@ -306,17 +306,17 @@ function Results({
   return (
     <div>
       <p className="text-[0.66rem] tracking-[0.3em] text-muted uppercase">{t.finder.yourMatch}</p>
-      <h2 className="mt-1.5 font-serif text-2xl text-ink sm:text-[2rem]">{t.finder.weRecommend}</h2>
+      <h2 className="mt-1.5 font-semibold tracking-[-0.02em] text-2xl text-forest sm:text-[2rem]">{t.finder.weRecommend}</h2>
 
       <article className="animate-fade-up mt-6 grid overflow-hidden rounded-lg border border-sand bg-white md:grid-cols-[0.9fr_1.4fr]">
         <div className="relative aspect-[16/10] md:aspect-auto md:min-h-[17rem]">
           <Image src={serviceImage(bestService.slug)} {...blurProps(serviceImage(bestService.slug))} alt={bestName} fill sizes="(min-width: 768px) 35vw, 100vw" className="object-cover" />
-          <span className="absolute top-4 start-4 inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-[0.65rem] tracking-[0.18em] text-cream uppercase">
+          <span className="absolute top-4 start-4 inline-flex items-center gap-1.5 rounded-full bg-forest px-3 py-1.5 text-[0.65rem] tracking-[0.18em] text-cream uppercase">
             <LotusIcon className="h-3.5 w-3.5" aria-hidden /> {t.finder.bestForYou}
           </span>
         </div>
         <div className="flex flex-col p-5 sm:p-7">
-          <h3 className="font-serif text-[1.9rem] leading-tight text-ink">{bestName}</h3>
+          <h3 className="font-semibold tracking-[-0.02em] text-[1.9rem] leading-tight text-ink">{bestName}</h3>
           <p className="mt-2 text-[0.88rem] leading-relaxed font-light text-ink-soft">{bestInfo.summary}</p>
           {best.reasons.length > 0 && (
             <ul className="mt-4 space-y-1.5 text-[0.84rem] text-ink-soft">
@@ -331,7 +331,7 @@ function Results({
           <button
             type="button"
             onClick={() => onPick(best)}
-            className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-full bg-ink py-3.5 text-[0.85rem] tracking-wide text-cream transition hover:-translate-y-0.5 hover:bg-black sm:w-auto sm:self-start sm:px-8"
+            className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-full bg-forest py-3.5 text-[0.85rem] tracking-wide text-cream transition hover:-translate-y-0.5 hover:bg-forest-dark sm:w-auto sm:self-start sm:px-8"
           >
             {fmt(t.finder.seeDetails, { duration: formatDuration(best.durationMinutes, locale) })}
             <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
@@ -352,13 +352,13 @@ function Results({
                   type="button"
                   onClick={() => onPick(m)}
                   style={{ animationDelay: `${150 + i * 80}ms` }}
-                  className="animate-fade-up group flex items-center gap-4 rounded-lg border border-sand bg-white p-3 text-start transition hover:-translate-y-0.5 hover:border-ink"
+                  className="animate-fade-up group flex items-center gap-4 rounded-lg border border-sand bg-white p-3 text-start transition hover:-translate-y-0.5 hover:border-forest"
                 >
                   <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
                     <Image src={serviceImage(s.slug)} {...blurProps(serviceImage(s.slug))} alt="" fill sizes="64px" className="object-cover" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block font-serif text-[1.15rem] leading-tight text-ink">{serviceText(t, s).name}</span>
+                    <span className="block font-semibold tracking-[-0.02em] text-[1.15rem] leading-tight text-ink">{serviceText(t, s).name}</span>
                     <span className="mt-0.5 block truncate text-[0.76rem] font-light text-muted">{localizedServiceDetails(t, s).summary}</span>
                   </span>
                   <ArrowRight className="h-4 w-4 shrink-0 text-ink-soft transition group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5" />

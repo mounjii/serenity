@@ -44,6 +44,7 @@ enum LoyaltyAlertKind {
   PERSONALIZED
   PROMO
   VOUCHER
+  CONFIRMED
 }
 
 model Service {
@@ -151,18 +152,40 @@ model Booking {
 /// Customer account, keyed by the WhatsApp / booking phone number (E.164).
 model Customer {
   id           String          @id @default(cuid())
-  name         String          @db.VarChar(80)
-  phone        String          @unique @db.VarChar(20)
-  passwordHash String          @db.VarChar(100)
-  birthday     DateTime?       @db.Date
-  points       Int             @default(0)
+  name              String          @db.VarChar(80)
+  phone             String          @unique @db.VarChar(20)
+  email             String?         @unique @db.VarChar(120)
+  passwordHash      String          @db.VarChar(100)
+  birthday          DateTime?       @db.Date
+  preferredMassage  String?         @db.VarChar(80)
+  wellnessGoal      String?         @db.VarChar(20)
+  visitFrequency    String?         @db.VarChar(20)
+  discovery         String?         @db.VarChar(20)
+  avatar            Bytes?          @db.LongBlob
+  avatarType        String?         @db.VarChar(20)
+  points            Int             @default(0)
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
   ledgers      LoyaltyLedger[]
   vouchers     Voucher[]
-  alerts       LoyaltyAlert[]
+  alerts         LoyaltyAlert[]
+  passwordResets PasswordReset[]
 
   @@map("customers")
+}
+
+model PasswordReset {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  channel    String   @db.VarChar(10)
+  codeHash   String   @db.VarChar(64)
+  expiresAt  DateTime
+  attempts   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([customerId])
+  @@map("password_resets")
 }
 
 model LoyaltyLedger {
@@ -212,11 +235,16 @@ model LoyaltyAlert {
   @@map("loyalty_alerts")
 }
 
-/// Single salon-owner login. Env ADMIN_* is used until this row is saved from the dashboard.
+/// Salon logins. The row with role OWNER is the main admin. STAFF can use the dashboard, not Members & offers.
 model AdminAccount {
-  id           Int      @id @default(1)
+  id           Int      @id @default(autoincrement())
   username     String   @unique @db.VarChar(40)
   passwordHash String   @db.VarChar(100)
+  role         String   @default("STAFF") @db.VarChar(10)
+  /// Comma-separated areas a staff admin may open. Ignored for OWNER.
+  permissions  String   @default("") @db.VarChar(120)
+  avatar       Bytes?   @db.LongBlob
+  avatarType   String?  @db.VarChar(20)
   updatedAt    DateTime @updatedAt
 
   @@map("admin_accounts")

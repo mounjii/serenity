@@ -19,3 +19,5 @@ export const SOCIAL_LINKS = {
   instagram: "https://www.instagram.com/touchsensespa/",
   facebook: "https://www.facebook.com/profile.php?id=61566777759531",
 } as const;
+
+export const GOOGLE_REVIEW_URL = "https://g.page/r/Cb1fS01ZnfTPEAE/review";

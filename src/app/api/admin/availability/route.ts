@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { requireAdmin } from "@/server/auth/session";
+import { assertArea } from "@/server/auth/session";
 import { getTimeGrid, parseDurationParam } from "@/server/booking/availability";
 import { getDaySchedule } from "@/server/booking/schedule";
 import { getDb } from "@/server/db";
@@ -7,7 +7,7 @@ import { errorResponse, jsonResponse } from "@/server/errors";
 
 export async function GET(request: NextRequest) {
   try {
-    await requireAdmin();
+    await assertArea("bookings");
     const serviceId = request.nextUrl.searchParams.get("serviceId") ?? "";
     const date = request.nextUrl.searchParams.get("date") ?? "";
     const durationMinutes = parseDurationParam(request.nextUrl.searchParams.get("duration"));

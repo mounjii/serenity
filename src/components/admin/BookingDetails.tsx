@@ -67,7 +67,7 @@ export default function BookingDetailsProvider({
       <div className={`fixed inset-0 z-50 ${visible ? "" : "pointer-events-none"}`} aria-hidden={!visible}>
         <div
           onClick={close}
-          className={`absolute inset-0 bg-ink/20 transition-opacity duration-300 motion-reduce:transition-none ${visible ? "opacity-100" : "opacity-0"}`}
+          className={`absolute inset-0 bg-forest/20 transition-opacity duration-300 motion-reduce:transition-none ${visible ? "opacity-100" : "opacity-0"}`}
         />
         <aside
           ref={panelRef}
@@ -103,7 +103,7 @@ function DetailsContent({ booking, whatsappMode, onClose }: { booking: AdminBook
       </div>
 
       <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-6 sm:px-6">
-        <h2 id="booking-details-title" className="font-serif text-[2rem] leading-tight text-ink">
+        <h2 id="booking-details-title" className="text-[1.7rem] leading-tight font-semibold tracking-[-0.03em] text-forest">
           {booking.customerName}
         </h2>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-[0.85rem] text-ink-soft">
@@ -127,7 +127,7 @@ function DetailsContent({ booking, whatsappMode, onClose }: { booking: AdminBook
             </a>
             <a
               href={`tel:${booking.customerPhone}`}
-              className="flex-1 rounded-full border border-sand px-4 py-2 text-center text-[0.75rem] tracking-wide text-ink transition hover:border-ink"
+              className="flex-1 rounded-full border border-sand px-4 py-2 text-center text-[0.75rem] tracking-wide text-ink transition hover:border-forest"
             >
               Call
             </a>

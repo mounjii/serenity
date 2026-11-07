@@ -1,7 +1,7 @@
 import { STATUS_LABEL, type BookingStatusValue } from "@/lib/booking-status";
 
 const styles: Record<BookingStatusValue, string> = {
-  PENDING: "bg-gold/[0.1] text-[#8a6a22] ring-gold/30",
+  PENDING: "bg-gold/[0.1] text-espresso ring-gold/30",
   CONFIRMED: "bg-olive/[0.07] text-olive ring-olive/20",
   COMPLETED: "bg-sand/50 text-ink-soft ring-sand",
   CANCELLED: "bg-red-50/70 text-red-700/80 ring-red-200/70",

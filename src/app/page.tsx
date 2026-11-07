@@ -3,6 +3,7 @@ import IntroSplash from "@/components/IntroSplash";
 import SiteHeader from "@/components/SiteHeader";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
+import PublicOffer from "@/components/PublicOffer";
 import About from "@/components/About";
 import Treatments from "@/components/Treatments";
 import Testimonials from "@/components/Testimonials";
@@ -30,6 +31,7 @@ export default function Home() {
       <main>
         <Hero />
         <Features />
+        <PublicOffer />
         <About />
         <Treatments />
         <Testimonials />

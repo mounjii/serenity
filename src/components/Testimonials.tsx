@@ -4,36 +4,41 @@ import { useEffect, useState } from "react";
 import { useI18n } from "@/i18n/client";
 import { fmt } from "@/i18n/format";
 import { ArrowLeft, ArrowRight, StarIcon } from "./Icons";
-import Reveal from "./Reveal";
 
 export default function Testimonials() {
   const { t } = useI18n();
   const testimonials = t.testimonials.items;
-  const [index, setIndex] = useState(0);
-  const count = testimonials.length;
-  const pair = [testimonials[index], testimonials[(index + 1) % count]];
+  const pageSize = 2;
+  const pageCount = Math.max(1, Math.ceil(testimonials.length / pageSize));
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(() => setIndex((i) => (i + 1) % count), 7000);
+    const id = setInterval(() => setPage((current) => (current + 1) % pageCount), 8000);
     return () => clearInterval(id);
-  }, [count, index]);
+  }, [pageCount]);
 
-  const prev = () => setIndex((i) => (i - 1 + count) % count);
-  const next = () => setIndex((i) => (i + 1) % count);
+  const start = page * pageSize;
+  const visible = testimonials.slice(start, start + pageSize);
+  const prev = () => setPage((current) => (current - 1 + pageCount) % pageCount);
+  const next = () => setPage((current) => (current + 1) % pageCount);
 
   return (
-    <section className="bg-cream">
-      <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 sm:px-6 sm:py-20 lg:grid-cols-[0.85fr_1.4fr] lg:gap-16 lg:px-12 lg:py-24">
-        <Reveal>
-          <p className="eyebrow">{t.testimonials.eyebrow}</p>
-          <h2 className="mt-4 max-w-xs font-serif text-[2.5rem] leading-[1.05] text-ink sm:text-5xl">{t.testimonials.title}</h2>
-          <p className="mt-4 max-w-xs text-[0.95rem] leading-relaxed font-light text-ink-soft">{t.testimonials.intro}</p>
-          <div className="mt-8 flex items-center gap-3">
+    <section className="bg-ivory">
+      <div className="grid w-full items-start gap-8 px-5 py-14 sm:px-6 sm:py-20 lg:grid-cols-[0.8fr_1.2fr] lg:items-center lg:gap-16 lg:px-8 lg:py-24">
+        <div className="font-display">
+          <p className="text-[0.68rem] font-medium tracking-[0.22em] text-sage uppercase sm:tracking-[0.28em]">{t.testimonials.eyebrow}</p>
+          <h2 className="mt-3 text-[2rem] leading-[1.08] font-semibold tracking-[-0.03em] text-forest sm:text-[2.45rem] lg:text-[2.8rem]">
+            {t.testimonials.title1}
+            <br />
+            {t.testimonials.title2}
+          </h2>
+          <p className="mt-4 max-w-xs text-[0.95rem] leading-relaxed text-sage">{t.testimonials.text}</p>
+          <div className="mt-7 flex items-center gap-3">
             <button
               type="button"
               onClick={prev}
               aria-label={t.testimonials.prev}
-              className="grid h-11 w-11 place-items-center rounded-full border border-sand bg-white text-ink transition hover:border-ink"
+              className="grid h-10 w-10 place-items-center rounded-full border border-sand bg-white text-ink transition hover:border-forest"
             >
               <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" />
             </button>
@@ -41,39 +46,36 @@ export default function Testimonials() {
               type="button"
               onClick={next}
               aria-label={t.testimonials.next}
-              className="grid h-11 w-11 place-items-center rounded-full border border-sand bg-white text-ink transition hover:border-ink"
+              className="grid h-10 w-10 place-items-center rounded-full border border-sand bg-white text-ink transition hover:border-forest"
             >
               <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
             </button>
-            <div className="ms-2 flex gap-2">
-              {testimonials.map((item, i) => (
+            <div className="ms-2 flex gap-1.5">
+              {Array.from({ length: pageCount }).map((_, i) => (
                 <button
-                  key={item.name}
+                  key={i}
                   type="button"
-                  onClick={() => setIndex(i)}
+                  onClick={() => setPage(i)}
                   aria-label={fmt(t.testimonials.show, { n: i + 1 })}
-                  className={`h-2 w-2 rounded-full transition ${i === index ? "bg-ink" : "bg-sand"}`}
+                  className={`h-1.5 rounded-full transition-all ${i === page ? "w-6 bg-forest" : "w-1.5 bg-sand"}`}
                 />
               ))}
             </div>
           </div>
-        </Reveal>
+        </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          {pair.map((item, slot) => (
-            <article
-              key={`${item.name}-${slot}`}
-              className={`relative rounded-2xl bg-white px-6 py-6 shadow-[0_18px_40px_-28px_rgba(60,40,20,0.4)] ${slot === 1 ? "hidden sm:block" : ""}`}
-            >
-              <span aria-hidden className="absolute top-4 right-6 font-serif text-5xl leading-none text-sand">
-                &rdquo;
+        <div className="grid gap-4 md:grid-cols-2">
+          {visible.map((item) => (
+            <blockquote key={item.name} className="relative rounded-2xl bg-white p-5 shadow-[0_18px_40px_-30px_rgba(23,23,23,0.35)] sm:p-6">
+              <span aria-hidden className="absolute top-4 end-5 font-serif text-4xl leading-none text-gold">
+                &ldquo;
               </span>
               <div className="flex items-center gap-3">
-                <div className="grid h-11 w-11 place-items-center rounded-full bg-sand font-serif text-lg text-ink">
-                  {item.name.charAt(0).toUpperCase()}
-                </div>
+                <span className="grid h-11 w-11 place-items-center rounded-full bg-sand font-display text-sm font-semibold text-ink">
+                  {item.name.charAt(0)}
+                </span>
                 <div>
-                  <p className="text-[0.92rem] font-medium text-ink">
+                  <p className="font-display text-[0.92rem] font-semibold text-ink">
                     <bdi>{item.name}</bdi>
                   </p>
                   <div className="mt-1 flex gap-0.5 text-gold">
@@ -83,8 +85,9 @@ export default function Testimonials() {
                   </div>
                 </div>
               </div>
-              <p className="mt-5 text-[0.92rem] leading-relaxed font-light text-ink-soft">&ldquo;{item.quote}&rdquo;</p>
-            </article>
+              <p className="mt-4 line-clamp-4 text-[0.9rem] leading-relaxed text-sage">&ldquo;{item.quote}&rdquo;</p>
+              <p className="mt-3 text-[0.72rem] text-sage">{t.testimonials.source}</p>
+            </blockquote>
           ))}
         </div>
       </div>

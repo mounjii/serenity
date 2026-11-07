@@ -67,7 +67,7 @@ export type AdminBooking = {
   completedAt: string | null;
   /** Language the client booked in, with the service and date written in it for WhatsApp messages. */
   client: { locale: Locale; serviceName: string; dateLabel: string };
-  /** Salon-time labels formatted on the server; browsers may ship outdated Africa/Casablanca rules. */
+  /** Salon-time labels formatted on the server. Morocco has been GMT since 20 September 2026. */
   labels: {
     confirmUntil: string | null;
     created: string;

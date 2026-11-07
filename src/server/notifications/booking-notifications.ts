@@ -4,6 +4,7 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { serviceText } from "@/i18n/services";
 import { normalizePhone } from "@/lib/phone";
 import { getDb } from "@/server/db";
+import { addBookingConfirmedAlert } from "@/server/loyalty/engine";
 import { getWhatsAppProvider, type WhatsAppMessage } from "@/server/whatsapp";
 import { logNotification } from "@/server/whatsapp/log";
 import {
@@ -86,6 +87,7 @@ export async function notifyBookingCreated(bookingId: string): Promise<void> {
       ? bookingRequestCustomer({ ...info, bookingId, deadline: booking.confirmationExpiresAt })
       : bookingConfirmedCustomer(info);
   await deliver({ bookingId, recipient: "CUSTOMER", to: booking.customerPhone, ...customerMessage });
+  if (!waiting) await alertCustomerConfirmed(booking.customerPhone, bookingId, booking.service, info.serviceName, booking.startAt);
   await deliverToOwner(bookingId, bookingNewOwner({ ...owner, waiting }));
 }
 
@@ -94,7 +96,25 @@ export async function notifyBookingConfirmed(bookingId: string, by: "CUSTOMER" |
   const loaded = await loadBooking(bookingId);
   if (!loaded) return;
   await deliver({ bookingId, recipient: "CUSTOMER", to: loaded.booking.customerPhone, ...bookingConfirmedCustomer(loaded.info) });
+  if (by === "ADMIN") {
+    await alertCustomerConfirmed(loaded.booking.customerPhone, bookingId, loaded.booking.service, loaded.info.serviceName, loaded.booking.startAt);
+  }
   if (by === "CUSTOMER") await deliverToOwner(bookingId, bookingConfirmedOwner(loaded.owner));
+}
+
+async function alertCustomerConfirmed(
+  phone: string,
+  bookingId: string,
+  service: { name: string; slug: string },
+  serviceName: string,
+  startAt: Date,
+): Promise<void> {
+  await addBookingConfirmedAlert(phone, {
+    bookingId,
+    service: serviceName || service.name,
+    slug: service.slug,
+    startAt: startAt.toISOString(),
+  });
 }
 
 /** Reservation cancelled by the admin: tell the customer. */

@@ -1,7 +1,15 @@
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
-import { PrismaClient } from "@/generated/prisma/client";
+import { LoyaltyAlertKind, Prisma, PrismaClient } from "@/generated/prisma/client";
 
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient; prismaFields?: string };
+
+function customerFields(): string {
+  return [
+    Object.keys(Prisma.CustomerScalarFieldEnum).join(","),
+    Object.keys(Prisma.AdminAccountScalarFieldEnum).join(","),
+    Object.keys(LoyaltyAlertKind).join(","),
+  ].join("|");
+}
 
 function createPrismaClient(): PrismaClient {
   const raw = process.env.DATABASE_URL;
@@ -25,13 +33,15 @@ function createPrismaClient(): PrismaClient {
 /** Lazily created so that importing this module never needs a database (e.g. during `next build`). */
 export function getDb(): PrismaClient {
   const cached = globalForPrisma.prisma;
-  // After `prisma generate`, a client created from the previous class is missing new models.
-  if (cached && (!cached.customer || !cached.voucher)) {
+  const fields = customerFields();
+  // The dev server keeps one client for the whole process. After `prisma generate`, that copy is missing new columns.
+  if (cached && (globalForPrisma.prismaFields !== fields || !cached.customer || !cached.voucher || !cached.passwordReset)) {
     globalForPrisma.prisma = undefined;
     void cached.$disconnect().catch(() => undefined);
   }
   if (!globalForPrisma.prisma) {
     globalForPrisma.prisma = createPrismaClient();
+    globalForPrisma.prismaFields = fields;
   }
   return globalForPrisma.prisma;
 }

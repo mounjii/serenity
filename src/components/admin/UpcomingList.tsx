@@ -48,7 +48,7 @@ export default function UpcomingList({ bookings, today, emptyText }: Props) {
                         highlighted.has(b.id) ? "bg-gold/10" : ""
                       }`}
                     >
-                      <span className={`font-serif text-[1.2rem] leading-none lining-nums tabular-nums ${cancelled ? "text-muted line-through" : "text-ink"}`}>
+                      <span className={`text-[1.05rem] leading-none font-semibold tracking-[-0.03em] lining-nums tabular-nums ${cancelled ? "text-muted line-through" : "text-ink"}`}>
                         {b.time}
                       </span>
                       <span className="min-w-0">

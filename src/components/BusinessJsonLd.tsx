@@ -5,8 +5,18 @@ import { getI18n } from "@/i18n/server";
 import { serviceText } from "@/i18n/services";
 import { NONCE_HEADER } from "@/lib/csp";
 import { normalizePhone } from "@/lib/phone";
-import { BUSINESS_ADDRESS, OG_IMAGE, OPENING_HOURS, SITE_NAME, SITE_URL, SOCIAL_LINKS } from "@/lib/site";
-import { getActiveServices, type PublicService } from "@/server/booking/services";
+import {
+  BUSINESS_ADDRESS,
+  OG_IMAGE,
+  OPENING_HOURS,
+  SITE_NAME,
+  SITE_URL,
+  SOCIAL_LINKS,
+} from "@/lib/site";
+import {
+  getActiveServices,
+  type PublicService,
+} from "@/server/booking/services";
 
 const absolute = (path: string) => new URL(path, SITE_URL).toString();
 
@@ -23,10 +33,16 @@ export default async function BusinessJsonLd() {
   await connection();
   const { t, locale } = await getI18n();
   const nonce = (await headers()).get(NONCE_HEADER) ?? undefined;
-  const phone = normalizePhone(process.env.CONTACT_PHONE || process.env.OWNER_WHATSAPP_PHONE || "");
+  const phone = normalizePhone(
+    process.env.CONTACT_PHONE || process.env.OWNER_WHATSAPP_PHONE || "",
+  );
   const services = await loadServices();
-  const prices = services.flatMap((s) => s.options.map((o) => o.priceCents / 100));
-  const mapQuery = encodeURIComponent(`${SITE_NAME}, ${BUSINESS_ADDRESS.streetAddress}, ${BUSINESS_ADDRESS.addressLocality}`);
+  const prices = services.flatMap((s) =>
+    s.options.map((o) => o.priceCents / 100),
+  );
+  const mapQuery = encodeURIComponent(
+    `${SITE_NAME}, ${BUSINESS_ADDRESS.streetAddress}, ${BUSINESS_ADDRESS.addressLocality}`,
+  );
 
   const data = {
     "@context": "https://schema.org",
@@ -36,18 +52,28 @@ export default async function BusinessJsonLd() {
     description: t.meta.description,
     url: absolute(localizePath(locale, "/")),
     image: absolute(OG_IMAGE.url),
-    logo: absolute("/images/ts-logo-stacked.png"),
+    logo: absolute("/images/logo-mark.png"),
     ...(phone ? { telephone: phone } : {}),
     address: { "@type": "PostalAddress", ...BUSINESS_ADDRESS },
     hasMap: `https://www.google.com/maps/search/?api=1&query=${mapQuery}`,
     openingHoursSpecification: {
       "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      dayOfWeek: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
       opens: OPENING_HOURS.opens,
       closes: OPENING_HOURS.closes,
     },
     currenciesAccepted: "MAD",
-    ...(prices.length > 0 ? { priceRange: `${Math.min(...prices)}–${Math.max(...prices)} MAD` } : {}),
+    ...(prices.length > 0
+      ? { priceRange: `${Math.min(...prices)}–${Math.max(...prices)} MAD` }
+      : {}),
     availableLanguage: ["English", "French", "Arabic"],
     sameAs: Object.values(SOCIAL_LINKS),
     potentialAction: {
@@ -68,7 +94,11 @@ export default async function BusinessJsonLd() {
                   "@type": "Offer",
                   price: (o.priceCents / 100).toFixed(2),
                   priceCurrency: "MAD",
-                  itemOffered: { "@type": "Service", name: `${name} (${o.durationMinutes} min)`, description },
+                  itemOffered: {
+                    "@type": "Service",
+                    name: `${name} (${o.durationMinutes} min)`,
+                    description,
+                  },
                 })),
               };
             }),
@@ -81,7 +111,9 @@ export default async function BusinessJsonLd() {
     <script
       type="application/ld+json"
       nonce={nonce}
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }}
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(data).replace(/</g, "\\u003c"),
+      }}
     />
   );
 }

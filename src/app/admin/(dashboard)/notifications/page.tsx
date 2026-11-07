@@ -2,26 +2,28 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { formatPhone } from "@/lib/phone";
 import { listNotifications } from "@/server/admin/notifications";
-import { requireAdminPage } from "@/server/auth/session";
+import { requireArea } from "@/server/auth/session";
 
 export default async function NotificationsPage() {
   await connection();
-  await requireAdminPage();
+  await requireArea("notifications");
   const notifications = await listNotifications();
   const provider = process.env.WHATSAPP_PROVIDER?.trim() || "not set";
 
   return (
-    <div>
-      <h1 className="font-serif text-4xl text-ink">WhatsApp notifications</h1>
-      <p className="mt-1 text-[0.85rem] text-ink-soft">
+    <div className="space-y-5 sm:space-y-6">
+      <header>
+        <h1 className="text-[1.7rem] leading-tight font-semibold tracking-[-0.03em] text-forest sm:text-[2rem]">WhatsApp notifications</h1>
+        <p className="mt-1 text-[0.85rem] text-sage">
         Last {notifications.length === 100 ? "100 " : ""}messages. Provider: <span className="font-medium text-ink">{provider}</span>
         {provider === "mock" && " (messages are simulated, nothing is actually sent)"}.
       </p>
+      </header>
 
       {notifications.length === 0 ? (
-        <p className="mt-8 rounded-lg bg-white px-5 py-8 text-center text-[0.85rem] text-muted">No messages yet.</p>
+        <p className="rounded-2xl border border-sand bg-white px-5 py-8 text-center text-[0.85rem] text-sage">No messages yet.</p>
       ) : (
-        <ul className="mt-8 divide-y divide-sand/70 overflow-hidden rounded-lg bg-white shadow-[0_20px_40px_-32px_rgba(60,40,20,0.35)]">
+        <ul className="divide-y divide-sand overflow-hidden rounded-2xl border border-sand bg-white">
           {notifications.map((n) => (
             <li key={n.id} className="px-5 py-4">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.78rem]">

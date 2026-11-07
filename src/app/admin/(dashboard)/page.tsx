@@ -24,7 +24,7 @@ import { formatPrice } from "@/lib/format";
 import { addDays, formatDayHeading, isValidDateString, toLocalMinuteOfDay, weekdayOf } from "@/lib/time";
 import { listActivity } from "@/server/admin/activity";
 import { getDashboardSummary, listBookingsForDates, type AdminBooking } from "@/server/admin/bookings";
-import { requireAdminPage } from "@/server/auth/session";
+import { requireArea } from "@/server/auth/session";
 import { sweepExpiredBookings } from "@/server/booking/confirmation";
 import { getWhatsAppMode } from "@/server/whatsapp";
 
@@ -58,7 +58,7 @@ function shiftMonth(month: string, delta: number): string {
 
 export default async function AdminDashboardPage({ searchParams }: PageProps<"/admin">) {
   await connection();
-  const session = await requireAdminPage();
+  const session = await requireArea("dashboard");
   await sweepExpiredBookings();
   const params = await searchParams;
   const now = new Date();
@@ -84,22 +84,22 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
       <div className="space-y-5 sm:space-y-6">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="font-serif text-[1.85rem] leading-tight text-ink sm:text-[2.2rem]">
+            <h1 className="text-[1.7rem] leading-tight font-semibold tracking-[-0.03em] text-forest sm:text-[2rem]">
               {greeting(now)}, {session.username}
             </h1>
-            <p className="mt-1 text-[0.85rem] text-ink-soft">
+            <p className="mt-1 text-[0.85rem] text-sage">
               {summary.weekCount} booking{summary.weekCount === 1 ? "" : "s"} this week
               {summary.todayRevenueCents > 0 ? ` · ${formatPrice(summary.todayRevenueCents)} today` : ""}.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:flex-col sm:items-end sm:gap-3">
-            <p className="inline-flex items-center gap-2 rounded-lg border border-sand/80 bg-white px-3.5 py-2 text-[0.78rem] text-ink">
-              <CalendarIcon className="h-4 w-4 text-ink-soft" />
+            <p className="inline-flex items-center gap-2 rounded-full border border-sand bg-white px-3.5 py-2 text-[0.78rem] text-ink">
+              <CalendarIcon className="h-4 w-4 text-sage" />
               {formatDayHeading(today, true).replace(" · ", ", ")}
             </p>
             <Link
               href="/admin/bookings/new"
-              className="hidden items-center gap-2 rounded-lg bg-ink px-4 py-2.5 text-[0.8rem] text-cream transition hover:bg-black sm:inline-flex"
+              className="hidden items-center gap-2 rounded-full bg-forest px-4 py-2.5 text-[0.84rem] font-medium text-white transition hover:bg-forest-dark sm:inline-flex"
             >
               <PlusIcon className="h-4 w-4" />
               New booking
@@ -163,10 +163,10 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
 }
 
 const tones = {
-  peach: { card: "border-[#f2e2cf] bg-[#fdf6ee] hover:border-[#e5c9a8]", icon: "bg-[#f8e3cb] text-[#b0733a]" },
-  green: { card: "border-[#dfe9d8] bg-[#f3f7f0] hover:border-[#bfd3b2]", icon: "bg-[#dfead6] text-olive" },
-  gold: { card: "border-[#eee4c8] bg-[#fbf7ec] hover:border-[#e0d09a]", icon: "bg-[#f3e6c0] text-[#9a7a2a]" },
-  blue: { card: "border-[#dbe5f2] bg-[#f1f5fb] hover:border-[#b9cbe4]", icon: "bg-[#dfe8f5] text-[#4a6c9c]" },
+  peach: { card: "border-sand bg-white hover:border-black/25", icon: "bg-ivory text-ink" },
+  green: { card: "border-sand bg-white hover:border-black/25", icon: "bg-ivory text-ink" },
+  gold: { card: "border-sand bg-white hover:border-black/25", icon: "bg-ivory text-ink" },
+  blue: { card: "border-sand bg-white hover:border-black/25", icon: "bg-ivory text-ink" },
 };
 
 function Stat({
@@ -186,10 +186,10 @@ function Stat({
 }) {
   const t = tones[tone];
   return (
-    <Link href={href} className={`group relative block rounded-lg border p-3.5 transition sm:p-5 ${t.card}`}>
-      <ChevronRight className="absolute top-4 right-3 h-4 w-4 text-ink-soft transition group-hover:translate-x-0.5 group-hover:text-ink sm:top-5 sm:right-4" />
-      <span className={`grid h-8 w-8 place-items-center rounded-lg sm:h-9 sm:w-9 ${t.icon}`}>{icon}</span>
-      <p className="mt-3 truncate text-[0.74rem] text-ink-soft sm:text-[0.78rem]">
+    <Link href={href} className={`group relative block rounded-2xl border p-3.5 transition sm:p-5 ${t.card}`}>
+      <ChevronRight className="absolute top-4 right-3 h-4 w-4 text-sage transition group-hover:translate-x-0.5 group-hover:text-ink sm:top-5 sm:right-4" />
+      <span className={`grid h-8 w-8 place-items-center rounded-full sm:h-9 sm:w-9 ${t.icon}`}>{icon}</span>
+      <p className="mt-3 truncate text-[0.74rem] text-sage sm:text-[0.78rem]">
         {short ? (
           <>
             <span className="sm:hidden">{short}</span>
@@ -199,8 +199,8 @@ function Stat({
           label
         )}
       </p>
-      <p className="mt-1 font-serif text-[2rem] leading-none text-ink lining-nums tabular-nums sm:text-[2.3rem]">{value}</p>
-      <p className="mt-2 hidden text-[0.74rem] text-ink-soft underline-offset-4 group-hover:underline sm:block">View bookings</p>
+      <p className="mt-1 text-[1.7rem] leading-none font-semibold tracking-[-0.03em] text-ink lining-nums tabular-nums sm:text-[2rem]">{value}</p>
+      <p className="mt-2 hidden text-[0.74rem] text-sage underline-offset-4 group-hover:underline sm:block">View bookings</p>
     </Link>
   );
 }
@@ -220,12 +220,12 @@ function MiniCalendar({ month, today, bookings }: { month: string; today: string
     perDay.set(b.date, entry);
   }
   const [y, m] = month.split("-").map(Number);
-  const arrow = "grid h-8 w-8 place-items-center rounded-lg border border-sand/80 text-ink transition hover:border-ink/40";
+  const arrow = "grid h-8 w-8 place-items-center rounded-full border border-sand text-ink transition hover:border-forest/30";
 
   return (
     <Card className="p-4 sm:p-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-[1rem] font-medium text-ink">
+        <h2 className="text-[1rem] font-semibold tracking-[-0.02em] text-ink">
           {MONTHS[m - 1]} {y}
         </h2>
         <div className="flex gap-1.5">
@@ -257,7 +257,7 @@ function MiniCalendar({ month, today, bookings }: { month: string; today: string
             >
               <span
                 className={`grid h-8 w-8 place-items-center rounded-full text-[0.8rem] lining-nums tabular-nums transition ${
-                  isToday ? "bg-ink text-cream" : date < today ? "text-muted group-hover:bg-cream" : "text-ink group-hover:bg-cream"
+                  isToday ? "bg-forest text-white" : date < today ? "text-sage group-hover:bg-forest/5" : "text-ink group-hover:bg-forest/5"
                 }`}
               >
                 {Number(date.slice(8))}
@@ -283,17 +283,17 @@ function QuickActions() {
   ];
   return (
     <Card className="p-4 sm:p-5">
-      <h2 className="text-[1rem] font-medium text-ink">Quick actions</h2>
+      <h2 className="text-[1rem] font-semibold tracking-[-0.02em] text-ink">Quick actions</h2>
       <div className="mt-3 space-y-2">
         {actions.map((a) => (
           <Link
             key={a.href}
             href={a.href}
-            className="group flex items-center gap-3 rounded-lg border border-sand/70 px-3 py-2.5 text-[0.8rem] text-ink transition hover:border-ink/30 hover:bg-cream/50"
+            className="group flex items-center gap-3 rounded-full border border-sand bg-white px-3 py-2.5 text-[0.8rem] text-ink transition hover:border-forest/30"
           >
-            <a.icon className="h-4 w-4 text-ink-soft" />
+            <a.icon className="h-4 w-4 text-sage" />
             <span className="flex-1">{a.label}</span>
-            <ChevronRight className="h-4 w-4 text-muted transition group-hover:translate-x-0.5 group-hover:text-ink" />
+            <ChevronRight className="h-4 w-4 text-sage transition group-hover:translate-x-0.5 group-hover:text-ink" />
           </Link>
         ))}
       </div>

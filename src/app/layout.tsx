@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
-import { Amiri, Cormorant_Garamond, Jost, Tajawal } from "next/font/google";
+import { Amiri, Cormorant_Garamond, Inter, Jost, Tajawal } from "next/font/google";
 import { I18nProvider } from "@/i18n/client";
 import { dirOf } from "@/i18n/config";
 import { getI18n } from "@/i18n/server";
@@ -20,6 +20,12 @@ const jost = Jost({
   variable: "--font-jost",
   subsets: ["latin"],
   weight: ["300", "400", "500"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 /** Arabic fonts: only downloaded when Arabic text is on the page. Applied by name in globals.css for lang="ar". */
@@ -48,7 +54,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#f7f3ed",
+  themeColor: "#F7F3EC",
 };
 
 export default async function RootLayout({
@@ -63,7 +69,7 @@ export default async function RootLayout({
       lang={locale}
       dir={dirOf(locale)}
       data-scroll-behavior="smooth"
-      className={`${cormorant.variable} ${jost.variable} ${amiri.variable} ${tajawal.variable}`}
+      className={`${cormorant.variable} ${jost.variable} ${inter.variable} ${amiri.variable} ${tajawal.variable}`}
       suppressHydrationWarning
     >
       <head>

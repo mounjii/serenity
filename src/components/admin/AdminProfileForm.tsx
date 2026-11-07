@@ -1,15 +1,16 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
-import { updateAdminProfileAction, type ProfileState } from "@/app/admin/actions";
+import { saveAdminAvatarAction, updateAdminProfileAction, type ProfileState } from "@/app/admin/actions";
+import ProfilePhotoForm from "@/components/account/ProfilePhotoForm";
 import { Button } from "@/components/ui/Button";
 import PasswordField from "./PasswordField";
 
 const initialState: ProfileState = { error: null, saved: false };
 const inputClass =
-  "block w-full rounded-sm border border-sand bg-white px-4 py-3 text-[0.95rem] text-ink outline-none transition focus:border-ink";
+  "block w-full rounded-sm border border-sand bg-white px-4 py-3 text-[0.95rem] text-ink outline-none transition focus:border-forest";
 
-export default function AdminProfileForm({ username }: { username: string }) {
+export default function AdminProfileForm({ username, avatarUrl }: { username: string; avatarUrl: string | null }) {
   const [state, formAction, pending] = useActionState(updateAdminProfileAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -22,9 +23,23 @@ export default function AdminProfileForm({ username }: { username: string }) {
   }, [state.saved]);
 
   return (
-    <form ref={formRef} action={formAction} className="mt-8 space-y-8 rounded-lg bg-white p-6 shadow-[0_20px_40px_-32px_rgba(60,40,20,0.35)] sm:p-8">
+    <div className="space-y-5">
+    <section className="rounded-2xl border border-sand bg-white p-5 sm:p-6">
+      <ProfilePhotoForm
+        src={avatarUrl}
+        initials={username}
+        title="Profile photo"
+        hint="JPG, PNG or WebP. Up to 2 MB."
+        changeLabel="Choose a photo"
+        saveLabel="Save photo"
+        removeLabel="Remove photo"
+        savedLabel="Photo saved."
+        action={saveAdminAvatarAction}
+      />
+    </section>
+    <form ref={formRef} action={formAction} className="space-y-8 rounded-2xl border border-sand bg-white p-5 sm:p-6">
       <fieldset className="space-y-5">
-        <legend className="font-serif text-2xl text-ink">Name</legend>
+        <legend className="text-[1.05rem] font-semibold tracking-[-0.02em] text-ink">Name</legend>
         <p className="text-[0.85rem] text-ink-soft">This is shown in the dashboard and used to sign in.</p>
         <div>
           <label htmlFor="username" className="mb-1.5 block text-[0.8rem]">
@@ -45,7 +60,7 @@ export default function AdminProfileForm({ username }: { username: string }) {
       </fieldset>
 
       <fieldset className="space-y-5">
-        <legend className="font-serif text-2xl text-ink">Password</legend>
+        <legend className="text-[1.05rem] font-semibold tracking-[-0.02em] text-ink">Password</legend>
         <p className="text-[0.85rem] text-ink-soft">Leave the new password blank if you only want to change the name.</p>
         <PasswordField
           id="currentPassword"
@@ -86,5 +101,6 @@ export default function AdminProfileForm({ username }: { username: string }) {
         Save changes
       </Button>
     </form>
+    </div>
   );
 }

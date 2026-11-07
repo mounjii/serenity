@@ -1,10 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { LOCALES, LOCALE_COOKIE, LOCALE_NAMES, LOCALE_SCROLL_KEY, LOCALE_SWITCH_KEY, localizePath, splitLocale, type Locale } from "@/i18n/config";
+import {
+  LOCALES,
+  LOCALE_COOKIE,
+  LOCALE_NAMES,
+  LOCALE_SCROLL_KEY,
+  LOCALE_SWITCH_KEY,
+  localizePath,
+  splitLocale,
+  type Locale,
+} from "@/i18n/config";
 import { useI18n } from "@/i18n/client";
 import { CheckIcon, ChevronDown } from "./Icons";
 
@@ -15,34 +24,60 @@ function rememberLocale(locale: Locale) {
   document.cookie = `${LOCALE_COOKIE}=${locale};path=/;max-age=${COOKIE_MAX_AGE};samesite=lax`;
 }
 
-export default function LanguageSwitcher({ className = "" }: { className?: string }) {
+function rememberSwitchPosition() {
+  try {
+    sessionStorage.setItem(LOCALE_SWITCH_KEY, String(Date.now()));
+    sessionStorage.setItem(LOCALE_SCROLL_KEY, String(window.scrollY));
+  } catch {
+    // Private browsing can block storage; the switch still proceeds.
+  }
+}
+
+export default function LanguageSwitcher({
+  className = "",
+  variant = "menu",
+}: {
+  className?: string;
+  variant?: "menu" | "inline";
+}) {
   const { locale, t } = useI18n();
   const pathname = usePathname();
-  const path = splitLocale(typeof window === "undefined" ? pathname : window.location.pathname).path;
+  const router = useRouter();
+  const path = splitLocale(pathname).path;
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState<{ top: number; end: number } | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (!open) {
-      setMenu(null);
-      return;
-    }
+    if (!open) return;
     const place = () => {
       const box = button.current?.getBoundingClientRect();
       if (!box) return;
       const rtl = document.documentElement.dir === "rtl";
-      setMenu({ top: box.bottom + 8, end: rtl ? box.left : window.innerWidth - box.right });
+      setMenu({
+        top: box.bottom + 8,
+        end: rtl ? box.left : window.innerWidth - box.right,
+      });
     };
     place();
     const onPointer = (e: PointerEvent) => {
-      if (!root.current?.contains(e.target as Node) && !(e.target instanceof Node && document.getElementById("language-menu")?.contains(e.target))) {
+      if (
+        !root.current?.contains(e.target as Node) &&
+        !(
+          e.target instanceof Node &&
+          document.getElementById("language-menu")?.contains(e.target)
+        )
+      ) {
         setOpen(false);
+        setMenu(null);
       }
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        setMenu(null);
+      }
     };
     document.addEventListener("pointerdown", onPointer);
     document.addEventListener("keydown", onKey);
@@ -63,16 +98,37 @@ export default function LanguageSwitcher({ className = "" }: { className?: strin
       return;
     }
     rememberLocale(next);
+    rememberSwitchPosition();
     const currentPath = splitLocale(window.location.pathname).path;
     const href = `${localizePath(next, currentPath)}${window.location.search}`;
-    try {
-      sessionStorage.setItem(LOCALE_SWITCH_KEY, String(Date.now()));
-      sessionStorage.setItem(LOCALE_SCROLL_KEY, String(window.scrollY));
-    } catch {}
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     e.preventDefault();
-    window.location.assign(href);
+    router.push(href, { scroll: false });
+    router.refresh();
   };
+
+  if (variant === "inline") {
+    return (
+      <nav aria-label={t.nav.language} className={`flex items-center gap-3 ${className}`}>
+        {LOCALES.map((l) => (
+          <Link
+            key={l}
+            href={localizePath(l, path)}
+            hrefLang={l}
+            lang={l}
+            scroll={false}
+            aria-current={l === locale ? "true" : undefined}
+            onClick={(e) => switchTo(e, l)}
+            className={`text-[0.78rem] transition hover:text-forest ${
+              l === locale ? "font-medium text-forest" : "text-sage"
+            }`}
+          >
+            {SHORT[l]}
+          </Link>
+        ))}
+      </nav>
+    );
+  }
 
   const menuList = open && menu && (
     <ul
@@ -111,11 +167,16 @@ export default function LanguageSwitcher({ className = "" }: { className?: strin
         aria-haspopup="true"
         aria-expanded={open}
         aria-controls="language-menu"
-        onClick={() => setOpen((v) => !v)}
-        className="flex h-10 items-center gap-1.5 rounded-full border border-ink/20 bg-white/90 ps-3.5 pe-2.5 text-[0.75rem] font-medium tracking-wide text-ink shadow-sm backdrop-blur-sm transition hover:border-ink hover:bg-white"
+        onClick={() => {
+          setOpen((v) => !v);
+          setMenu(null);
+        }}
+        className="flex h-11 items-center gap-1 rounded-full border border-sand bg-white ps-4 pe-3 text-[0.84rem] font-medium text-ink transition hover:border-black/25"
       >
         {SHORT[locale]}
-        <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
       {menuList && createPortal(menuList, document.body)}
     </div>

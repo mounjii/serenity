@@ -3,6 +3,8 @@ import { getDb } from "@/server/db";
 
 export const CUSTOMER_SESSION_COOKIE = "serenity_customer";
 export const CUSTOMER_SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
+/** Used when the customer leaves Remember me unchecked. */
+export const CUSTOMER_SESSION_SHORT_SECONDS = 12 * 60 * 60;
 
 export type CustomerSession = { id: string; name: string; phone: string; expiresAt: Date };
 
@@ -22,12 +24,16 @@ async function credentialsVersion(passwordHash: string): Promise<string> {
   return Array.from(new Uint8Array(digest).slice(0, 8), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export async function createCustomerSessionToken(id: string, passwordHash: string): Promise<string> {
+export async function createCustomerSessionToken(
+  id: string,
+  passwordHash: string,
+  maxAgeSeconds = CUSTOMER_SESSION_MAX_AGE_SECONDS,
+): Promise<string> {
   return new SignJWT({ ver: await credentialsVersion(passwordHash) })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(id)
     .setIssuedAt()
-    .setExpirationTime(`${CUSTOMER_SESSION_MAX_AGE_SECONDS}s`)
+    .setExpirationTime(`${maxAgeSeconds}s`)
     .sign(sessionSecret());
 }
 

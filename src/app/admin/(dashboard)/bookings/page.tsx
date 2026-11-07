@@ -5,7 +5,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import type { BookingStatusValue } from "@/lib/booking-status";
 import { formatDayHeading, toLocalDateString } from "@/lib/time";
 import { listBookingsForDates } from "@/server/admin/bookings";
-import { requireAdminPage } from "@/server/auth/session";
+import { requireArea } from "@/server/auth/session";
 import { sweepExpiredBookings } from "@/server/booking/confirmation";
 
 export const metadata = { title: "Bookings — Touch Sense" };
@@ -19,7 +19,7 @@ const STATUS_FILTERS = [
 
 export default async function AdminBookingsPage({ searchParams }: PageProps<"/admin/bookings">) {
   await connection();
-  await requireAdminPage();
+  await requireArea("bookings");
   await sweepExpiredBookings();
   const params = await searchParams;
   const today = toLocalDateString(new Date());
@@ -34,12 +34,11 @@ export default async function AdminBookingsPage({ searchParams }: PageProps<"/ad
   const countFor = (statuses: readonly BookingStatusValue[] | null) => (statuses ? all.filter((b) => statuses.includes(b.status)).length : all.length);
 
   return (
-    <div className="space-y-10 sm:space-y-12">
-      <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+    <div className="space-y-5 sm:space-y-6">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-[0.68rem] tracking-[0.3em] text-muted uppercase">{formatDayHeading(today, true)}</p>
-          <h1 className="mt-3 font-serif text-[2.75rem] leading-none text-ink sm:text-5xl">Bookings</h1>
-          <p className="mt-3 text-[0.9rem] text-ink-soft">Every reservation, grouped by day.</p>
+          <h1 className="text-[1.7rem] leading-tight font-semibold tracking-[-0.03em] text-forest sm:text-[2rem]">Bookings</h1>
+          <p className="mt-1 text-[0.85rem] text-sage">{formatDayHeading(today, true)}. Every reservation, grouped by day.</p>
         </div>
         <ButtonLink href="/admin/bookings/new" size="sm" className="self-start px-5 sm:self-auto">
           + New booking
@@ -56,7 +55,7 @@ export default async function AdminBookingsPage({ searchParams }: PageProps<"/ad
               scroll={false}
               aria-current={active ? "true" : undefined}
               className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-[0.78rem] transition ${
-                active ? "border-ink bg-ink text-cream" : "border-sand/80 bg-white text-ink-soft hover:border-ink/40 hover:text-ink"
+                active ? "border-forest bg-forest text-white" : "border-sand/80 bg-white text-ink-soft hover:border-forest/40 hover:text-ink"
               }`}
             >
               {f.label}

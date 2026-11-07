@@ -11,12 +11,12 @@ import { BUFFER_MINUTES, DEFAULT_PHONE_PREFIX, NOTE_MAX } from "@/lib/booking-ru
 import { customerDetailsSchema } from "@/lib/booking-schema";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { voucherDiscount } from "@/lib/loyalty-rules";
-import { blurProps, serviceCardImage, serviceImage } from "@/lib/images";
+import { blurProps, serviceImage } from "@/lib/images";
 import { formatPhone } from "@/lib/phone";
 import { PRESSURE_LEVEL, type ServiceDetails } from "@/lib/service-details";
 import { pickOption } from "@/lib/service-options";
 import { LOCALE_SWITCH_KEY } from "@/i18n/config";
-import { NAVBAR_OFFSET, prefersReducedMotion, smoothScrollTo } from "@/lib/smooth-scroll";
+import { NAVBAR_OFFSET, smoothScrollTo } from "@/lib/smooth-scroll";
 import type { FinderMatch } from "@/lib/treatment-finder";
 import TreatmentFinder from "./TreatmentFinder";
 import { useI18n } from "@/i18n/client";
@@ -35,9 +35,9 @@ type GridStatus = "available" | "booked" | "rest" | "unavailable";
 type GridTime = Slot & { available: boolean; status?: GridStatus };
 
 const UNAVAILABLE_STYLE: Record<Exclude<GridStatus, "available">, { label: "booked" | "rest" | "tooShort"; className: string }> = {
-  booked: { label: "booked", className: "border-transparent bg-cream-dark/70 text-muted/70" },
-  rest: { label: "rest", className: "border-dashed border-sand bg-white/60 text-bronze/80" },
-  unavailable: { label: "tooShort", className: "border-transparent bg-cream-dark/35 text-muted/60" },
+  booked: { label: "booked", className: "border-transparent bg-sand text-sage" },
+  rest: { label: "rest", className: "border-dashed border-sand bg-white text-sage" },
+  unavailable: { label: "tooShort", className: "border-transparent bg-sand/70 text-sage" },
 };
 type Step = 1 | 2 | 3 | 4 | 5;
 type Details = { customerName: string; customerPhone: string; note: string; website: string };
@@ -45,8 +45,6 @@ type Details = { customerName: string; customerPhone: string; note: string; webs
 const STEP_IDS: Step[] = [1, 2, 3, 4, 5];
 
 const SLOT_REFRESH_MS = 30_000;
-/** How long a tapped treatment card shows its photo reveal before the details open. */
-const CARD_REVEAL_MS = 650;
 
 function newIdempotencyKey(): string {
   if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
@@ -133,11 +131,9 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
   const scrolledForPosition = useRef(position);
   const [shownPosition, setShownPosition] = useState(position);
   const [direction, setDirection] = useState<1 | -1>(1);
-  const [hasMoved, setHasMoved] = useState(false);
   if (position !== shownPosition) {
     setDirection(position > shownPosition ? 1 : -1);
     setShownPosition(position);
-    setHasMoved(true);
   }
 
   // Arriving on the page: let the hero settle, then glide down to the steps, unless the visitor
@@ -244,23 +240,9 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
     };
   }, [step, serviceId, durationMinutes, date, loadSlots]);
 
-  const [openingId, setOpeningId] = useState<string | null>(null);
-  const openingTimer = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(openingTimer.current), []);
-
   const openDetail = (id: string) => {
     setNotice(null);
-    setOpeningId(null);
     setDetailId(id);
-  };
-
-  // Touch screens have no hover: play the card's photo reveal first, then open the treatment.
-  const tapCard = (id: string) => {
-    if (openingId) return;
-    const touch = window.matchMedia("(hover: none)").matches;
-    if (!touch || prefersReducedMotion()) return openDetail(id);
-    setOpeningId(id);
-    openingTimer.current = window.setTimeout(() => openDetail(id), CARD_REVEAL_MS);
   };
 
   const closeDetail = () => setDetailId(null);
@@ -399,8 +381,8 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
   const normalizedPhone = customerDetailsSchema.shape.customerPhone.safeParse(details.customerPhone);
 
   return (
-    <div ref={rootRef} id="book" className="-mt-6 scroll-mt-24 sm:-mt-8">
-      <ol className="animate-fade-up mx-auto flex max-w-3xl items-start [animation-delay:200ms]" aria-label={t.booking.stepsAria}>
+    <div ref={rootRef} id="book" className="scroll-mt-24 font-display">
+      <ol className="flex w-full items-start" aria-label={t.booking.stepsAria}>
         {STEP_IDS.map((id, index) => {
           const s = { id, label: t.booking.steps[index] };
           const current = s.id === step;
@@ -410,7 +392,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
               {index > 0 && (
                 <span
                   aria-hidden
-                  className={`absolute top-[1.15rem] h-px -translate-y-1/2 sm:top-5 ${s.id <= step ? "bg-ink/40" : "bg-sand"}`}
+                  className={`absolute top-[1.15rem] h-px -translate-y-1/2 sm:top-5 ${s.id <= step ? "bg-forest/30" : "bg-black/10"}`}
                   style={{ insetInlineStart: "calc(-50% + 1.6rem)", insetInlineEnd: "calc(50% + 1.6rem)" }}
                 />
               )}
@@ -422,15 +404,15 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                 aria-label={fmt(t.booking.stepAria, { n: s.id, label: s.label })}
                 className={`relative grid h-9 w-9 place-items-center rounded-full text-[0.8rem] transition sm:h-10 sm:w-10 ${
                   current
-                    ? "bg-ink text-cream shadow-[0_6px_16px_-6px_rgba(20,18,15,0.7)] ring-4 ring-ink/10"
+                    ? "bg-forest text-white"
                     : done
-                      ? "border border-ink/40 bg-white text-ink hover:bg-ink hover:text-cream"
-                      : "border border-sand bg-white/80 text-muted"
+                      ? "border border-forest/30 bg-white text-ink hover:bg-forest hover:text-white"
+                      : "border border-sand bg-white text-sage"
                 }`}
               >
                 {s.id}
               </button>
-              <span className={`text-[0.6rem] tracking-[0.2em] uppercase sm:text-[0.68rem] ${current ? "font-medium text-ink" : "text-muted"}`}>
+              <span className={`text-[0.62rem] tracking-[0.14em] uppercase sm:text-[0.68rem] ${current ? "font-medium text-ink" : "text-sage"}`}>
                 {s.label}
               </span>
             </li>
@@ -439,49 +421,38 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
       </ol>
 
       {notice && (
-        <div role="alert" className="mt-8 rounded-lg border border-gold/40 bg-gold/10 px-5 py-4 text-[0.85rem] text-ink">
+        <div role="alert" className="mt-8 rounded-2xl border border-sand bg-white px-5 py-4 text-[0.85rem] text-ink">
           {notice}
         </div>
       )}
 
-      <section className="animate-fade-up mt-8 overflow-hidden rounded-lg border border-sand/60 bg-[#fcfaf7] p-4 shadow-[0_30px_60px_-35px_rgba(60,40,20,0.35)] [animation-delay:300ms] sm:p-8 lg:p-10">
+      <section className="mt-8 overflow-hidden rounded-2xl border border-black/[0.06] bg-white p-4 sm:p-8 lg:p-10">
         <div key={position} className={direction > 0 ? "animate-step-next" : "animate-step-prev"}>
         {showFinder && <TreatmentFinder services={services} onPick={pickFromFinder} onClose={() => setFinderOpen(false)} />}
 
         {step === 1 && !showFinder && !detailService && (
           <div>
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3 sm:gap-4">
-                <LeafIcon className="h-9 w-9 shrink-0 -rotate-12 text-olive sm:h-11 sm:w-11" aria-hidden />
-                <div>
-                  <h2 className="font-serif text-2xl text-ink sm:text-[2.1rem] sm:leading-tight">{t.booking.chooseTitle}</h2>
-                  <p className="mt-0.5 text-[0.85rem] font-light text-ink-soft">{t.booking.chooseSubtitle}</p>
-                </div>
-              </div>
-              <p
-                className={`hidden pt-1 text-bronze/80 md:block ${locale === "en" ? "-rotate-6 font-script text-2xl leading-none" : "-rotate-3 font-serif text-xl leading-tight italic"}`}
-                aria-hidden
-              >
-                {t.booking.wellness1}
-                <br />
-                <span className="ps-6">{t.booking.wellness2}</span>
-              </p>
+            <div>
+              <h2 className="text-[1.7rem] leading-[1.12] font-semibold tracking-[-0.03em] text-forest sm:text-[2.15rem]">
+                {t.booking.chooseTitle}
+              </h2>
+              <p className="mt-2 max-w-md text-[0.95rem] leading-relaxed text-sage">{t.booking.chooseSubtitle}</p>
             </div>
             {services.length > 1 && (
-              <div className="mt-6 flex flex-col gap-3 rounded-lg border border-sand bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+              <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-black/[0.06] bg-ivory px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                 <div className="flex items-center gap-3">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-cream-dark text-ink-soft">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-ink">
                     <LotusIcon className="h-5 w-5" aria-hidden />
                   </span>
                   <div>
-                    <p className="text-[0.9rem] text-ink">{recommended ? t.booking.finderAgain : t.booking.finderPrompt}</p>
-                    <p className="text-[0.76rem] font-light text-muted">{t.booking.finderText}</p>
+                    <p className="text-[0.9rem] font-medium text-ink">{recommended ? t.booking.finderAgain : t.booking.finderPrompt}</p>
+                    <p className="text-[0.8rem] text-sage">{t.booking.finderText}</p>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setFinderOpen(true)}
-                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-ink px-6 py-2.5 text-[0.8rem] tracking-wide text-cream transition hover:-translate-y-0.5 hover:bg-black"
+                  className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-forest px-6 text-[0.88rem] font-medium text-white transition hover:bg-forest-dark"
                 >
                   {t.booking.helpMe}
                   <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
@@ -491,66 +462,50 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
             {services.length === 0 ? (
               <p className="mt-6 text-[0.9rem] text-ink-soft">{t.booking.noServices}</p>
             ) : (
-              <div className="mt-6 grid gap-4 lg:grid-cols-2">
-                {orderedServices.map((s, index) => {
+              <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {orderedServices.map((s) => {
                   const text = serviceText(t, s);
                   return (
                   <button
                     key={s.id}
                     type="button"
-                    onClick={() => tapCard(s.id)}
-                    data-open={openingId === s.id ? "" : undefined}
+                    onClick={() => openDetail(s.id)}
                     aria-label={fmt(t.treatments.detailsAria, { name: text.name })}
-                    style={{ animationDelay: `${(hasMoved ? 40 : 380) + index * 50}ms` }}
-                    className={`animate-fade-up group relative isolate flex min-h-[10rem] overflow-hidden rounded-lg border bg-gradient-to-r from-[#f7f2eb] to-[#efe8de] text-start rtl:bg-gradient-to-l transition-[box-shadow,border-color,translate] duration-500 outline-none hover:-translate-y-0.5 hover:shadow-[0_22px_40px_-24px_rgba(40,30,15,0.65)] focus-visible:ring-2 focus-visible:ring-olive/60 sm:min-h-[10.5rem] ${
-                      s.id === serviceId ? "border-olive/50" : "border-sand/60"
+                    className={`group flex flex-col overflow-hidden rounded-2xl border bg-white text-start outline-none transition focus-visible:ring-2 focus-visible:ring-forest/30 ${
+                      s.id === serviceId ? "border-forest" : "border-black/[0.06]"
                     }`}
                   >
-                    {/* The photo always spans the whole card; the clip only uncovers its first third until hover/focus
-                        (or a tap on touch screens). In Arabic the whole layer is mirrored so the photo sits on the right,
-                        where the card starts. */}
-                    <span className="absolute inset-0 -z-20 overflow-hidden transition-[clip-path] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] [clip-path:inset(0_64%_0_0)] rtl:-scale-x-100 group-hover:[clip-path:inset(0_0_0_0)] group-focus-visible:[clip-path:inset(0_0_0_0)] group-data-[open]:[clip-path:inset(0_0_0_0)]">
+                    <span className="relative h-40 overflow-hidden sm:h-44">
                       <Image
-                        src={serviceCardImage(s.slug)} {...blurProps(serviceCardImage(s.slug))}
+                        src={serviceImage(s.slug)}
+                        {...blurProps(serviceImage(s.slug))}
                         alt=""
                         fill
-                        sizes="(min-width: 1024px) 560px, 100vw"
-                        className="origin-left object-cover object-left transition-transform duration-[1.2s] ease-out group-hover:scale-[1.03] group-focus-visible:scale-[1.03] group-data-[open]:scale-[1.03]"
+                        sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 100vw"
+                        className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                       />
                     </span>
-                    <span
-                      aria-hidden
-                      className="absolute inset-0 -z-10 bg-gradient-to-r from-black/20 via-black/45 to-black/65 opacity-0 rtl:bg-gradient-to-l transition-opacity duration-700 group-hover:opacity-100 group-focus-visible:opacity-100 group-data-[open]:opacity-100"
-                    />
-
-                    <span className="ms-[36%] flex min-w-0 flex-1 flex-col py-4 pe-4 ps-4 sm:py-5 sm:pe-5 sm:ps-6">
-                      <span className="flex items-center justify-between gap-2">
-                        <span className="text-[0.65rem] tracking-[0.2em] text-muted transition-colors duration-500 group-hover:text-white/70 group-focus-visible:text-white/70 group-data-[open]:text-white/70">
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
+                    <span className="flex flex-1 flex-col px-4 pt-3.5 pb-4">
+                      <span className="flex items-start justify-between gap-2">
+                        <span className="text-[1.02rem] leading-tight font-semibold text-ink">{text.name}</span>
                         {s.id === recommendedId && (
-                          <span className="rounded-full bg-ink px-2.5 py-1 text-[0.58rem] tracking-[0.15em] text-cream uppercase transition-colors duration-500 group-hover:bg-white group-hover:text-ink group-data-[open]:bg-white group-data-[open]:text-ink">
+                          <span className="shrink-0 rounded-full bg-sand px-2.5 py-1 text-[0.62rem] font-medium tracking-[0.08em] text-ink uppercase">
                             {t.booking.recommended}
                           </span>
                         )}
                       </span>
-                      <span className="mt-1.5 font-serif text-xl leading-tight text-ink transition-colors duration-500 group-hover:text-white group-focus-visible:text-white group-data-[open]:text-white sm:text-[1.4rem]">
-                        {text.name}
-                      </span>
-                      <span className="mt-1.5 line-clamp-2 text-[0.76rem] leading-relaxed font-light text-muted transition-colors duration-500 group-hover:text-white/85 group-focus-visible:text-white/85 group-data-[open]:text-white/85">
-                        {text.description}
-                      </span>
-                      <span className="mt-auto flex items-center justify-between gap-3 pt-3">
-                        <span className="flex min-w-0 flex-col leading-tight">
-                          <span className="font-serif text-[1.05rem] text-ink transition-colors duration-500 group-hover:text-white group-focus-visible:text-white group-data-[open]:text-white">
+                      <span className="mt-1.5 line-clamp-2 flex-1 text-[0.8rem] leading-relaxed text-sage">{text.description}</span>
+                      <span className="mt-3 flex items-end justify-between gap-3">
+                        <span className="min-w-0">
+                          <span className="block text-[0.95rem] font-semibold text-ink">
                             {fmt(t.booking.from, { price: formatPrice(Math.min(...s.options.map((o) => o.priceCents)), locale) })}
                           </span>
-                          <span className="mt-0.5 text-[0.62rem] tracking-[0.16em] text-ink-soft uppercase transition-colors duration-500 group-hover:text-white/85 group-focus-visible:text-white/85 group-data-[open]:text-white/85">
+                          <span className="mt-0.5 block text-[0.72rem] text-sage">
                             {s.options.map((o) => o.durationMinutes).join(" · ")} {t.booking.min}
                           </span>
                         </span>
-                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-ink bg-ink text-cream transition-all duration-500 group-hover:border-white/80 group-hover:bg-white/10 group-hover:backdrop-blur-sm group-focus-visible:border-white/80 group-focus-visible:bg-white/10 group-data-[open]:border-white/80 group-data-[open]:bg-white/10">
-                          <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-0.5 group-data-[open]:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5 rtl:group-data-[open]:-translate-x-0.5" />
+                        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-sand text-ink transition group-hover:bg-forest group-hover:text-white">
+                          <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" />
                         </span>
                       </span>
                     </span>
@@ -592,16 +547,16 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                     aria-label={
                       d.open ? longDate(new Date(`${d.date}T12:00:00.000Z`)) : `${parts.weekday} ${parts.day} ${parts.month} (${t.booking.closed})`
                     }
-                    className={`flex min-h-16 flex-col items-center justify-center rounded-lg border text-center transition ${
+                    className={`flex min-h-16 flex-col items-center justify-center rounded-xl border text-center transition ${
                       selected
-                        ? "border-ink bg-ink text-cream"
+                        ? "border-forest bg-forest text-white"
                         : d.open
-                          ? "border-sand bg-white text-ink hover:border-ink"
-                          : "cursor-not-allowed border-transparent bg-cream-dark/50 text-muted/60 line-through"
+                          ? "border-sand bg-white text-ink hover:border-forest"
+                          : "cursor-not-allowed border-transparent bg-sand/70 text-sage line-through"
                     }`}
                   >
                     <span className="text-[0.65rem] tracking-wider uppercase">{parts.weekday}</span>
-                    <span className="font-serif text-xl leading-tight">{parts.day}</span>
+                    <span className="text-xl leading-tight font-semibold">{parts.day}</span>
                     <span className="text-[0.65rem]">{parts.month}</span>
                   </button>
                 );
@@ -645,8 +600,8 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                         type="button"
                         onClick={() => chooseSlot({ time: time.time, startAt: time.startAt })}
                         aria-pressed={slot?.startAt === time.startAt}
-                        className={`min-h-12 rounded-lg border text-[0.9rem] transition ${
-                          slot?.startAt === time.startAt ? "border-ink bg-ink text-cream" : "border-sand bg-white text-ink hover:border-ink"
+                        className={`min-h-12 rounded-xl border text-[0.9rem] transition ${
+                          slot?.startAt === time.startAt ? "border-forest bg-forest text-white" : "border-sand bg-white text-ink hover:border-forest"
                         }`}
                       >
                         {time.time}
@@ -659,7 +614,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                           <span
                             key={time.startAt}
                             aria-label={`${time.time}, ${label.toLowerCase()}`}
-                            className={`flex min-h-12 cursor-not-allowed flex-col items-center justify-center rounded-lg border leading-tight ${look.className}`}
+                            className={`flex min-h-12 cursor-not-allowed flex-col items-center justify-center rounded-xl border leading-tight ${look.className}`}
                           >
                             <span className="text-[0.85rem] line-through">{time.time}</span>
                             <span className="text-[0.56rem] tracking-[0.15em] uppercase">{label}</span>
@@ -670,9 +625,9 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
                   )}
                 </div>
                 <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 text-[0.72rem] text-muted">
-                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm bg-cream-dark" aria-hidden /> {t.booking.legendBooked}</li>
-                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm border border-dashed border-sand" aria-hidden /> {fmt(t.booking.legendRest, { n: BUFFER_MINUTES })}</li>
-                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm bg-cream-dark/40" aria-hidden /> {t.booking.legendShort}</li>
+                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm bg-sand" aria-hidden /> {t.booking.legendBooked}</li>
+                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm border border-dashed border-black/20" aria-hidden /> {fmt(t.booking.legendRest, { n: BUFFER_MINUTES })}</li>
+                  <li className="flex items-center gap-2"><span className="h-3 w-3 rounded-sm bg-sand/70" aria-hidden /> {t.booking.legendShort}</li>
                 </ul>
               </>
             )}
@@ -775,7 +730,7 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
         {step === 5 && service && option && slot && (
           <div>
             <StepTitle title={t.booking.review} />
-            <dl className="mt-6 divide-y divide-sand border-y border-sand text-[0.9rem]">
+            <dl className="mt-6 divide-y divide-black/[0.06] border-y border-black/[0.06] text-[0.9rem]">
               <SummaryRow label={t.booking.service} value={nameOf(service)} />
               <SummaryRow label={t.booking.date} value={longDate(new Date(slot.startAt))} />
               <SummaryRow label={t.booking.time} value={`${slot.time} (${formatDuration(option.durationMinutes, locale)})`} />
@@ -827,14 +782,14 @@ export default function BookingFlow({ services, days, initialServiceSlug, initia
 function StepTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div>
-      <h2 className="font-serif text-2xl text-ink sm:text-3xl">{title}</h2>
-      {subtitle && <p className="mt-1 text-[0.85rem] font-light text-ink-soft">{subtitle}</p>}
+      <h2 className="text-[1.7rem] leading-[1.12] font-semibold tracking-[-0.03em] text-forest sm:text-[2.05rem]">{title}</h2>
+      {subtitle && <p className="mt-2 text-[0.95rem] leading-relaxed text-sage">{subtitle}</p>}
     </div>
   );
 }
 
 function inputClass(invalid: boolean) {
-  return `block w-full rounded-sm border bg-white px-4 py-3 text-[0.95rem] text-ink outline-none transition focus:border-ink ${
+  return `block w-full rounded-sm border bg-white px-4 py-3 text-[0.95rem] text-ink outline-none transition focus:border-forest ${
     invalid ? "border-red-400" : "border-sand"
   }`;
 }
@@ -892,21 +847,21 @@ function ServiceDetailView({
       <button
         type="button"
         onClick={onBack}
-        className="inline-flex items-center gap-2 text-[0.72rem] tracking-[0.2em] text-muted uppercase transition hover:text-ink"
+        className="inline-flex items-center gap-2 text-[0.88rem] font-medium text-ink"
       >
         <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" /> {t.booking.allTreatments}
       </button>
 
       <div className="mt-5 grid gap-6 md:grid-cols-[0.85fr_1.5fr] md:gap-8">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-lg md:aspect-auto md:min-h-[21rem]">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl md:aspect-auto md:min-h-[21rem]">
           <Image src={serviceImage(service.slug)} {...blurProps(serviceImage(service.slug))} alt={name} fill sizes="(min-width: 768px) 34vw, 100vw" className="object-cover" />
         </div>
 
         <div className="flex flex-col">
-          <p className="text-[0.66rem] tracking-[0.3em] text-muted uppercase">{t.booking.treatment}</p>
-          <h2 className="mt-1.5 font-serif text-3xl leading-tight text-ink sm:text-[2.3rem]">{name}</h2>
+          <p className="text-[0.68rem] font-medium tracking-[0.22em] text-sage uppercase">{t.booking.treatment}</p>
+          <h2 className="mt-2 text-[1.7rem] leading-[1.1] font-semibold tracking-[-0.03em] text-forest sm:text-[2.15rem]">{name}</h2>
 
-          <ul className="mt-5 grid grid-cols-3 border-b border-sand pb-5">
+          <ul className="mt-5 grid grid-cols-3 border-b border-black/[0.06] pb-5">
             {info.benefits.map((benefit, index) => {
               const Icon = BENEFIT_ICONS[index % BENEFIT_ICONS.length];
               return (
@@ -918,7 +873,7 @@ function ServiceDetailView({
             })}
           </ul>
 
-          <p className="mt-5 text-[0.66rem] tracking-[0.3em] text-muted uppercase">{t.booking.duration}</p>
+          <p className="mt-5 text-[0.68rem] font-medium tracking-[0.22em] text-sage uppercase">{t.booking.duration}</p>
           <div className="mt-2.5 grid grid-cols-3 gap-2 sm:gap-3">
             {service.options.map((o, index) => {
               const isSelected = o.durationMinutes === selected.durationMinutes;
@@ -929,14 +884,14 @@ function ServiceDetailView({
                   onClick={() => onSelect(o.durationMinutes)}
                   aria-pressed={isSelected}
                   style={{ animationDelay: `${120 + index * 60}ms` }}
-                  className={`animate-fade-up flex min-h-[3.75rem] flex-col items-center justify-center rounded-lg border px-1 leading-tight transition ${
+                  className={`flex min-h-[3.75rem] flex-col items-center justify-center rounded-xl border px-1 leading-tight transition ${
                     isSelected
-                      ? "border-ink bg-ink text-cream shadow-[0_10px_22px_-12px_rgba(20,18,15,0.8)]"
-                      : "border-sand bg-white text-ink shadow-[0_6px_16px_-14px_rgba(60,40,20,0.5)] hover:border-ink"
+                      ? "border-forest bg-forest text-white"
+                      : "border-sand bg-white text-ink hover:border-forest"
                   }`}
                 >
                   <span className="text-[0.72rem] opacity-80">{formatDuration(o.durationMinutes, locale)}</span>
-                  <span className="mt-0.5 font-serif text-lg">{formatPrice(o.priceCents, locale)}</span>
+                  <span className="mt-0.5 text-lg font-semibold">{formatPrice(o.priceCents, locale)}</span>
                 </button>
               );
             })}
@@ -947,7 +902,7 @@ function ServiceDetailView({
           <button
             type="button"
             onClick={onContinue}
-            className="mt-4 inline-flex w-full items-center justify-center gap-3 rounded-full bg-ink py-3.5 text-[0.85rem] tracking-wide text-cream shadow-[0_12px_24px_-14px_rgba(20,18,15,0.9)] transition hover:-translate-y-0.5 hover:bg-black"
+            className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-forest text-[0.88rem] font-medium text-white transition hover:bg-forest-dark"
           >
             {fmt(t.booking.bookDuration, { duration: formatDuration(selected.durationMinutes, locale) })}
             <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
@@ -962,30 +917,30 @@ function ServiceDetailView({
 
 function TreatmentDetails({ info, t }: { info: ServiceDetails; t: Dictionary }) {
   return (
-    <section className="mt-8 rounded-lg border border-sand/70 bg-white/60 p-4 sm:p-6">
+    <section className="mt-8 rounded-2xl border border-black/[0.06] bg-ivory p-4 sm:p-6">
       <h3 className="px-1 text-[1.05rem] font-medium text-ink">{t.booking.treatmentDetails}</h3>
       <div className="mt-4 space-y-3">
         <DetailItem icon={LotusIcon} title={t.booking.overview} summary={info.summary}>
           <p className="text-[0.86rem] leading-relaxed font-light text-ink-soft">{info.intro}</p>
           <dl className="mt-4 grid grid-cols-2 gap-3">
-            <div className="rounded-lg bg-cream px-4 py-3">
-              <dt className="text-[0.6rem] tracking-[0.25em] text-muted uppercase">{t.booking.pressure}</dt>
+            <div className="rounded-xl bg-white px-4 py-3">
+              <dt className="text-[0.68rem] tracking-[0.16em] text-sage uppercase">{t.booking.pressure}</dt>
               <dd className="mt-2">
                 <span className="flex gap-1" aria-hidden>
                   {[1, 2, 3, 4, 5].map((level) => (
-                    <span key={level} className={`h-1.5 w-5 rounded-full ${level <= PRESSURE_LEVEL[info.pressure] ? "bg-ink" : "bg-sand"}`} />
+                    <span key={level} className={`h-1.5 w-5 rounded-full ${level <= PRESSURE_LEVEL[info.pressure] ? "bg-forest" : "bg-sand"}`} />
                   ))}
                 </span>
                 <span className="mt-1.5 block text-[0.8rem] text-ink first-letter:uppercase">{t.pressure[info.pressure]}</span>
               </dd>
             </div>
-            <div className="rounded-lg bg-cream px-4 py-3">
-              <dt className="text-[0.6rem] tracking-[0.25em] text-muted uppercase">{t.booking.idealFor}</dt>
+            <div className="rounded-xl bg-white px-4 py-3">
+              <dt className="text-[0.68rem] tracking-[0.16em] text-sage uppercase">{t.booking.idealFor}</dt>
               <dd className="mt-2 text-[0.8rem] leading-snug text-ink">{info.idealFor}</dd>
             </div>
           </dl>
           {info.why && (
-            <p className="mt-4 border-s-2 border-ink/20 ps-3 font-serif text-[1.02rem] leading-snug text-ink italic">{info.why}</p>
+            <p className="mt-4 border-s-2 border-sand ps-3 text-[0.95rem] leading-snug text-ink">{info.why}</p>
           )}
         </DetailItem>
 
@@ -1006,7 +961,7 @@ function TreatmentDetails({ info, t }: { info: ServiceDetails; t: Dictionary }) 
           <DetailItem icon={HeartIcon} title={t.booking.helpsWith} summary={`${info.helpsWith.slice(0, 3).join(t.booking.listSeparator)}…`}>
             <ul className="flex flex-wrap gap-1.5">
               {info.helpsWith.map((item) => (
-                <li key={item} className="rounded-full bg-cream-dark px-3 py-1 text-[0.76rem] text-ink">
+                <li key={item} className="rounded-full bg-white px-3 py-1 text-[0.76rem] text-ink">
                   {item}
                 </li>
               ))}
@@ -1031,20 +986,20 @@ function DetailItem({
 }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className={`rounded-lg border bg-white transition-shadow duration-300 ${open ? "border-sand shadow-[0_14px_30px_-24px_rgba(60,40,20,0.5)]" : "border-sand/70"}`}>
+    <div className={`rounded-2xl border bg-white ${open ? "border-sand" : "border-black/[0.06]"}`}>
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="flex w-full items-center gap-4 px-4 py-3.5 text-start sm:px-5">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-cream-dark text-ink-soft">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-sand text-ink">
           <Icon className="h-5 w-5" aria-hidden />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block font-serif text-[1.15rem] leading-tight text-ink">{title}</span>
+          <span className="block text-[1.05rem] leading-tight font-semibold text-ink">{title}</span>
           <span className="mt-0.5 block truncate text-[0.78rem] font-light text-muted">{summary}</span>
         </span>
         <ChevronDown className={`h-4 w-4 shrink-0 text-ink-soft transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
       </button>
       <div className={`grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
         <div className="overflow-hidden" inert={!open}>
-          <div className="border-t border-sand/70 px-4 pt-4 pb-5 sm:ps-[4.75rem] sm:pe-6">{children}</div>
+          <div className="border-t border-black/[0.06] px-4 pt-4 pb-5 sm:ps-[4.75rem] sm:pe-6">{children}</div>
         </div>
       </div>
     </div>
@@ -1055,7 +1010,7 @@ function SummaryRow({ label, value, strong = false, ltr = false }: { label: stri
   return (
     <div className="flex items-baseline justify-between gap-4 py-3 sm:gap-6">
       <dt className="shrink-0 text-muted">{label}</dt>
-      <dd className={`min-w-0 text-end break-words ${strong ? "font-serif text-xl text-ink" : "text-ink"}`}>
+      <dd className={`min-w-0 text-end break-words text-ink ${strong ? "text-xl font-semibold" : ""}`}>
         {ltr ? <bdi dir="ltr">{value}</bdi> : value}
       </dd>
     </div>

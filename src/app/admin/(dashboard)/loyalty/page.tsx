@@ -1,23 +1,25 @@
-import { formatPhone } from "@/lib/phone";
-import { requireAdminPage } from "@/server/auth/session";
-import { listLoyaltyMembers } from "@/server/loyalty/engine";
+import CustomerAvatar from "@/components/admin/CustomerAvatar";
 import LoyaltyPromoForm from "@/components/admin/LoyaltyPromoForm";
+import { formatPhone } from "@/lib/phone";
+import { requireOwnerPage } from "@/server/auth/session";
+import { listLoyaltyMembers } from "@/server/loyalty/engine";
 
 export default async function AdminLoyaltyPage() {
-  await requireAdminPage();
+  await requireOwnerPage();
   const members = await listLoyaltyMembers();
 
   return (
-    <div className="mx-auto max-w-5xl px-5 py-8 sm:px-8">
-      <p className="text-[0.7rem] tracking-[0.28em] text-muted uppercase">Loyalty</p>
-      <h1 className="mt-2 font-serif text-3xl text-ink">Members & offers</h1>
-      <p className="mt-2 max-w-xl text-[0.9rem] text-ink-soft">
+    <div className="space-y-5 sm:space-y-6">
+      <header>
+        <h1 className="text-[1.7rem] leading-tight font-semibold tracking-[-0.03em] text-forest sm:text-[2rem]">Members & offers</h1>
+        <p className="mt-1 max-w-xl text-[0.85rem] text-sage">
         Points are earned when a visit is marked completed. Send a promo to every customer account below.
       </p>
+      </header>
 
       <LoyaltyPromoForm />
 
-      <section className="mt-8 overflow-hidden rounded-lg bg-white shadow-[0_20px_40px_-32px_rgba(60,40,20,0.35)]">
+      <section className="overflow-hidden rounded-2xl border border-sand bg-white">
         {members.length === 0 ? (
           <p className="px-5 py-8 text-center text-[0.85rem] text-muted">No customer accounts yet.</p>
         ) : (
@@ -34,7 +36,12 @@ export default async function AdminLoyaltyPage() {
             <tbody className="divide-y divide-sand/60">
               {members.map((m) => (
                 <tr key={m.id}>
-                  <td className="px-4 py-3 text-ink">{m.name}</td>
+                  <td className="px-4 py-3 text-ink">
+                    <span className="flex items-center gap-2.5">
+                      <CustomerAvatar id={m.id} name={m.name} updatedAt={m.avatarUpdatedAt} />
+                      <span className="min-w-0 truncate">{m.name}</span>
+                    </span>
+                  </td>
                   <td className="px-4 py-3 text-ink-soft" dir="ltr">
                     {formatPhone(m.phone)}
                   </td>

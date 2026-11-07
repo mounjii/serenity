@@ -16,7 +16,7 @@ export default function BookingRow({ booking, showDate = false, highlighted = fa
     >
       <Link href={href} className="flex min-w-0 flex-1 flex-col gap-2 text-left sm:flex-row sm:items-center sm:gap-6">
         <span className="shrink-0 sm:w-40">
-          <span className={`block font-serif text-[1.45rem] leading-none lining-nums tabular-nums ${cancelled ? "text-muted line-through" : "text-ink"}`}>
+          <span className={`block text-[1.15rem] leading-none font-semibold tracking-[-0.03em] lining-nums tabular-nums ${cancelled ? "text-muted line-through" : "text-ink"}`}>
             {booking.time}
             <span className="text-[0.95rem] text-muted"> – {booking.endTime}</span>
           </span>
@@ -47,7 +47,7 @@ export default function BookingRow({ booking, showDate = false, highlighted = fa
         </a>
         <Link
           href={href}
-          className="flex-1 rounded-full border border-transparent px-4 py-1.5 text-center text-[0.74rem] text-ink transition group-hover:border-sand hover:border-ink! sm:flex-none"
+          className="flex-1 rounded-full border border-transparent px-4 py-1.5 text-center text-[0.74rem] text-ink transition group-hover:border-sand hover:border-forest! sm:flex-none"
         >
           Details
         </Link>

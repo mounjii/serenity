@@ -46,8 +46,8 @@ export default function UpcomingSection({ basePath, range, bookings, today, head
     <section id="upcoming" className="scroll-mt-28">
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h2 className="font-serif text-[1.9rem] leading-tight text-ink">{heading}</h2>
-          <p className="mt-1 text-[0.8rem] text-muted">{range.title}</p>
+          <h2 className="text-[1.05rem] font-semibold tracking-[-0.02em] text-ink">{heading}</h2>
+          <p className="mt-1 text-[0.8rem] text-sage">{range.title}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -58,7 +58,7 @@ export default function UpcomingSection({ basePath, range, bookings, today, head
                 href={`${basePath}?view=${f.view}${extraQuery}#upcoming`}
                 aria-current={range.view === f.view ? "true" : undefined}
                 className={`rounded-full px-4 py-1.5 text-[0.76rem] transition ${
-                  range.view === f.view ? "bg-ink text-cream" : "text-ink-soft hover:text-ink"
+                  range.view === f.view ? "bg-forest text-white" : "text-ink-soft hover:text-ink"
                 }`}
               >
                 {f.label}
@@ -82,7 +82,7 @@ export default function UpcomingSection({ basePath, range, bookings, today, head
             <button
               type="submit"
               className={`rounded-full px-4 py-1.5 text-[0.76rem] transition ${
-                range.view === "date" ? "bg-ink text-cream" : "text-ink hover:bg-cream"
+                range.view === "date" ? "bg-forest text-white" : "text-ink hover:bg-cream"
               }`}
             >
               Show
