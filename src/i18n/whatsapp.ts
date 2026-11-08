@@ -23,13 +23,13 @@ export type WhatsAppWording = {
 
 export const WHATSAPP_WORDING: Record<Locale, WhatsAppWording> = {
   en: {
-    customerConfirm: "Hello Touch Sense, I confirm my reservation.\nName: {name}\nService: {service}\nDate: {date}\nTime: {time}\nRef: {ref}",
-    customerCancel: "Hello Touch Sense, I would like to cancel my reservation.\nName: {name}\nService: {service}\nDate: {date}\nTime: {time}\nRef: {ref}",
+    customerConfirm: "Hello THAI PRAKHOP, I confirm my reservation.\nName: {name}\nService: {service}\nDate: {date}\nTime: {time}\nRef: {ref}",
+    customerCancel: "Hello THAI PRAKHOP, I would like to cancel my reservation.\nName: {name}\nService: {service}\nDate: {date}\nTime: {time}\nRef: {ref}",
     ownerRequest:
-      "Hello {first}, this is Touch Sense. Please confirm your reservation: {service} on {date} at {time}. Reply YES to confirm or NO to cancel. Thank you!",
-    ownerConfirmed: "Hello {first}, your reservation at Touch Sense is confirmed: {service} on {date} at {time}. Payment is made at the salon. See you soon!",
+      "Hello {first}, this is THAI PRAKHOP. Please confirm your reservation: {service} on {date} at {time}. Reply YES to confirm or NO to cancel. Thank you!",
+    ownerConfirmed: "Hello {first}, your reservation at THAI PRAKHOP is confirmed: {service} on {date} at {time}. Payment is made at the salon. See you soon!",
     ownerCancelled:
-      "Hello {first}, your reservation at Touch Sense for {service} on {date} at {time} has been cancelled. You are welcome to book another time.",
+      "Hello {first}, your reservation at THAI PRAKHOP for {service} on {date} at {time} has been cancelled. You are welcome to book another time.",
     request:
       'Please confirm your reservation. Service: {service} / Date: {date} / Time: {time}. Tap "Confirm" before {deadline}, otherwise the reservation is cancelled automatically.',
     confirmed: "Your reservation is confirmed. Service: {service} / Date: {date} / Time: {time}. Thank you for your reservation.",
@@ -39,14 +39,14 @@ export const WHATSAPP_WORDING: Record<Locale, WhatsAppWording> = {
     cancelButton: "Cancel",
   },
   fr: {
-    customerConfirm: "Bonjour Touch Sense, je confirme ma réservation.\nNom : {name}\nSoin : {service}\nDate : {date}\nHeure : {time}\nRéf : {ref}",
-    customerCancel: "Bonjour Touch Sense, je souhaite annuler ma réservation.\nNom : {name}\nSoin : {service}\nDate : {date}\nHeure : {time}\nRéf : {ref}",
+    customerConfirm: "Bonjour THAI PRAKHOP, je confirme ma réservation.\nNom : {name}\nSoin : {service}\nDate : {date}\nHeure : {time}\nRéf : {ref}",
+    customerCancel: "Bonjour THAI PRAKHOP, je souhaite annuler ma réservation.\nNom : {name}\nSoin : {service}\nDate : {date}\nHeure : {time}\nRéf : {ref}",
     ownerRequest:
-      "Bonjour {first}, ici Touch Sense. Merci de confirmer votre réservation : {service} le {date} à {time}. Répondez OUI pour confirmer ou NON pour annuler. Merci !",
+      "Bonjour {first}, ici THAI PRAKHOP. Merci de confirmer votre réservation : {service} le {date} à {time}. Répondez OUI pour confirmer ou NON pour annuler. Merci !",
     ownerConfirmed:
-      "Bonjour {first}, votre réservation chez Touch Sense est confirmée : {service} le {date} à {time}. Le paiement se fait au salon. À bientôt !",
+      "Bonjour {first}, votre réservation chez THAI PRAKHOP est confirmée : {service} le {date} à {time}. Le paiement se fait au salon. À bientôt !",
     ownerCancelled:
-      "Bonjour {first}, votre réservation chez Touch Sense pour {service} le {date} à {time} a été annulée. N’hésitez pas à réserver un autre créneau.",
+      "Bonjour {first}, votre réservation chez THAI PRAKHOP pour {service} le {date} à {time} a été annulée. N’hésitez pas à réserver un autre créneau.",
     request:
       "Merci de confirmer votre réservation. Soin : {service} / Date : {date} / Heure : {time}. Appuyez sur « Confirmer » avant {deadline}, sinon la réservation sera annulée automatiquement.",
     confirmed: "Votre réservation est confirmée. Soin : {service} / Date : {date} / Heure : {time}. Merci pour votre réservation.",
@@ -56,12 +56,12 @@ export const WHATSAPP_WORDING: Record<Locale, WhatsAppWording> = {
     cancelButton: "Annuler",
   },
   ar: {
-    customerConfirm: "مرحبًا Touch Sense، أؤكد حجزي.\nالاسم: {name}\nالخدمة: {service}\nالتاريخ: {date}\nالوقت: {time}\nالمرجع: {ref}",
-    customerCancel: "مرحبًا Touch Sense، أرغب في إلغاء حجزي.\nالاسم: {name}\nالخدمة: {service}\nالتاريخ: {date}\nالوقت: {time}\nالمرجع: {ref}",
+    customerConfirm: "مرحبًا THAI PRAKHOP، أؤكد حجزي.\nالاسم: {name}\nالخدمة: {service}\nالتاريخ: {date}\nالوقت: {time}\nالمرجع: {ref}",
+    customerCancel: "مرحبًا THAI PRAKHOP، أرغب في إلغاء حجزي.\nالاسم: {name}\nالخدمة: {service}\nالتاريخ: {date}\nالوقت: {time}\nالمرجع: {ref}",
     ownerRequest:
-      "مرحبًا {first}، معك Touch Sense. يرجى تأكيد حجزك: {service} يوم {date} على الساعة {time}. أجب بـ «نعم» للتأكيد أو «لا» للإلغاء. شكرًا لك!",
-    ownerConfirmed: "مرحبًا {first}، تم تأكيد حجزك لدى Touch Sense: {service} يوم {date} على الساعة {time}. يتم الدفع في المركز. نراك قريبًا!",
-    ownerCancelled: "مرحبًا {first}، تم إلغاء حجزك لدى Touch Sense: {service} يوم {date} على الساعة {time}. يسعدنا استقبالك في موعد آخر.",
+      "مرحبًا {first}، معك THAI PRAKHOP. يرجى تأكيد حجزك: {service} يوم {date} على الساعة {time}. أجب بـ «نعم» للتأكيد أو «لا» للإلغاء. شكرًا لك!",
+    ownerConfirmed: "مرحبًا {first}، تم تأكيد حجزك لدى THAI PRAKHOP: {service} يوم {date} على الساعة {time}. يتم الدفع في المركز. نراك قريبًا!",
+    ownerCancelled: "مرحبًا {first}، تم إلغاء حجزك لدى THAI PRAKHOP: {service} يوم {date} على الساعة {time}. يسعدنا استقبالك في موعد آخر.",
     request:
       "يرجى تأكيد حجزك. الخدمة: {service} / التاريخ: {date} / الوقت: {time}. اضغط على «تأكيد» قبل {deadline}، وإلا سيُلغى الحجز تلقائيًا.",
     confirmed: "تم تأكيد حجزك. الخدمة: {service} / التاريخ: {date} / الوقت: {time}. شكرًا لحجزك.",

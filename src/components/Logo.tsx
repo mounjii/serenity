@@ -4,13 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useI18n } from "@/i18n/client";
 
-type Props = { className?: string; variant?: "horizontal" | "stacked" };
+type Props = { className?: string; variant?: "horizontal" | "stacked"; flush?: boolean };
 
 const ALT = "Thai Prakhop Herbal Massage Studio";
 
 export default function Logo({
   className = "",
   variant = "horizontal",
+  flush = false,
 }: Props) {
   const { href } = useI18n();
   return (
@@ -35,7 +36,7 @@ export default function Logo({
           height={341}
           priority
           data-nav-logo
-          className="h-10 w-auto origin-left scale-[1.22] sm:h-12 lg:h-14"
+          className={`h-10 w-auto sm:h-12 lg:h-14 ${flush ? "" : "origin-left scale-[1.22]"}`}
         />
       )}
     </Link>

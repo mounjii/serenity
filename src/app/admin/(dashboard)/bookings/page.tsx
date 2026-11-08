@@ -8,7 +8,7 @@ import { listBookingsForDates } from "@/server/admin/bookings";
 import { requireArea } from "@/server/auth/session";
 import { sweepExpiredBookings } from "@/server/booking/confirmation";
 
-export const metadata = { title: "Bookings — Touch Sense" };
+export const metadata = { title: "Bookings — THAI PRAKHOP" };
 
 const STATUS_FILTERS = [
   { key: "all", label: "All", statuses: null },

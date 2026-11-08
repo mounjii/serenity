@@ -28,7 +28,7 @@ import { requireArea } from "@/server/auth/session";
 import { sweepExpiredBookings } from "@/server/booking/confirmation";
 import { getWhatsAppMode } from "@/server/whatsapp";
 
-export const metadata = { title: "Dashboard — Touch Sense" };
+export const metadata = { title: "Dashboard — THAI PRAKHOP" };
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 

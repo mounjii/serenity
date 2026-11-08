@@ -3,7 +3,7 @@ import AdminsManager from "@/components/admin/AdminsManager";
 import { listStaffAdmins } from "@/server/admin/profile";
 import { requireOwnerPage } from "@/server/auth/session";
 
-export const metadata = { title: "Admins — Touch Sense" };
+export const metadata = { title: "Admins — THAI PRAKHOP" };
 
 export default async function AdminStaffPage() {
   await connection();

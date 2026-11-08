@@ -2,16 +2,16 @@ import type { Dictionary } from "./en";
 
 const fr: Dictionary = {
   meta: {
-    title: "Touch Sense — Massage thaï et spa à Rabat",
+    title: "THAI PRAKHOP — Massage thaï et spa à Rabat",
     description:
       "Massage thaï, massage à l’huile, réflexologie et plus encore à Rabat (Av. Al Haouz). Thérapeutes professionnels, ouvert tous les jours de 10:00 à 22:00. Réservez en ligne en une minute.",
-    reservationTitle: "Réserver un massage à Rabat — Touch Sense",
+    reservationTitle: "Réserver un massage à Rabat — THAI PRAKHOP",
     reservationDescription: "Choisissez votre soin, un horaire, et confirmez votre réservation en une minute.",
-    confirmationTitle: "Votre réservation — Touch Sense",
-    privacyTitle: "Politique de confidentialité — Touch Sense",
-    privacyDescription: "Comment Touch Sense Thai Massage collecte, utilise et protège vos données personnelles.",
-    accountTitle: "Votre compte — Touch Sense",
-    accountDescription: "Connectez-vous pour voir vos réservations et gérer votre compte Touch Sense.",
+    confirmationTitle: "Votre réservation — THAI PRAKHOP",
+    privacyTitle: "Politique de confidentialité — THAI PRAKHOP",
+    privacyDescription: "Comment THAI PRAKHOP collecte, utilise et protège vos données personnelles.",
+    accountTitle: "Votre compte — THAI PRAKHOP",
+    accountDescription: "Connectez-vous pour voir vos réservations et gérer votre compte THAI PRAKHOP.",
   },
   nav: {
     home: "Accueil",
@@ -33,7 +33,7 @@ const fr: Dictionary = {
     relax: "Détente",
     recharge: "Énergie",
     reconnect: "Harmonie",
-    brand: "Touch Sense Thai Massage",
+    brand: "THAI PRAKHOP",
     title1: "Plus qu'un massage,",
     title2: "c'est une renaissance.",
     text: "Des massages thaï authentiques et des soins bien-être pour détendre, restaurer et rééquilibrer le corps et l'esprit.",
@@ -54,7 +54,7 @@ const fr: Dictionary = {
     eyebrow: "À propos",
     title1: "Votre bien-être",
     title2: "est notre priorité",
-    text: "Chez Touch Sense, nous allions la sagesse du massage thaï à une expérience bien-être moderne, dans un cadre calme et élégant pensé pour votre détente.",
+    text: "Chez THAI PRAKHOP, nous allions la sagesse du massage thaï à une expérience bien-être moderne, dans un cadre calme et élégant pensé pour votre détente.",
     cta: "Découvrir",
     imageAlt: "Serviettes roulées et bougies",
   },
@@ -81,7 +81,7 @@ const fr: Dictionary = {
     eyebrow: "Témoignages",
     title1: "Ce que disent",
     title2: "nos clients",
-    text: "Des expériences réelles de personnes qui ont fait confiance à Touch Sense.",
+    text: "Des expériences réelles de personnes qui ont fait confiance à THAI PRAKHOP.",
     items: [
       {
         quote:
@@ -122,7 +122,7 @@ const fr: Dictionary = {
     title: "Un lieu de sérénité",
     text: "Entrez dans un cadre serein, pensé pour vous aider à lâcher prise et à vous sentir bien.",
     swipe: "Glisser",
-    fallbackAlt: "Salon Touch Sense",
+    fallbackAlt: "Salon THAI PRAKHOP",
     alts: [
       "Salle de massage avec drap en soie thaïe et bougies",
       "Salle de soin avec table de massage et canapé",
@@ -140,7 +140,7 @@ const fr: Dictionary = {
     text: "De courts aperçus du salon, au format vertical d’Instagram.",
     swipe: "Glisser",
     follow: "Nous suivre",
-    clipLabel: "Reel Instagram Touch Sense",
+    clipLabel: "Reel Instagram THAI PRAKHOP",
   },
   contact: {
     eyebrow: "Nous contacter",
@@ -153,12 +153,12 @@ const fr: Dictionary = {
     email: "E-mail",
     hours: "Horaires",
     hoursValue: "Lundi – dimanche · 10:00 – 22:00",
-    greeting: "Bonjour Touch Sense, je souhaiterais avoir des informations.",
+    greeting: "Bonjour THAI PRAKHOP, je souhaiterais avoir des informations.",
     address: "2ème étage, 42 Ave Al Haouz, Rabat 10140",
-    mapTitle: "Carte indiquant Touch Sense",
+    mapTitle: "Carte indiquant THAI PRAKHOP",
   },
   footer: {
-    rights: "© {year} Touch Sense Thai Massage. Tous droits réservés.",
+    rights: "© {year} THAI PRAKHOP. Tous droits réservés.",
     privacy: "Confidentialité",
     bookings: "Réservations",
     staff: "Espace salon",
@@ -510,7 +510,7 @@ const fr: Dictionary = {
     forgotSend: "Envoyer le code",
     forgotSent: "Si un compte correspond, un code à 6 chiffres a été envoyé. Il expire dans 10 minutes.",
     forgotCode: "Code de vérification",
-    forgotCodeMessage: "Votre code Touch Sense est {code}. Il expire dans 10 minutes.",
+    forgotCodeMessage: "Votre code THAI PRAKHOP est {code}. Il expire dans 10 minutes.",
     forgotSave: "Enregistrer le mot de passe",
     forgotResend: "Envoyer un nouveau code",
     forgotChanged: "Mot de passe mis à jour. Connectez-vous avec le nouveau mot de passe.",
@@ -547,7 +547,7 @@ const fr: Dictionary = {
     qMassage: "Quel type de massage préférez-vous ?",
     qGoal: "Quel est votre objectif bien-être principal ?",
     qFrequency: "À quelle fréquence venez-vous au spa ?",
-    qDiscovery: "Comment avez-vous découvert Touch Sense ?",
+    qDiscovery: "Comment avez-vous découvert THAI PRAKHOP ?",
     chooseOne: "Veuillez choisir une réponse.",
     discovery: "Comment vous nous avez connus",
     frequencies: {
@@ -625,13 +625,13 @@ const fr: Dictionary = {
     title: "Politique de confidentialité",
     updated: "Dernière mise à jour : {date}",
     intro:
-      "Votre vie privée compte autant pour nous que votre confort. Cette page explique simplement quelles informations nous collectons lorsque vous réservez chez Touch Sense, pourquoi nous en avons besoin et comment vous en gardez le contrôle.",
+      "Votre vie privée compte autant pour nous que votre confort. Cette page explique simplement quelles informations nous collectons lorsque vous réservez chez THAI PRAKHOP, pourquoi nous en avons besoin et comment vous en gardez le contrôle.",
     sections: [
       {
         title: "Qui sommes-nous",
         blocks: [
           {
-            p: "Touch Sense Thai Massage (« Touch Sense », « nous ») est un salon de massage situé au 2ème étage, 42 Ave Al Haouz, Rabat 10140, Maroc. Nous sommes responsables des données personnelles collectées via ce site.",
+            p: "THAI PRAKHOP (« nous ») est un salon de massage situé au 2ème étage, 42 Ave Al Haouz, Rabat 10140, Maroc. Nous sommes responsables des données personnelles collectées via ce site.",
           },
         ],
       },
@@ -677,7 +677,7 @@ const fr: Dictionary = {
         title: "Qui peut les voir",
         blocks: [
           {
-            p: "Seule l’équipe Touch Sense peut consulter vos informations de réservation. Nous ne vendons ni ne louons jamais vos données et ne les utilisons pas à des fins publicitaires.",
+            p: "Seule l’équipe THAI PRAKHOP peut consulter vos informations de réservation. Nous ne vendons ni ne louons jamais vos données et ne les utilisons pas à des fins publicitaires.",
           },
           { p: "Vos données peuvent transiter par quelques prestataires qui nous aident à faire fonctionner le site, uniquement dans ce but :" },
           {

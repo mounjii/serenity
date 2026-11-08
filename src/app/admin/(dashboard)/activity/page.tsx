@@ -7,7 +7,7 @@ import { requireArea } from "@/server/auth/session";
 import { sweepExpiredBookings } from "@/server/booking/confirmation";
 import { getWhatsAppMode } from "@/server/whatsapp";
 
-export const metadata = { title: "Activity — Touch Sense" };
+export const metadata = { title: "Activity — THAI PRAKHOP" };
 
 const LIMIT = 100;
 

@@ -70,7 +70,7 @@ async function readLive(): Promise<GoogleRating> {
 
 const readCached = unstable_cache(readLive, ["touch-sense-google-rating"], { revalidate: 60 * 60 });
 
-/** Rating and review count for Touch Sense, refreshed from Google about once an hour. */
+/** Rating and review count for THAI PRAKHOP, refreshed from Google about once an hour. */
 export async function getGoogleRating(): Promise<GoogleRating> {
   try {
     return await readCached();

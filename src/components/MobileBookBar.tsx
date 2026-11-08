@@ -27,7 +27,8 @@ export default function MobileBookBar() {
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
 
-    const targets = [document.getElementById("contact"), document.querySelector("footer")].filter((el): el is HTMLElement => el !== null);
+    const targets = () =>
+      [document.getElementById("contact"), document.querySelector("footer")].filter((el): el is HTMLElement => el !== null);
     const visible = new Set<Element>();
     const observer = new IntersectionObserver((entries) => {
       for (const e of entries) {
@@ -36,9 +37,11 @@ export default function MobileBookBar() {
       }
       setBlocked(visible.size > 0);
     });
-    targets.forEach((t) => observer.observe(t));
+    targets().forEach((el) => observer.observe(el));
+    const retry = window.setTimeout(() => targets().forEach((el) => observer.observe(el)), 400);
 
     return () => {
+      window.clearTimeout(retry);
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
       observer.disconnect();
@@ -56,7 +59,7 @@ export default function MobileBookBar() {
     >
       <div className="flex items-center gap-4">
         <div className="min-w-0 flex-1 leading-tight">
-          <p className="font-serif text-[1.1rem] text-ink">Touch Sense</p>
+          <p className="font-serif text-[1.1rem] text-ink">THAI PRAKHOP</p>
           <p className="truncate text-[0.7rem] text-muted">{t.bookBar.hours}</p>
         </div>
         <Link

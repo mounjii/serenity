@@ -2,16 +2,16 @@ import type { Dictionary } from "./en";
 
 const ar: Dictionary = {
   meta: {
-    title: "Touch Sense — تدليك تايلاندي وسبا في الرباط",
+    title: "THAI PRAKHOP — تدليك تايلاندي وسبا في الرباط",
     description:
       "تدليك تايلاندي، تدليك بالزيت، علاج انعكاسي للقدمين وغيرها في الرباط (شارع الحوز). معالجون محترفون، مفتوح يوميًا من 10:00 إلى 22:00. احجز عبر الإنترنت في دقيقة.",
-    reservationTitle: "احجز جلسة تدليك في الرباط — Touch Sense",
+    reservationTitle: "احجز جلسة تدليك في الرباط — THAI PRAKHOP",
     reservationDescription: "اختر علاجك وحدد الوقت المناسب وأكّد حجزك في دقيقة واحدة.",
-    confirmationTitle: "حجزك — Touch Sense",
-    privacyTitle: "سياسة الخصوصية — Touch Sense",
-    privacyDescription: "كيف يجمع Touch Sense Thai Massage بياناتك الشخصية ويستخدمها ويحميها.",
-    accountTitle: "حسابك — Touch Sense",
-    accountDescription: "سجّل الدخول لعرض حجوزاتك وإدارة حسابك في Touch Sense.",
+    confirmationTitle: "حجزك — THAI PRAKHOP",
+    privacyTitle: "سياسة الخصوصية — THAI PRAKHOP",
+    privacyDescription: "كيف يجمع THAI PRAKHOP بياناتك الشخصية ويستخدمها ويحميها.",
+    accountTitle: "حسابك — THAI PRAKHOP",
+    accountDescription: "سجّل الدخول لعرض حجوزاتك وإدارة حسابك في THAI PRAKHOP.",
   },
   nav: {
     home: "الرئيسية",
@@ -33,7 +33,7 @@ const ar: Dictionary = {
     relax: "استرخِ",
     recharge: "جدّد طاقتك",
     reconnect: "تواصل مع ذاتك",
-    brand: "Touch Sense Thai Massage",
+    brand: "THAI PRAKHOP",
     title1: "أكثر من مجرد تدليك،",
     title2: "إنها بداية جديدة.",
     text: "تدليك تايلاندي أصيل وعلاجات عافية للاسترخاء واستعادة التوازن بين الجسد والعقل.",
@@ -54,7 +54,7 @@ const ar: Dictionary = {
     eyebrow: "من نحن",
     title1: "راحتك",
     title2: "هي أولويتنا",
-    text: "في Touch Sense نجمع بين حكمة التدليك التايلاندي وتجربة عافية حديثة، في مكان هادئ وأنيق صُمم لاسترخائك التام.",
+    text: "في THAI PRAKHOP نجمع بين حكمة التدليك التايلاندي وتجربة عافية حديثة، في مكان هادئ وأنيق صُمم لاسترخائك التام.",
     cta: "اكتشف المزيد",
     imageAlt: "مناشف ملفوفة وشموع",
   },
@@ -81,7 +81,7 @@ const ar: Dictionary = {
     eyebrow: "آراء العملاء",
     title1: "ماذا يقول",
     title2: "عملاؤنا",
-    text: "تجارب حقيقية من أشخاص وثقوا بـ Touch Sense.",
+    text: "تجارب حقيقية من أشخاص وثقوا بـ THAI PRAKHOP.",
     items: [
       {
         quote: "تدليك جيد جدًا. الجميع يتحدث الإنجليزية ولطيف للغاية، ومن السهل حجز موعد عبر واتساب. نظيف جدًا واحترافي.",
@@ -120,7 +120,7 @@ const ar: Dictionary = {
     title: "مكان للسكينة",
     text: "ادخل إلى أجواء هادئة صُممت لتساعدك على الاسترخاء والشعور بالراحة.",
     swipe: "اسحب",
-    fallbackAlt: "مركز Touch Sense",
+    fallbackAlt: "مركز THAI PRAKHOP",
     alts: [
       "غرفة تدليك بغطاء طاولة من الحرير التايلاندي وشموع",
       "غرفة علاج بطاولة تدليك وأريكة",
@@ -138,7 +138,7 @@ const ar: Dictionary = {
     text: "لمحات قصيرة من الصالون بنفس التنسيق العمودي لإنستغرام.",
     swipe: "اسحب",
     follow: "تابعونا",
-    clipLabel: "ريل إنستغرام Touch Sense",
+    clipLabel: "ريل إنستغرام THAI PRAKHOP",
   },
   contact: {
     eyebrow: "تواصل معنا",
@@ -151,12 +151,12 @@ const ar: Dictionary = {
     email: "البريد الإلكتروني",
     hours: "أوقات العمل",
     hoursValue: "من الاثنين إلى الأحد · 10:00 – 22:00",
-    greeting: "مرحبًا Touch Sense، أرغب في الحصول على بعض المعلومات.",
+    greeting: "مرحبًا THAI PRAKHOP، أرغب في الحصول على بعض المعلومات.",
     address: "الطابق الثاني، 42 شارع الحوز، الرباط 10140",
-    mapTitle: "خريطة توضح موقع Touch Sense",
+    mapTitle: "خريطة توضح موقع THAI PRAKHOP",
   },
   footer: {
-    rights: "© {year} Touch Sense Thai Massage. جميع الحقوق محفوظة.",
+    rights: "© {year} THAI PRAKHOP. جميع الحقوق محفوظة.",
     privacy: "سياسة الخصوصية",
     bookings: "الحجوزات",
     staff: "لوحة الصالون",
@@ -500,7 +500,7 @@ const ar: Dictionary = {
     forgotSend: "إرسال الرمز",
     forgotSent: "إذا وُجد حساب مطابق، أرسلنا رمزًا من 6 أرقام. ينتهي خلال 10 دقائق.",
     forgotCode: "رمز التحقق",
-    forgotCodeMessage: "رمز التحقق في Touch Sense هو {code}. ينتهي خلال 10 دقائق.",
+    forgotCodeMessage: "رمز التحقق في THAI PRAKHOP هو {code}. ينتهي خلال 10 دقائق.",
     forgotSave: "حفظ كلمة المرور",
     forgotResend: "إرسال رمز جديد",
     forgotChanged: "تم تحديث كلمة المرور. سجّل الدخول بكلمة المرور الجديدة.",
@@ -537,7 +537,7 @@ const ar: Dictionary = {
     qMassage: "ما نوع التدليك الذي تفضله؟",
     qGoal: "ما هو هدفك الرئيسي للعناية؟",
     qFrequency: "كم مرة تزور مركزًا للعناية؟",
-    qDiscovery: "كيف تعرفت على Touch Sense؟",
+    qDiscovery: "كيف تعرفت على THAI PRAKHOP؟",
     chooseOne: "يرجى اختيار إجابة.",
     discovery: "كيف عرفت بنا",
     frequencies: {
@@ -615,13 +615,13 @@ const ar: Dictionary = {
     title: "سياسة الخصوصية",
     updated: "آخر تحديث: {date}",
     intro:
-      "خصوصيتك تهمنا بقدر راحتك. توضح هذه الصفحة بكلمات بسيطة المعلومات التي نجمعها عند الحجز لدى Touch Sense، ولماذا نحتاجها، وكيف تبقى متحكمًا فيها.",
+      "خصوصيتك تهمنا بقدر راحتك. توضح هذه الصفحة بكلمات بسيطة المعلومات التي نجمعها عند الحجز لدى THAI PRAKHOP، ولماذا نحتاجها، وكيف تبقى متحكمًا فيها.",
     sections: [
       {
         title: "من نحن",
         blocks: [
           {
-            p: "Touch Sense Thai Massage (‏«Touch Sense» أو «نحن») مركز تدليك يقع في الطابق الثاني، 42 شارع الحوز، الرباط 10140، المغرب. نحن المسؤولون عن البيانات الشخصية التي يتم جمعها عبر هذا الموقع.",
+            p: "THAI PRAKHOP («نحن») مركز تدليك يقع في الطابق الثاني، 42 شارع الحوز، الرباط 10140، المغرب. نحن المسؤولون عن البيانات الشخصية التي يتم جمعها عبر هذا الموقع.",
           },
         ],
       },
@@ -666,7 +666,7 @@ const ar: Dictionary = {
       {
         title: "من يمكنه رؤيتها",
         blocks: [
-          { p: "فريق Touch Sense وحده يمكنه الاطلاع على تفاصيل حجزك. لا نبيع بياناتك ولا نؤجرها أبدًا، ولا نستخدمها لأغراض إعلانية." },
+          { p: "فريق THAI PRAKHOP وحده يمكنه الاطلاع على تفاصيل حجزك. لا نبيع بياناتك ولا نؤجرها أبدًا، ولا نستخدمها لأغراض إعلانية." },
           { p: "قد تمر بياناتك عبر بعض مزودي الخدمات الذين يساعدوننا في تشغيل الموقع، ولهذا الغرض فقط:" },
           {
             ul: [

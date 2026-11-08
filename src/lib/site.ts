@@ -1,7 +1,7 @@
 /** Public address of the site, used for canonical links, the sitemap and share previews. */
 export const SITE_URL = (process.env.SITE_URL?.trim() || "https://touchsensespa.com").replace(/\/+$/, "");
 
-export const SITE_NAME = "Touch Sense Thai Massage";
+export const SITE_NAME = "THAI PRAKHOP";
 
 /** Share preview for WhatsApp, Facebook, Instagram…: 1200×630. */
 export const OG_IMAGE = { url: "/images/og.jpg", width: 1200, height: 630 } as const;

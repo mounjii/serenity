@@ -15,7 +15,7 @@ export default async function Contact() {
   const configuredAddress = process.env.CONTACT_ADDRESS?.trim();
   const address = configuredAddress || t.contact.address;
   const email = process.env.CONTACT_EMAIL?.trim() || null;
-  const mapQuery = encodeURIComponent(`Touch Sense Thai Massage, ${configuredAddress || DEFAULT_ADDRESS}`);
+  const mapQuery = encodeURIComponent(`THAI PRAKHOP, ${configuredAddress || DEFAULT_ADDRESS}`);
 
   const items: Item[] = [];
   if (phone) items.push({ icon: PhoneIcon, label: t.contact.callUs, value: formatPhone(phone), href: `tel:${phone}` });

@@ -57,7 +57,7 @@ async function deliver(channel: ResetChannel, to: string, text: string): Promise
           ? { user: process.env.SMTP_USER.trim(), pass: process.env.SMTP_PASS ?? "" }
           : undefined,
       });
-      await transport.sendMail({ from: process.env.SMTP_FROM.trim(), to, subject: "Touch Sense", text });
+      await transport.sendMail({ from: process.env.SMTP_FROM.trim(), to, subject: "THAI PRAKHOP", text });
       return "sent";
     }
     const token = process.env.META_WA_TOKEN?.trim();

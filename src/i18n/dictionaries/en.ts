@@ -16,16 +16,16 @@ export type PrivacyBlock = { p: string; link?: { text: string; href: string } } 
 
 const en = {
   meta: {
-    title: "Touch Sense — Thai Massage & Spa in Rabat",
+    title: "THAI PRAKHOP — Thai Massage & Spa in Rabat",
     description:
       "Thai massage, oil massage, reflexology and more in Rabat (Ave Al Haouz). Professional therapists, open every day 10:00–22:00. Book online in a minute.",
-    reservationTitle: "Book a massage in Rabat — Touch Sense",
+    reservationTitle: "Book a massage in Rabat — THAI PRAKHOP",
     reservationDescription: "Choose your treatment, pick a time and confirm your reservation in a minute.",
-    confirmationTitle: "Your reservation — Touch Sense",
-    privacyTitle: "Privacy Policy — Touch Sense",
-    privacyDescription: "How Touch Sense Thai Massage collects, uses and protects your personal data.",
-    accountTitle: "Your account — Touch Sense",
-    accountDescription: "Sign in to see your bookings and manage your Touch Sense account.",
+    confirmationTitle: "Your reservation — THAI PRAKHOP",
+    privacyTitle: "Privacy Policy — THAI PRAKHOP",
+    privacyDescription: "How THAI PRAKHOP collects, uses and protects your personal data.",
+    accountTitle: "Your account — THAI PRAKHOP",
+    accountDescription: "Sign in to see your bookings and manage your THAI PRAKHOP account.",
   },
   nav: {
     home: "Home",
@@ -47,7 +47,7 @@ const en = {
     relax: "Relax",
     recharge: "Recharge",
     reconnect: "Reconnect",
-    brand: "Touch Sense Thai Massage",
+    brand: "THAI PRAKHOP",
     title1: "More Than a Massage,",
     title2: "It's a Reset.",
     text: "Authentic Thai massage and wellness treatments designed to relax, restore, and rebalance your body and mind.",
@@ -68,7 +68,7 @@ const en = {
     eyebrow: "About Us",
     title1: "Your Wellness",
     title2: "Is Our Priority",
-    text: "At Touch Sense, we combine the wisdom of Thai massage with a modern wellness experience, in a calm and elegant environment designed for your total relaxation.",
+    text: "At THAI PRAKHOP, we combine the wisdom of Thai massage with a modern wellness experience, in a calm and elegant environment designed for your total relaxation.",
     cta: "Discover More",
     imageAlt: "Rolled towels and candles",
   },
@@ -95,7 +95,7 @@ const en = {
     eyebrow: "Testimonials",
     title1: "What Our",
     title2: "Clients Say",
-    text: "Real experiences from people who trusted Touch Sense.",
+    text: "Real experiences from people who trusted THAI PRAKHOP.",
     items: [
       {
         quote:
@@ -136,7 +136,7 @@ const en = {
     title: "A Place for Peace",
     text: "Step into a serene environment designed to help you unwind and feel at ease.",
     swipe: "Swipe",
-    fallbackAlt: "Touch Sense salon",
+    fallbackAlt: "THAI PRAKHOP salon",
     alts: [
       "Massage room with a Thai silk table cover and candles",
       "Treatment room with a massage table and a lounge sofa",
@@ -154,7 +154,7 @@ const en = {
     text: "Short glimpses of the salon — the same vertical format as Instagram.",
     swipe: "Swipe",
     follow: "Follow us",
-    clipLabel: "Touch Sense Instagram reel",
+    clipLabel: "THAI PRAKHOP Instagram reel",
   },
   contact: {
     eyebrow: "Get in Touch",
@@ -167,12 +167,12 @@ const en = {
     email: "Email",
     hours: "Opening hours",
     hoursValue: "Monday – Sunday · 10:00 – 22:00",
-    greeting: "Hello Touch Sense, I would like some information.",
+    greeting: "Hello THAI PRAKHOP, I would like some information.",
     address: "2nd floor, 42 Ave Al Haouz, Rabat 10140",
-    mapTitle: "Map showing Touch Sense",
+    mapTitle: "Map showing THAI PRAKHOP",
   },
   footer: {
-    rights: "© {year} Touch Sense Thai Massage. All rights reserved.",
+    rights: "© {year} THAI PRAKHOP. All rights reserved.",
     privacy: "Privacy Policy",
     bookings: "Bookings",
     staff: "Salon dashboard",
@@ -404,7 +404,7 @@ const en = {
     forgotSend: "Send code",
     forgotSent: "If an account matches, we sent a 6-digit code. It expires in 10 minutes.",
     forgotCode: "Verification code",
-    forgotCodeMessage: "Your Touch Sense verification code is {code}. It expires in 10 minutes.",
+    forgotCodeMessage: "Your THAI PRAKHOP verification code is {code}. It expires in 10 minutes.",
     forgotSave: "Save new password",
     forgotResend: "Send a new code",
     forgotChanged: "Password updated. Sign in with your new password.",
@@ -441,7 +441,7 @@ const en = {
     qMassage: "What type of massage do you prefer?",
     qGoal: "What is your main wellness goal?",
     qFrequency: "How often do you visit a spa?",
-    qDiscovery: "How did you discover Touch Sense?",
+    qDiscovery: "How did you discover THAI PRAKHOP?",
     chooseOne: "Please choose one.",
     discovery: "How you found us",
     frequencies: {
@@ -519,13 +519,13 @@ const en = {
     title: "Privacy Policy",
     updated: "Last updated: {date}",
     intro:
-      "Your privacy matters to us as much as your comfort. This page explains, in plain words, what information we collect when you book with Touch Sense, why we need it, and how you stay in control of it.",
+      "Your privacy matters to us as much as your comfort. This page explains, in plain words, what information we collect when you book with THAI PRAKHOP, why we need it, and how you stay in control of it.",
     sections: [
       {
         title: "Who we are",
         blocks: [
           {
-            p: "Touch Sense Thai Massage (“Touch Sense”, “we”) is a massage salon located at 2nd floor, 42 Ave Al Haouz, Rabat 10140, Morocco. We are responsible for the personal data collected through this website.",
+            p: "THAI PRAKHOP (“we”) is a massage salon located at 2nd floor, 42 Ave Al Haouz, Rabat 10140, Morocco. We are responsible for the personal data collected through this website.",
           },
         ],
       },
@@ -570,7 +570,7 @@ const en = {
       {
         title: "Who can see it",
         blocks: [
-          { p: "Only the Touch Sense team can see your booking details. We never sell or rent your data, and we do not use it for advertising." },
+          { p: "Only the THAI PRAKHOP team can see your booking details. We never sell or rent your data, and we do not use it for advertising." },
           { p: "Your data may pass through a few service providers that help us run the website, only for that purpose:" },
           {
             ul: [

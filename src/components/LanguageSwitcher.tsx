@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -38,14 +38,13 @@ export default function LanguageSwitcher({
   variant = "menu",
 }: {
   className?: string;
-  variant?: "menu" | "inline";
+  variant?: "menu" | "inline" | "icon";
 }) {
   const { locale, t } = useI18n();
   const pathname = usePathname();
-  const router = useRouter();
   const path = splitLocale(pathname).path;
   const [open, setOpen] = useState(false);
-  const [menu, setMenu] = useState<{ top: number; end: number } | null>(null);
+  const [menu, setMenu] = useState<{ top?: number; bottom?: number; left: number } | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
 
@@ -54,11 +53,15 @@ export default function LanguageSwitcher({
     const place = () => {
       const box = button.current?.getBoundingClientRect();
       if (!box) return;
-      const rtl = document.documentElement.dir === "rtl";
-      setMenu({
-        top: box.bottom + 8,
-        end: rtl ? box.left : window.innerWidth - box.right,
-      });
+      const margin = 12;
+      const width = 176;
+      const left = Math.min(Math.max(margin, box.right - width), window.innerWidth - width - margin);
+      const roomBelow = window.innerHeight - box.bottom;
+      setMenu(
+        roomBelow < 180
+          ? { bottom: window.innerHeight - box.top + 8, left }
+          : { top: box.bottom + 8, left },
+      );
     };
     place();
     const onPointer = (e: PointerEvent) => {
@@ -93,18 +96,19 @@ export default function LanguageSwitcher({
 
   const switchTo = (e: React.MouseEvent<HTMLAnchorElement>, next: Locale) => {
     setOpen(false);
+    setMenu(null);
     if (next === locale) {
       e.preventDefault();
       return;
     }
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
     rememberLocale(next);
     rememberSwitchPosition();
     const currentPath = splitLocale(window.location.pathname).path;
-    const href = `${localizePath(next, currentPath)}${window.location.search}`;
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-    e.preventDefault();
-    router.push(href, { scroll: false });
-    router.refresh();
+    const href = `${localizePath(next, currentPath)}${window.location.search}${window.location.hash}`;
+    // A full load is required: /fr and /ar are rewritten onto the same page, so a soft navigation keeps the old language on phones.
+    window.location.assign(href);
   };
 
   if (variant === "inline") {
@@ -119,7 +123,7 @@ export default function LanguageSwitcher({
             scroll={false}
             aria-current={l === locale ? "true" : undefined}
             onClick={(e) => switchTo(e, l)}
-            className={`text-[0.78rem] transition hover:text-forest ${
+            className={`inline-flex min-h-11 items-center text-[0.9rem] transition hover:text-forest ${
               l === locale ? "font-medium text-forest" : "text-sage"
             }`}
           >
@@ -134,7 +138,7 @@ export default function LanguageSwitcher({
     <ul
       id="language-menu"
       aria-label={t.nav.language}
-      style={{ top: menu.top, insetInlineEnd: menu.end }}
+      style={{ top: menu.top, bottom: menu.bottom, left: menu.left }}
       className="fixed z-[80] min-w-40 overflow-hidden rounded-lg border border-sand bg-white py-1.5 shadow-[0_18px_40px_-18px_rgba(40,30,20,0.4)]"
     >
       {LOCALES.map((l) => (
@@ -171,14 +175,32 @@ export default function LanguageSwitcher({
           setOpen((v) => !v);
           setMenu(null);
         }}
-        className="flex h-11 items-center gap-1 rounded-full border border-sand bg-white ps-4 pe-3 text-[0.84rem] font-medium text-ink transition hover:border-black/25"
+        className={
+          variant === "icon"
+            ? "grid h-11 w-11 place-items-center rounded-full border border-sand bg-white text-forest transition hover:border-forest"
+            : "flex h-11 items-center gap-1 rounded-full border border-sand bg-white ps-4 pe-3 text-[0.84rem] font-medium text-ink transition hover:border-black/25"
+        }
       >
-        {SHORT[locale]}
-        <ChevronDown
-          className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`}
-        />
+        {variant === "icon" ? (
+          <GlobeIcon className="h-5 w-5" />
+        ) : (
+          <>
+            {SHORT[locale]}
+            <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+          </>
+        )}
       </button>
       {menuList && createPortal(menuList, document.body)}
     </div>
+  );
+}
+
+function GlobeIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+      <circle cx="12" cy="12" r="8.25" />
+      <path d="M3.75 12h16.5" />
+      <path d="M12 3.75c2.2 2.35 3.4 5.2 3.4 8.25s-1.2 5.9-3.4 8.25c-2.2-2.35-3.4-5.2-3.4-8.25s1.2-5.9 3.4-8.25Z" />
+    </svg>
   );
 }

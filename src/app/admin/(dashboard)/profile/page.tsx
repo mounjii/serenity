@@ -3,7 +3,7 @@ import AdminProfileForm from "@/components/admin/AdminProfileForm";
 import { getAdminProfile } from "@/server/admin/profile";
 import { requireAdminPage } from "@/server/auth/session";
 
-export const metadata = { title: "Profile — Touch Sense" };
+export const metadata = { title: "Profile — THAI PRAKHOP" };
 
 export default async function AdminProfilePage() {
   await connection();

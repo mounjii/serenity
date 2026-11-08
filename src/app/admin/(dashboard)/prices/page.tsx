@@ -3,7 +3,7 @@ import PricesManager from "@/components/admin/PricesManager";
 import { listPricedServices } from "@/server/admin/prices";
 import { requireArea } from "@/server/auth/session";
 
-export const metadata = { title: "Prices — Touch Sense" };
+export const metadata = { title: "Prices — THAI PRAKHOP" };
 
 export default async function AdminPricesPage() {
   await connection();
