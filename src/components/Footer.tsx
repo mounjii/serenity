@@ -1,12 +1,17 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { fmt } from "@/i18n/format";
 import { getI18n } from "@/i18n/server";
+import { serviceText } from "@/i18n/services";
 import BackToTop from "./BackToTop";
 import LanguageSwitcher from "./LanguageSwitcher";
 import Logo from "./Logo";
 import { navLinks, RESERVATION_PATH } from "@/lib/navigation";
+import { formatPhone, salonPhone, whatsappLink } from "@/lib/phone";
 import { SOCIAL_LINKS } from "@/lib/site";
+import { getActiveServices } from "@/server/booking/services";
 import { FacebookIcon, InstagramIcon } from "./Icons";
+import Reveal from "./Reveal";
 
 const socials = [
   { label: "Instagram", icon: InstagramIcon, href: SOCIAL_LINKS.instagram },
@@ -14,25 +19,37 @@ const socials = [
 ];
 
 export default async function Footer() {
+  await connection();
   const { t, href } = await getI18n();
+  const phone = salonPhone();
+  let treatments: { slug: string; name: string }[] = [];
+  try {
+    const services = await getActiveServices();
+    treatments = services.map((service) => ({ slug: service.slug, name: serviceText(t, service).name }));
+  } catch {
+    treatments = [];
+  }
+
   return (
     <footer className="bg-ivory font-display text-ink">
       <div className="w-full px-5 pt-12 pb-10 sm:px-6 sm:pt-16 md:pb-12 lg:px-8">
-        <div className="grid gap-10 border-t border-sand pt-10 lg:grid-cols-[minmax(16rem,1.15fr)_auto_minmax(14rem,0.85fr)] lg:items-start lg:gap-16 lg:pt-14">
+        <div className="grid gap-10 border-t border-sand pt-10 lg:grid-cols-4 lg:gap-12 lg:pt-14">
           <div>
             <Logo flush />
-            <p className="mt-5 max-w-xs text-[0.95rem] leading-relaxed text-sage">{t.contact.address}</p>
-            <p className="mt-2 text-[0.88rem] text-ink">{t.contact.hoursValue}</p>
+            <Reveal delay={80}>
+              <p className="mt-5 max-w-xs text-[0.95rem] leading-relaxed text-sage">{t.footer.blurb}</p>
+            </Reveal>
             <Link
               href={href(RESERVATION_PATH)}
               className="mt-6 inline-flex min-h-11 items-center rounded-full bg-forest px-5 text-[0.88rem] font-medium text-white transition hover:bg-forest-dark"
             >
-              {t.nav.bookNow}
+              {t.hero.cta}
             </Link>
           </div>
 
-          <nav>
-            <ul className="grid grid-cols-2 gap-x-6 sm:max-w-xs lg:grid-cols-1">
+          <Reveal delay={140} as="section">
+          <nav aria-label={t.nav.breadcrumb}>
+            <ul>
               {navLinks.map((l) => (
                 <li key={l.href}>
                   <Link href={href(l.href)} className="inline-flex min-h-11 items-center text-[0.95rem] text-ink transition hover:text-forest">
@@ -42,10 +59,41 @@ export default async function Footer() {
               ))}
             </ul>
           </nav>
+          </Reveal>
 
-          <div className="flex items-center gap-3">
-            <LanguageSwitcher variant="icon" />
-            <div className="flex gap-3">
+          {treatments.length > 0 ? (
+            <Reveal delay={200} as="section">
+            <nav aria-label={t.footer.treatments}>
+              <p className="text-[0.72rem] font-medium tracking-[0.16em] text-sage uppercase">{t.footer.treatments}</p>
+              <ul className="mt-3">
+                {treatments.slice(0, 4).map((service) => (
+                  <li key={service.slug}>
+                    <Link
+                      href={href(`${RESERVATION_PATH}?service=${service.slug}`)}
+                      className="inline-flex min-h-11 items-center text-[0.95rem] text-ink transition hover:text-forest"
+                    >
+                      {service.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            </Reveal>
+          ) : null}
+
+          <Reveal delay={260}>
+            <p className="text-[0.72rem] font-medium tracking-[0.16em] text-sage uppercase">{t.contact.title}</p>
+            <p className="mt-4 max-w-xs text-[0.95rem] leading-relaxed text-ink">{t.contact.address}</p>
+            <p className="mt-2 text-[0.88rem] text-sage">{t.contact.hoursValue}</p>
+            {phone ? (
+              <a href={whatsappLink(phone, t.contact.bookMessage)} className="mt-3 inline-flex min-h-11 items-center text-[0.95rem] text-ink" dir="ltr">
+                {formatPhone(phone)}
+              </a>
+            ) : null}
+            <div className="mt-4 flex items-center gap-3">
+              <div className="hidden lg:block">
+                <LanguageSwitcher variant="icon" />
+              </div>
               {socials.map((s) => (
                 <a
                   key={s.label}
@@ -59,7 +107,7 @@ export default async function Footer() {
                 </a>
               ))}
             </div>
-          </div>
+          </Reveal>
         </div>
 
         <div className="mt-8 flex flex-col gap-4 border-t border-sand pt-5 sm:mt-12 sm:flex-row sm:items-center sm:justify-between">

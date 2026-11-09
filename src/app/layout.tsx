@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
-import { Amiri, Cormorant_Garamond, Inter, Jost, Tajawal } from "next/font/google";
+import { Inter, Tajawal } from "next/font/google";
 import { I18nProvider } from "@/i18n/client";
 import { dirOf } from "@/i18n/config";
 import { getI18n } from "@/i18n/server";
@@ -9,34 +9,13 @@ import { INTRO_BOOT_SCRIPT } from "@/lib/intro";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
-const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  style: ["normal", "italic"],
-});
-
-const jost = Jost({
-  variable: "--font-jost",
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
-});
-
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
 
-/** Arabic fonts: only downloaded when Arabic text is on the page. Applied by name in globals.css for lang="ar". */
-const amiri = Amiri({
-  variable: "--font-amiri",
-  subsets: ["arabic"],
-  weight: ["400", "700"],
-  preload: false,
-  adjustFontFallback: false,
-});
-
+/** Arabic letters only. Inter has no Arabic glyphs, so this face covers that script on /ar. */
 const tajawal = Tajawal({
   variable: "--font-tajawal",
   subsets: ["arabic"],
@@ -69,7 +48,7 @@ export default async function RootLayout({
       lang={locale}
       dir={dirOf(locale)}
       data-scroll-behavior="smooth"
-      className={`${cormorant.variable} ${jost.variable} ${inter.variable} ${amiri.variable} ${tajawal.variable}`}
+      className={`${inter.variable} ${tajawal.variable}`}
       suppressHydrationWarning
     >
       <head>

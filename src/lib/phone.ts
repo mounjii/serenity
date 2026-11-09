@@ -13,6 +13,11 @@ export function formatPhone(e164: string): string {
   return parsePhoneNumberFromString(e164)?.formatInternational() ?? e164;
 }
 
+/** The salon's public number, from the hosting panel. */
+export function salonPhone(): string | null {
+  return normalizePhone(process.env.CONTACT_PHONE || process.env.OWNER_WHATSAPP_PHONE || "");
+}
+
 /** wa.me expects digits only; `text` pre-fills the message, the user still presses send. */
 export function whatsappLink(e164: string, text?: string): string {
   const base = `https://wa.me/${e164.replace(/\D/g, "")}`;

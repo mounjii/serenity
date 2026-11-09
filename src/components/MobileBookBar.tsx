@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useI18n } from "@/i18n/client";
 import { RESERVATION_PATH } from "@/lib/navigation";
-import { ArrowRight } from "./Icons";
+import { ArrowRight, WhatsAppIcon } from "./Icons";
 
 /**
  * Phones only: the navbar hides while scrolling down, so a booking button stays within thumb reach
  * once the hero is out of view. It steps aside when the booking banner or the footer is on screen.
  */
-export default function MobileBookBar() {
+export default function MobileBookBar({ whatsappHref = null }: { whatsappHref?: string | null }) {
   const { t, href } = useI18n();
   const [pastHero, setPastHero] = useState(false);
   const [blocked, setBlocked] = useState(false);
@@ -62,6 +62,17 @@ export default function MobileBookBar() {
           <p className="font-serif text-[1.1rem] text-ink">THAI PRAKHOP</p>
           <p className="truncate text-[0.7rem] text-muted">{t.bookBar.hours}</p>
         </div>
+        {whatsappHref ? (
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t.contact.whatsapp}
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-sand bg-white text-forest"
+          >
+            <WhatsAppIcon className="h-5 w-5" />
+          </a>
+        ) : null}
         <Link
           href={href(RESERVATION_PATH)}
           className="inline-flex min-h-12 shrink-0 items-center gap-2 rounded-full bg-forest px-6 text-[0.85rem] tracking-wide text-cream shadow-[0_12px_24px_-14px_rgba(20,18,15,0.9)]"

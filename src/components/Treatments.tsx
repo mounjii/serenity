@@ -2,7 +2,9 @@ import { connection } from "next/server";
 import TreatmentCarousel from "@/components/TreatmentCarousel";
 import { getI18n } from "@/i18n/server";
 import { serviceText } from "@/i18n/services";
+import { fmt } from "@/i18n/format";
 import { serviceImage } from "@/lib/images";
+import { formatDuration, formatPrice } from "@/lib/format";
 import { RESERVATION_PATH } from "@/lib/navigation";
 import { getActiveServices, type PublicService } from "@/server/booking/services";
 
@@ -37,15 +39,19 @@ async function loadServices(): Promise<PublicService[]> {
 }
 
 export default async function Treatments() {
-  const [treatments, { t, href }] = await Promise.all([loadServices(), getI18n()]);
+  const [treatments, { t, href, locale }] = await Promise.all([loadServices(), getI18n()]);
   const cards = treatments.map((service) => {
     const { name, description } = serviceText(t, service);
+    const prices = service.options.map((option) => option.priceCents);
+    const durations = service.options.map((option) => formatDuration(option.durationMinutes, locale));
     return {
       slug: service.slug,
       name,
       description,
       image: serviceImage(service.slug),
       href: href(`${RESERVATION_PATH}?service=${service.slug}`),
+      durations: durations.length > 0 ? durations.join(" · ") : null,
+      fromLabel: prices.length > 0 ? fmt(t.booking.from, { price: formatPrice(Math.min(...prices), locale) }) : null,
     };
   });
 
@@ -54,14 +60,15 @@ export default async function Treatments() {
       <div className="w-full px-5 py-16 font-display sm:px-6 sm:py-20 lg:px-8 lg:py-24">
         <TreatmentCarousel
           items={cards}
+          prevLabel={t.treatments.prev}
+          nextLabel={t.treatments.next}
+          swipeLabel={t.treatments.swipe}
+          bookLabel={t.nav.bookNow}
           detailsAria={t.treatments.detailsAria}
           eyebrow={t.treatments.eyebrow}
           title={t.treatments.title}
-          swipeLabel={t.treatments.swipe}
           viewAll={t.treatments.viewAll}
           viewAllHref={href(RESERVATION_PATH)}
-          prevLabel={t.treatments.prev}
-          nextLabel={t.treatments.next}
         />
       </div>
     </section>

@@ -1,4 +1,5 @@
 import { getI18n } from "@/i18n/server";
+import Reveal from "./Reveal";
 import { HeartIcon, LeafIcon, LotusIcon, SparkLotusIcon } from "./Icons";
 
 const icons = [LotusIcon, LeafIcon, HeartIcon, SparkLotusIcon];
@@ -12,8 +13,9 @@ export default async function Features() {
           {t.features.map((feature, i) => {
             const Icon = icons[i % icons.length];
             return (
-              <div
+              <Reveal
                 key={feature.title}
+                delay={i * 90}
                 className={`flex items-start gap-2.5 px-3 py-4 sm:items-center sm:gap-3 sm:px-6 sm:py-5 ${i % 2 === 1 ? "border-s border-sand" : ""} ${
                   i >= 2 ? "border-t border-sand lg:border-t-0" : ""
                 } ${i > 0 ? "lg:border-s lg:border-sand" : ""}`}
@@ -23,7 +25,7 @@ export default async function Features() {
                   <h3 className="font-display text-[0.82rem] leading-tight font-semibold text-ink sm:text-[0.92rem]">{feature.title}</h3>
                   <p className="mt-1 text-[0.72rem] leading-snug text-balance text-sage sm:text-[0.78rem]">{feature.text}</p>
                 </div>
-              </div>
+              </Reveal>
             );
           })}
         </div>

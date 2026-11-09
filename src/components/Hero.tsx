@@ -5,7 +5,7 @@ import { blurProps, images } from "@/lib/images";
 import { RESERVATION_PATH } from "@/lib/navigation";
 import { getGoogleRating } from "@/lib/google-reviews";
 import { GOOGLE_REVIEW_URL } from "@/lib/site";
-import { ArrowRight, GoogleIcon, PlayIcon, StarIcon } from "./Icons";
+import { ArrowRight, GoogleIcon, StarIcon } from "./Icons";
 import Parallax from "./Parallax";
 
 export default async function Hero() {
@@ -19,7 +19,7 @@ export default async function Hero() {
   return (
     <section
       id="home"
-      className="relative flex min-h-[100dvh] w-full min-w-0 flex-col overflow-hidden bg-white sm:block sm:bg-ivory"
+      className="relative flex min-h-[100dvh] w-full min-w-0 flex-col overflow-hidden bg-ivory sm:block"
     >
       <Parallax speed={0.12}>
         <Image
@@ -42,42 +42,39 @@ export default async function Hero() {
           sizes="(max-width: 639px) 100vw, 1px"
           className="object-cover object-[72%_center] rtl:-scale-x-100"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(to_top,white_0%,white_16%,rgba(255,255,255,0.94)_32%,rgba(255,255,255,0.55)_48%,transparent_68%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_top,#F3EBDD_0%,#F3EBDD_18%,rgba(243,235,221,0.94)_34%,rgba(243,235,221,0.5)_50%,transparent_68%)]" />
       </div>
       <div className="absolute inset-0 hidden bg-gradient-to-t from-ivory via-ivory/30 to-transparent sm:block lg:hidden" />
       <div className="absolute inset-y-0 start-0 hidden w-[55%] bg-gradient-to-r from-ivory via-ivory/50 to-transparent rtl:bg-gradient-to-l md:block lg:w-[62%]" />
 
       <div className="relative mt-auto w-full min-w-0 px-5 pt-28 pb-8 sm:mt-0 sm:flex sm:min-h-[100dvh] sm:items-center sm:px-6 sm:pt-28 sm:pb-40 lg:px-8 lg:pb-44">
         <div className="w-full min-w-0 max-w-[44rem] font-display">
-          <p className="text-[0.62rem] font-medium tracking-[0.16em] text-sage uppercase sm:text-[0.68rem] sm:tracking-[0.28em]">
+          <p className="animate-fade-up text-[0.62rem] font-medium tracking-[0.16em] text-sage uppercase sm:text-[0.68rem] sm:tracking-[0.28em]" style={{ animationDelay: "0.08s" }}>
             {t.hero.brand}
           </p>
-          <h1 className="mt-3 max-w-full text-[clamp(1.5rem,6.8vw,1.85rem)] leading-[1.05] font-semibold tracking-[-0.035em] text-ink sm:mt-4 sm:text-[clamp(1.85rem,4.2vw,3.35rem)] sm:leading-[1.08] sm:tracking-[-0.03em]">
+          <h1 className="animate-fade-up mt-3 max-w-full text-[clamp(1.65rem,6.8vw,1.95rem)] leading-[1.12] font-semibold tracking-[-0.03em] text-ink sm:mt-4 sm:text-[clamp(1.85rem,4.2vw,3.35rem)] sm:leading-[1.08]" style={{ animationDelay: "0.2s" }}>
             <span className="block whitespace-nowrap">{t.hero.title1}</span>
             <span className="block">{t.hero.title2}</span>
           </h1>
-          <p className="mt-3 max-w-md text-[0.9rem] leading-relaxed text-sage sm:mt-5 sm:text-[1.02rem]">
+          <p className="animate-fade-up mt-4 max-w-md text-[0.95rem] leading-relaxed text-sage sm:mt-5 sm:text-[1.05rem]" style={{ animationDelay: "0.34s" }}>
             {t.hero.text}
           </p>
-          <div className="mt-5 flex flex-col gap-2.5 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+          <div className="animate-fade-up mt-6 flex flex-col gap-2.5 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3" style={{ animationDelay: "0.48s" }}>
             <Link
               href={href(RESERVATION_PATH)}
-              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-forest px-6 text-[0.9rem] font-medium text-white transition hover:bg-forest-dark sm:w-auto"
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-forest px-6 text-[0.92rem] font-medium text-white transition hover:bg-forest-dark sm:w-auto"
             >
               {t.hero.cta}
               <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
             </Link>
             <Link
-              href="#gallery"
-              className="inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-full border border-forest/15 bg-white/80 px-5 text-[0.9rem] font-medium text-ink backdrop-blur-sm transition hover:border-forest/40 sm:w-auto"
+              href="#services"
+              className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-sand bg-white px-6 text-[0.92rem] font-medium text-ink transition hover:border-forest sm:w-auto"
             >
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-forest text-white">
-                <PlayIcon className="h-3 w-3 translate-x-px rtl:-translate-x-px rtl:-scale-x-100" />
-              </span>
-              {t.hero.watch}
+              {t.hero.explore}
             </Link>
           </div>
-          <div className="mt-5 flex flex-wrap items-center gap-3 sm:mt-8">
+          <div className="animate-fade-up mt-5 flex flex-wrap items-center gap-3 sm:mt-8" style={{ animationDelay: "0.62s" }}>
             <a
               href={GOOGLE_REVIEW_URL}
               target="_blank"

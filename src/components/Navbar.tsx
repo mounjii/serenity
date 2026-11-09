@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import LanguageSwitcher from "./LanguageSwitcher";
 import Logo from "./Logo";
 import { ArrowRight, ArrowUpRight, CloseIcon, MenuIcon } from "./Icons";
 import { splitLocale } from "@/i18n/config";
@@ -222,6 +223,9 @@ export default function Navbar({
           style={{ transitionDelay: open ? "380ms" : "0ms" }}
           className={`space-y-3 pt-6 pb-4 transition-all duration-500 ${open ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
         >
+          <div className="flex justify-center pb-1">
+            <LanguageSwitcher variant="icon" />
+          </div>
           <Link
             href={href(RESERVATION_PATH)}
             onClick={close}

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
+import Reveal from "@/components/Reveal";
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
+import WhatsAppFloat from "@/components/WhatsAppFloat";
 import { INTL_LOCALE } from "@/i18n/config";
 import type { PrivacyBlock } from "@/i18n/dictionaries/en";
 import { fmt } from "@/i18n/format";
@@ -60,10 +62,18 @@ export default async function PrivacyPage() {
       <SiteHeader />
       <main className="min-h-screen bg-cream pt-28 pb-16 sm:pt-36 sm:pb-24">
         <article className="mx-auto max-w-3xl px-5 sm:px-6">
-          <p className="eyebrow">{p.eyebrow}</p>
-          <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.08] text-forest sm:text-5xl">{p.title}</h1>
-          <p className="mt-3 text-[0.8rem] text-muted">{fmt(p.updated, { date: updated })}</p>
-          <p className="mt-6 text-[0.95rem] leading-relaxed font-light text-ink-soft">{p.intro}</p>
+          <Reveal>
+            <p className="eyebrow">{p.eyebrow}</p>
+          </Reveal>
+          <Reveal delay={110}>
+            <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.08] text-forest sm:text-5xl">{p.title}</h1>
+          </Reveal>
+          <Reveal delay={180}>
+            <p className="mt-3 text-[0.8rem] text-muted">{fmt(p.updated, { date: updated })}</p>
+          </Reveal>
+          <Reveal delay={250}>
+            <p className="mt-6 text-[0.95rem] leading-relaxed font-light text-ink-soft">{p.intro}</p>
+          </Reveal>
 
           <div className="mt-10 divide-y divide-sand border-y border-sand">
             {p.sections.map((s, i) => (
@@ -126,6 +136,7 @@ export default async function PrivacyPage() {
         </article>
       </main>
       <Footer />
+      <WhatsAppFloat />
     </>
   );
 }
