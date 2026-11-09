@@ -10,7 +10,7 @@ export default async function BookingCTA() {
   const { t, href } = await getI18n();
   return (
     <section id="book" className="relative overflow-hidden bg-forest">
-      <Parallax speed={0.2}>
+      <Parallax speed={0.06}>
         <Image src={images.cta} {...blurProps(images.cta)} alt="" fill sizes="100vw" className="object-cover" />
       </Parallax>
       <div className="absolute inset-0 bg-forest/40" />

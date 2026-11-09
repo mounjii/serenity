@@ -38,21 +38,21 @@ export default async function Contact() {
     <section id="contact" className="scroll-mt-16 bg-ivory">
       <div className="grid w-full gap-8 px-5 py-16 font-display sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-stretch lg:gap-10 lg:px-8 lg:py-24">
         <div>
-          <Reveal>
+          <Reveal variant="left">
             <p className="text-[0.68rem] font-medium tracking-[0.22em] text-sage uppercase sm:tracking-[0.28em]">
               {t.contact.eyebrow}
             </p>
           </Reveal>
-          <Reveal delay={110}>
+          <Reveal variant="left" delay={110}>
             <h2 className="mt-3 text-[1.7rem] leading-[1.12] font-semibold tracking-[-0.03em] text-balance text-forest sm:text-[2.15rem] lg:text-[2.45rem]">
               {t.contact.title}
             </h2>
           </Reveal>
-          <Reveal delay={200}>
+          <Reveal variant="left" delay={200}>
             <p className="mt-4 max-w-md text-[0.95rem] leading-relaxed text-sage">{t.contact.text}</p>
           </Reveal>
 
-          <Reveal delay={280}>
+          <Reveal variant="left" delay={280}>
           <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap">
             {phone ? (
               <>
@@ -120,7 +120,7 @@ export default async function Contact() {
           </Reveal>
         </div>
 
-        <Reveal variant="fade" delay={120} className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-sand bg-mist lg:aspect-auto lg:min-h-[480px]">
+        <Reveal variant="right" delay={160} className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-sand bg-mist lg:aspect-auto lg:min-h-[480px]">
           <iframe
             title={t.contact.mapTitle}
             src={`https://maps.google.com/maps?q=${mapQuery}&z=17&hl=${locale}&output=embed`}

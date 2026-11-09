@@ -36,7 +36,7 @@ export default async function Footer() {
         <div className="grid gap-10 border-t border-sand pt-10 lg:grid-cols-4 lg:gap-12 lg:pt-14">
           <div>
             <Logo flush />
-            <Reveal delay={80}>
+            <Reveal variant="fade" delay={80}>
               <p className="mt-5 max-w-xs text-[0.95rem] leading-relaxed text-sage">{t.footer.blurb}</p>
             </Reveal>
             <Link
@@ -47,7 +47,7 @@ export default async function Footer() {
             </Link>
           </div>
 
-          <Reveal delay={140} as="section">
+          <Reveal variant="fade" delay={140} as="section">
           <nav aria-label={t.nav.breadcrumb}>
             <ul>
               {navLinks.map((l) => (
@@ -62,7 +62,7 @@ export default async function Footer() {
           </Reveal>
 
           {treatments.length > 0 ? (
-            <Reveal delay={200} as="section">
+            <Reveal variant="fade" delay={200} as="section">
             <nav aria-label={t.footer.treatments}>
               <p className="text-[0.72rem] font-medium tracking-[0.16em] text-sage uppercase">{t.footer.treatments}</p>
               <ul className="mt-3">
@@ -81,7 +81,7 @@ export default async function Footer() {
             </Reveal>
           ) : null}
 
-          <Reveal delay={260}>
+          <Reveal variant="fade" delay={260}>
             <p className="text-[0.72rem] font-medium tracking-[0.16em] text-sage uppercase">{t.contact.title}</p>
             <p className="mt-4 max-w-xs text-[0.95rem] leading-relaxed text-ink">{t.contact.address}</p>
             <p className="mt-2 text-[0.88rem] text-sage">{t.contact.hoursValue}</p>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getI18n } from "@/i18n/server";
 import { blurProps, images } from "@/lib/images";
 import { ArrowRight } from "./Icons";
+import Parallax from "./Parallax";
 import Reveal from "./Reveal";
 
 export default async function About() {
@@ -11,14 +12,16 @@ export default async function About() {
     <section id="about" className="bg-ivory">
       <div className="grid w-full items-center gap-10 px-5 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1.05fr_0.9fr] lg:gap-16 lg:px-8 lg:py-24">
         <Reveal variant="curtain" className="relative aspect-[16/11] overflow-hidden rounded-2xl shadow-[0_24px_50px_-34px_rgba(23,23,23,0.45)]">
-          <Image
-            src={images.about}
-            {...blurProps(images.about)}
-            alt={t.about.imageAlt}
-            fill
-            sizes="(min-width: 1024px) 48vw, 100vw"
-            className="object-cover"
-          />
+          <Parallax speed={0.05}>
+            <Image
+              src={images.about}
+              {...blurProps(images.about)}
+              alt={t.about.imageAlt}
+              fill
+              sizes="(min-width: 1024px) 48vw, 100vw"
+              className="object-cover"
+            />
+          </Parallax>
         </Reveal>
         <div className="max-w-md font-display">
           <Reveal>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { blurProps } from "@/lib/images";
 import { ArrowLeft, ArrowRight, CloseIcon } from "./Icons";
+import Reveal from "./Reveal";
 
 export type GalleryGroup = {
   title: string;
@@ -66,26 +67,28 @@ export default function GalleryGrid({
         </button>
       </div>
       <div ref={scroller} className="no-scrollbar -me-5 mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto pe-5 pb-2">
-        {photos.map((item) => (
+        {photos.map((item, index) => (
           <button
             key={item.src}
             type="button"
             onClick={() => setOpen(item)}
             className="group relative aspect-[4/5] w-[78%] shrink-0 snap-start overflow-hidden rounded-2xl border border-sand text-start sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]"
           >
-            <Image
-              src={item.src}
-              {...blurProps(item.src)}
-              alt={item.alt}
-              fill
-              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-            />
-            {item.label ? (
-              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#174A35]/80 to-transparent px-3 pt-8 pb-3 text-start text-[0.72rem] font-medium text-white">
-                {item.label}
-              </span>
-            ) : null}
+            <Reveal variant="curtain" delay={Math.min(index, 3) * 90} className="absolute inset-0">
+              <Image
+                src={item.src}
+                {...blurProps(item.src)}
+                alt={item.alt}
+                fill
+                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+                className="object-cover transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
+              />
+              {item.label ? (
+                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#174A35]/80 to-transparent px-3 pt-8 pb-3 text-start text-[0.72rem] font-medium text-white">
+                  {item.label}
+                </span>
+              ) : null}
+            </Reveal>
           </button>
         ))}
       </div>

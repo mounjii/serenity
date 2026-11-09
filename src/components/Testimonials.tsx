@@ -32,7 +32,7 @@ export default function Testimonials({
   const next = () => setPage((current) => (current + 1) % pageCount);
 
   return (
-    <section className="bg-ivory">
+    <section id="reviews" className="bg-ivory">
       <div className="grid w-full items-start gap-8 px-5 py-14 sm:px-6 sm:py-20 lg:grid-cols-[0.8fr_1.2fr] lg:items-center lg:gap-16 lg:px-8 lg:py-24">
         <div className="font-display">
           <Reveal>
@@ -96,24 +96,26 @@ export default function Testimonials({
           </Reveal>
         </div>
 
-        <Reveal delay={160} className="grid gap-4 md:grid-cols-2">
-          {visible.map((item) => (
-            <blockquote key={item.name} className="rounded-2xl border border-sand bg-white p-5 sm:p-6">
-              <div className="flex items-center gap-3">
-                <span className="grid h-11 w-11 place-items-center rounded-full bg-mist font-display text-sm font-semibold text-ink">
-                  {item.name.charAt(0)}
-                </span>
-                <div>
-                  <p className="font-display text-[0.92rem] font-semibold text-ink">
-                    <bdi>{item.name}</bdi>
-                  </p>
-                  <p className="mt-0.5 text-[0.75rem] text-sage">{t.testimonials.source}</p>
+        <div className="grid gap-4 md:grid-cols-2">
+          {visible.map((item, index) => (
+            <Reveal key={index} delay={160 + index * 120} variant={index === 0 ? "left" : "right"}>
+              <blockquote className="h-full rounded-2xl border border-sand bg-white p-5 sm:p-6">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-11 w-11 place-items-center rounded-full bg-mist font-display text-sm font-semibold text-ink">
+                    {item.name.charAt(0)}
+                  </span>
+                  <div>
+                    <p className="font-display text-[0.92rem] font-semibold text-ink">
+                      <bdi>{item.name}</bdi>
+                    </p>
+                    <p className="mt-0.5 text-[0.75rem] text-sage">{t.testimonials.source}</p>
+                  </div>
                 </div>
-              </div>
-              <p className="mt-4 text-[0.95rem] leading-relaxed text-ink">&ldquo;{item.quote}&rdquo;</p>
-            </blockquote>
+                <p className="mt-4 text-[0.95rem] leading-relaxed text-ink">&ldquo;{item.quote}&rdquo;</p>
+              </blockquote>
+            </Reveal>
           ))}
-        </Reveal>
+        </div>
       </div>
     </section>
   );

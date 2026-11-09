@@ -104,7 +104,7 @@ export default function Navbar({
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 font-display transition-all duration-500 ${
+        className={`fixed inset-x-0 top-0 z-50 font-display transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           open
             ? "bg-ivory py-3 lg:py-4"
             : scrolled
@@ -125,7 +125,7 @@ export default function Navbar({
               <li key={link.href}>
                 <Link
                   href={href(link.href)}
-                  className={`relative pb-1.5 text-[0.82rem] tracking-wide transition-colors hover:text-ink ${
+                  className={`group relative pb-1.5 text-[0.82rem] tracking-wide transition-colors duration-500 hover:text-ink ${
                     active === hashOf(link.href) || !scrolled
                       ? "text-ink"
                       : "text-ink-soft"
@@ -133,8 +133,8 @@ export default function Navbar({
                 >
                   {t.nav[link.key]}
                   <span
-                    className={`absolute -bottom-0.5 left-1/2 h-px -translate-x-1/2 bg-forest transition-all duration-300 ${
-                      active === hashOf(link.href) ? "w-full" : "w-0"
+                    className={`absolute -bottom-0.5 left-1/2 h-px -translate-x-1/2 bg-forest transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                      active === hashOf(link.href) ? "w-full" : "w-0 group-hover:w-full"
                     }`}
                   />
                 </Link>
@@ -193,7 +193,7 @@ export default function Navbar({
       <div
         id="mobile-menu"
         inert={!open}
-        className={`fixed inset-0 z-40 flex flex-col bg-cream px-6 pt-24 pb-safe font-display transition-[opacity,visibility] duration-400 lg:hidden ${
+        className={`fixed inset-0 z-40 flex flex-col bg-cream px-6 pt-24 pb-safe font-display transition-[opacity,visibility] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hidden ${
           open ? "visible opacity-100" : "invisible opacity-0"
         }`}
       >

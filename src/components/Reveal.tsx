@@ -20,6 +20,7 @@ export default function Reveal({
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    document.documentElement.dataset.motionReady = "1";
     const el = ref.current;
     if (!el) return;
     const observer = new IntersectionObserver(

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
+import HomeScroll from "@/components/HomeScroll";
 import IntroSplash from "@/components/IntroSplash";
 import SiteHeader from "@/components/SiteHeader";
 import Hero from "@/components/Hero";
@@ -34,6 +35,7 @@ export default async function Home() {
   return (
     <>
       <BusinessJsonLd />
+      <HomeScroll />
       <IntroSplash />
       <SiteHeader />
       <main>

@@ -86,8 +86,8 @@ export default function TreatmentCarousel({
       </div>
 
       <div ref={scroller} className="no-scrollbar -me-5 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pe-5 pb-2 sm:mt-10">
-        {items.map((item) => (
-          <article key={item.slug} className="group flex w-[84%] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-sand bg-white sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]">
+        {items.map((item, index) => (
+          <Reveal key={item.slug} as="article" delay={Math.min(index, 3) * 110} className="group flex w-[84%] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-sand bg-white sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]">
             <Link href={item.href} className="relative h-40 overflow-hidden sm:h-44" aria-label={detailsAria.replace("{name}", item.name)}>
               <Image
                 src={item.image}
@@ -95,10 +95,10 @@ export default function TreatmentCarousel({
                 alt={item.name}
                 fill
                 sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 100vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                className="object-cover transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
               />
             </Link>
-            <Reveal delay={80} className="flex flex-1 flex-col px-4 py-4 font-display">
+            <div className="flex flex-1 flex-col px-4 py-4 font-display">
               <h3 className="text-[1.05rem] leading-tight font-semibold text-ink">{item.name}</h3>
               <p className="mt-2 line-clamp-3 flex-1 text-[0.86rem] leading-relaxed text-sage">{item.description}</p>
               {item.durations ? <p className="mt-3 text-[0.78rem] text-ink">{item.durations}</p> : null}
@@ -111,8 +111,8 @@ export default function TreatmentCarousel({
                   {bookLabel}
                 </Link>
               </div>
-            </Reveal>
-          </article>
+            </div>
+          </Reveal>
         ))}
       </div>
     </div>

@@ -46,16 +46,17 @@ export default async function Reels() {
         </Reveal>
 
         <div className="no-scrollbar -me-5 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pe-5 pb-2 sm:mx-0 sm:mt-10 sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible sm:pe-0 sm:pb-0">
-          {reels.map((reel) => (
-            <div
+          {reels.map((reel, index) => (
+            <Reveal
               key={reel.src}
+              delay={Math.min(index, 2) * 120}
               className="group relative aspect-[9/16] w-[72%] shrink-0 snap-start overflow-hidden rounded-2xl border border-sand bg-sand sm:w-auto"
             >
               <ReelVideo src={reel.src} poster={reel.poster} label={t.reels.clipLabel} />
               <span className="pointer-events-none absolute bottom-3 start-3 grid h-10 w-10 place-items-center rounded-full bg-white text-forest transition duration-500 group-hover:opacity-0">
                 <PlayIcon className="h-3.5 w-3.5 translate-x-px" />
               </span>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

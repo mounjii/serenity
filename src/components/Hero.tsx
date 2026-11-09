@@ -21,16 +21,18 @@ export default async function Hero() {
       id="home"
       className="relative flex min-h-[100dvh] w-full min-w-0 flex-col overflow-hidden bg-ivory sm:block"
     >
-      <Parallax speed={0.12}>
-        <Image
-          src={images.hero}
-          {...blurProps(images.hero)}
-          alt={t.hero.imageAlt}
-          fill
-          priority
-          sizes="(min-width: 640px) 100vw, 1px"
-          className="hidden object-cover object-center sm:block rtl:-scale-x-100"
-        />
+      <Parallax speed={0.08}>
+        <div className="hero-photo absolute inset-0">
+          <Image
+            src={images.hero}
+            {...blurProps(images.hero)}
+            alt={t.hero.imageAlt}
+            fill
+            priority
+            sizes="(min-width: 640px) 100vw, 1px"
+            className="hidden object-cover object-center sm:block rtl:-scale-x-100"
+          />
+        </div>
       </Parallax>
       <div className="absolute inset-0 sm:hidden">
         <Image
@@ -49,17 +51,17 @@ export default async function Hero() {
 
       <div className="relative mt-auto w-full min-w-0 px-5 pt-28 pb-8 sm:mt-0 sm:flex sm:min-h-[100dvh] sm:items-center sm:px-6 sm:pt-28 sm:pb-40 lg:px-8 lg:pb-44">
         <div className="w-full min-w-0 max-w-[44rem] font-display">
-          <p className="animate-fade-up text-[0.62rem] font-medium tracking-[0.16em] text-sage uppercase sm:text-[0.68rem] sm:tracking-[0.28em]" style={{ animationDelay: "0.08s" }}>
+          <p className="animate-fade-up text-[0.62rem] font-medium tracking-[0.16em] text-sage uppercase sm:text-[0.68rem] sm:tracking-[0.28em]" style={{ animationDelay: "0.16s" }}>
             {t.hero.brand}
           </p>
-          <h1 className="animate-fade-up mt-3 max-w-full text-[clamp(1.65rem,6.8vw,1.95rem)] leading-[1.12] font-semibold tracking-[-0.03em] text-ink sm:mt-4 sm:text-[clamp(1.85rem,4.2vw,3.35rem)] sm:leading-[1.08]" style={{ animationDelay: "0.2s" }}>
+          <h1 className="animate-fade-up mt-3 max-w-full text-[clamp(1.65rem,6.8vw,1.95rem)] leading-[1.12] font-semibold tracking-[-0.03em] text-ink sm:mt-4 sm:text-[clamp(1.85rem,4.2vw,3.35rem)] sm:leading-[1.08]" style={{ animationDelay: "0.34s" }}>
             <span className="block whitespace-nowrap">{t.hero.title1}</span>
             <span className="block">{t.hero.title2}</span>
           </h1>
-          <p className="animate-fade-up mt-4 max-w-md text-[0.95rem] leading-relaxed text-sage sm:mt-5 sm:text-[1.05rem]" style={{ animationDelay: "0.34s" }}>
+          <p className="animate-fade-up mt-4 max-w-md text-[0.95rem] leading-relaxed text-sage sm:mt-5 sm:text-[1.05rem]" style={{ animationDelay: "0.52s" }}>
             {t.hero.text}
           </p>
-          <div className="animate-fade-up mt-6 flex flex-col gap-2.5 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3" style={{ animationDelay: "0.48s" }}>
+          <div className="animate-fade-up mt-6 flex flex-col gap-2.5 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3" style={{ animationDelay: "0.7s" }}>
             <Link
               href={href(RESERVATION_PATH)}
               className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-forest px-6 text-[0.92rem] font-medium text-white transition hover:bg-forest-dark sm:w-auto"
@@ -74,7 +76,7 @@ export default async function Hero() {
               {t.hero.explore}
             </Link>
           </div>
-          <div className="animate-fade-up mt-5 flex flex-wrap items-center gap-3 sm:mt-8" style={{ animationDelay: "0.62s" }}>
+          <div className="animate-fade-up mt-5 flex flex-wrap items-center gap-3 sm:mt-8" style={{ animationDelay: "0.86s" }}>
             <a
               href={GOOGLE_REVIEW_URL}
               target="_blank"

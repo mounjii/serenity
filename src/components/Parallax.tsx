@@ -12,7 +12,9 @@ export default function Parallax({ children, speed = 0.12 }: { children: React.R
   useEffect(() => {
     const el = ref.current;
     const parent = el?.parentElement;
-    if (!el || !parent || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const desktop = window.matchMedia("(min-width: 768px)").matches;
+    if (!el || !parent || reduce || !desktop) return;
 
     let frame = 0;
     const update = () => {
@@ -36,7 +38,7 @@ export default function Parallax({ children, speed = 0.12 }: { children: React.R
   }, [speed]);
 
   return (
-    <div ref={ref} className="absolute inset-x-0 -inset-y-[15%] will-change-transform">
+    <div ref={ref} className="absolute inset-0 will-change-transform md:-inset-y-[10%]">
       {children}
     </div>
   );
